@@ -1,49 +1,77 @@
 # FRONTEND.md — frontend rules
 
-> Status: **STUB**. Load for any frontend work. Decisions below are owned by the frontend developers
-> (Erlan Artykbaev, Gennadii Chzhen); filling §6 is their first step.
+> Status: **STUB**. Load for any frontend work. Decisions are owned by the frontend developers
+> (Erlan Artykbaev, Gennadii Chzhen); going through §6 is their first step.
 
 ## §1. Stack
 
 > Preliminary, to be confirmed by the frontend developers.
 
 - React, Vite, TypeScript in strict mode; one app under `frontend/`.
-- UI kit: TODO (§6, question 1).
-- Routing: TODO (§6, question 2).
-- Server state and data fetching: TODO (§6, question 3).
-- API types: generated from the backend's OpenAPI document (decided, see `BACKEND.md` §3). Generator: TODO (§6, question 4).
+- UI kit, routing, server state, type generator: TODO (§6, block A).
+- API types are generated from the backend's OpenAPI document (decided, see `BACKEND.md` §3).
 
 ## §2. Layout
 
-- TODO: folder structure (§6, question 10).
+> Proposal, to be confirmed by the frontend developers (§6, A6).
+
+```text
+frontend/
+├── package.json, vite.config.ts     ← dev proxy /api → localhost:8080
+└── src/
+    ├── main.tsx, App.tsx            ← providers and routes; the only place that knows the libraries
+    ├── api/                         ← types generated from /v3/api-docs + one thin client; no hand-written API types
+    ├── shared/                      ← UI building blocks, i18n, error messages, money and hotel-time formatting
+    └── features/<feature>/          ← one folder per feature, same name as the backend package
+        ├── pages/  components/  hooks/
+        └── <feature>Api.ts          ← this feature's calls through api/
+```
+
+- Routes by persona: `/staff/...` (front desk, kitchen, manager) and `/guest/...`. No login (`CLAUDE.md` §4).
+- Features are created on the event day, as on the backend. Before 11:00 only `api/`, `shared/` and `App.tsx` exist.
 
 ## §3. UX principles
 
 - Staff screens in English; guest-facing content in the guest's language (decided).
-- TODO: staff screens vs guest screens, phone-first where a phone is the device.
+- TODO: phone-first where a phone is the device (§6, B3).
 
 ## §4. Conventions
 
 - The browser calls only our backend, never the sandbox or the model directly (keys stay on the backend).
-- TODO: state, styling, forms, lint and format.
+- Errors: show a message chosen by the ProblemDetail `code`, in one place in `shared/` (`BACKEND.md` §3).
+- TODO: state, styling, forms, lint and format (§6).
 
 ## §5. Tests
 
-- TODO (§6, question 9).
+- TODO (§6, B5).
 
-## §6. Open questions for the frontend developers
+## §6. Kickoff questions for the frontend developers
 
-1. UI kit: Mantine, shadcn/ui + Tailwind, MUI, or another?
-2. Routing: React Router or TanStack Router?
-3. Server state: TanStack Query, or plain fetch with a thin wrapper?
-4. Type generation from the backend OpenAPI: `openapi-typescript` (+ `openapi-fetch`), Orval, or another?
-5. Forms and validation: React Hook Form + Zod, or the UI kit's own form helpers?
-6. Localisation for guest screens: i18next, or the UI kit's tools? How do we pick the language (from `guest.language`, a switcher, or both)?
-7. Live updates on staff screens: polling our backend, or server-sent events from it?
-8. Device targets: which screens are phone-first (room attendant, guest), which are desktop or tablet (front desk, kitchen, manager)? Do we need a PWA?
-9. Tests: Vitest + Testing Library for components? One Playwright end-to-end test for the demo path?
-10. Folder structure: by feature or by type?
-11. Package manager (npm or pnpm) and the exact Node version.
-12. How the frontend runs in the demo: Vite dev server with a proxy to the backend, or a production build served by Spring Boot?
-13. Look and feel: theme, colours, a hotel brand per topic, dark mode?
-14. Lint and format: ESLint + Prettier with which presets?
+Each question has a default: if nobody objects, the default stands. Block A blocks the frontend skeleton.
+
+**A. Before the skeleton**
+
+1. Node version and package manager. Default: Node 22 LTS, npm.
+2. UI kit. Default: Mantine. Alternatives: shadcn/ui + Tailwind, MUI.
+3. Routing. Default: React Router.
+4. Server state and data fetching. Default: TanStack Query.
+5. Types from the backend OpenAPI. Default: `openapi-typescript` + `openapi-fetch`. Alternative: Orval.
+6. Layout in §2: confirm or change.
+7. Client state beyond server state. Default: none (URL + TanStack Query); a store only if a screen really needs one.
+8. Lint and format. Default: the Vite template's ESLint + Prettier with default settings.
+
+**B. Before 11:00 on Sunday**
+
+1. Live updates on staff screens. Default: server-sent events from `GET /api/stream` (backend proposal), polling as fallback.
+2. Localisation of guest screens. Default: i18next on guest screens only; language from `guest.language` with a switcher.
+3. Device targets. Default: guest and room-attendant screens phone-first; front desk, kitchen and manager desktop or tablet. No PWA.
+4. Forms and validation. Default: the UI kit's form helpers + Zod.
+5. Tests. Default: Vitest for logic with rules (formatting, mapping); type check, lint and build in CI; no end-to-end test.
+6. How the frontend runs in the demo. Default: Vite dev server with the proxy; the backend runs separately.
+7. Formatting of money and time. Default: `Intl` with the hotel currency and time zone from the backend.
+
+**C. On the day, once the topic is known**
+
+1. Who builds which screens: staff screens vs guest screens.
+2. Look and feel: the UI kit theme with one accent colour for the hotel; light mode only.
+3. Which screens are on the demo path, and in which order they are built.
