@@ -1,0 +1,5 @@
+{
+  "success": false,
+  "message": "Wrong pinCode",
+  "code": "AUTH_INVALID"
+}

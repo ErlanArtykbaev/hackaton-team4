@@ -1,0 +1,20 @@
+stages:
+  - test
+
+variables:
+  MAVEN_OPTS: "-Dmaven.repo.local=$CI_PROJECT_DIR/.m2/repository"
+
+backend:
+  stage: test
+  image: eclipse-temurin:21-jdk
+  cache:
+    key: backend-maven
+    paths:
+      - .m2/repository
+  script:
+    - cd backend
+    - ./mvnw -B verify
+  artifacts:
+    when: always
+    reports:
+      junit: backend/target/surefire-reports/TEST-*.xml

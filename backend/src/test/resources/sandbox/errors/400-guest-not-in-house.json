@@ -1,0 +1,5 @@
+{
+  "success": false,
+  "message": "Reservation R-900001 is CHECKED_OUT, not IN_HOUSE",
+  "code": "GUEST_NOT_IN_HOUSE"
+}

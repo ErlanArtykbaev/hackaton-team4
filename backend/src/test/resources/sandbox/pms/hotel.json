@@ -1,0 +1,70 @@
+{
+  "success": true,
+  "hotel": {
+    "businessDate": "2026-10-16",
+    "city": "Tbilisi",
+    "code": "practice",
+    "currency": "GEL",
+    "housekeepers": [
+      {
+        "id": "HK-01",
+        "name": "Dodo Kakabadze"
+      },
+      {
+        "id": "HK-02",
+        "name": "Ia Kharaishvili"
+      },
+      {
+        "id": "HK-03",
+        "name": "Rusudan Datuashvili"
+      }
+    ],
+    "localLanguage": "ka",
+    "name": "TYNGO Practice Hotel",
+    "ratePlans": [
+      {
+        "breakfastIncluded": false,
+        "code": "RO",
+        "name": "Room Only"
+      },
+      {
+        "breakfastIncluded": true,
+        "code": "BB",
+        "name": "Bed & Breakfast"
+      },
+      {
+        "breakfastIncluded": true,
+        "code": "CORP",
+        "name": "Corporate"
+      },
+      {
+        "breakfastIncluded": true,
+        "code": "GRP",
+        "name": "Group"
+      }
+    ],
+    "roomTypes": [
+      {
+        "baseRate": 200,
+        "code": "STD",
+        "maxOccupancy": 2,
+        "name": "Standard Double"
+      },
+      {
+        "baseRate": 230,
+        "code": "TWN",
+        "maxOccupancy": 2,
+        "name": "Superior Twin"
+      },
+      {
+        "baseRate": 290,
+        "code": "DLX",
+        "maxOccupancy": 3,
+        "name": "Deluxe King"
+      }
+    ],
+    "timezone": "Asia/Tbilisi",
+    "totalRooms": 20
+  },
+  "message": null
+}

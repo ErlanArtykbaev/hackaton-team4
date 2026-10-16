@@ -1,0 +1,236 @@
+{
+  "success": true,
+  "elements": [
+    {
+      "data": {
+        "rvc": 3,
+        "checkSeq": "83333",
+        "checkNumber": "1098",
+        "totalDueRaw": 0,
+        "reservationId": "R-900641"
+      },
+      "id": 11,
+      "key": "pos.check.opened:3:1098:83333",
+      "occurredAt": "2026-10-16T11:56:12.748315+04:00",
+      "type": "pos.check.opened"
+    },
+    {
+      "data": {
+        "rvc": 3,
+        "items": [
+          {
+            "code": "2011",
+            "name": "Borjomi mineral water",
+            "quantity": 1,
+            "allergens": [],
+            "condiments": []
+          },
+          {
+            "code": "2014",
+            "name": "Espresso",
+            "quantity": 1,
+            "allergens": [],
+            "condiments": []
+          }
+        ],
+        "round": 1,
+        "table": null,
+        "checkSeq": "83333",
+        "checkName": "205",
+        "checkNumber": "1098",
+        "reservationId": "R-900641"
+      },
+      "id": 12,
+      "key": "pos.check.round_sent:3:1098:83333:1",
+      "occurredAt": "2026-10-16T11:56:12.753544+04:00",
+      "type": "pos.check.round_sent"
+    },
+    {
+      "data": {
+        "amount": 12,
+        "lineId": "F-9001955",
+        "source": "POS",
+        "description": "Room Service check 1098",
+        "reservationId": "R-900641"
+      },
+      "id": 13,
+      "key": "folio.posted:F-9001955",
+      "occurredAt": "2026-10-16T11:56:14.056533+04:00",
+      "type": "folio.posted"
+    },
+    {
+      "data": {
+        "rvc": 3,
+        "amount": 12,
+        "tender": "10",
+        "checkSeq": "83333",
+        "tenderType": "ROOM_CHARGE",
+        "checkNumber": "1098",
+        "totalDueRaw": 0,
+        "reservationId": "R-900641",
+        "transactionId": "e696b569-e670-493a-be5f-453bb4b2e8d7"
+      },
+      "id": 14,
+      "key": "pos.check.paid:3:1098:83333:e696b569-e670-493a-be5f-453bb4b2e8d7",
+      "occurredAt": "2026-10-16T11:56:14.061077+04:00",
+      "type": "pos.check.paid"
+    },
+    {
+      "data": {
+        "rvc": 3,
+        "checkSeq": "83333",
+        "checkNumber": "1098",
+        "totalDueRaw": 0,
+        "reservationId": "R-900641"
+      },
+      "id": 15,
+      "key": "pos.check.closed:3:1098:83333",
+      "occurredAt": "2026-10-16T11:56:14.06525+04:00",
+      "type": "pos.check.closed"
+    },
+    {
+      "data": {
+        "guestId": "G-900641",
+        "changedFields": [
+          "allergies"
+        ]
+      },
+      "id": 16,
+      "key": "guest.updated:G-900641:1792153928929",
+      "occurredAt": "2026-10-16T16:32:08.933246+04:00",
+      "type": "guest.updated"
+    },
+    {
+      "data": {
+        "amount": 1,
+        "lineId": "F-9001956",
+        "source": "MANUAL",
+        "description": "Fixture recording test charge",
+        "reservationId": "R-900641"
+      },
+      "id": 17,
+      "key": "folio.posted:F-9001956",
+      "occurredAt": "2026-10-16T16:32:10.104538+04:00",
+      "type": "folio.posted"
+    },
+    {
+      "data": {
+        "amount": -1,
+        "lineId": "F-9001957",
+        "source": "MANUAL",
+        "description": "Fixture recording test charge, reverted",
+        "reservationId": "R-900641"
+      },
+      "id": 18,
+      "key": "folio.posted:F-9001957",
+      "occurredAt": "2026-10-16T16:32:10.710332+04:00",
+      "type": "folio.posted"
+    },
+    {
+      "data": {
+        "rvc": 3,
+        "checkSeq": "83334",
+        "checkNumber": "1099",
+        "totalDueRaw": 0,
+        "reservationId": "R-900641"
+      },
+      "id": 19,
+      "key": "pos.check.opened:3:1099:83334",
+      "occurredAt": "2026-10-16T16:32:14.300115+04:00",
+      "type": "pos.check.opened"
+    },
+    {
+      "data": {
+        "rvc": 3,
+        "items": [
+          {
+            "code": "2011",
+            "name": "Borjomi mineral water",
+            "quantity": 1,
+            "allergens": [],
+            "condiments": []
+          }
+        ],
+        "round": 1,
+        "table": null,
+        "checkSeq": "83334",
+        "checkName": "205",
+        "checkNumber": "1099",
+        "reservationId": "R-900641"
+      },
+      "id": 20,
+      "key": "pos.check.round_sent:3:1099:83334:1",
+      "occurredAt": "2026-10-16T16:32:14.305601+04:00",
+      "type": "pos.check.round_sent"
+    },
+    {
+      "data": {
+        "rvc": 3,
+        "items": [
+          {
+            "code": "2014",
+            "name": "Espresso",
+            "quantity": 1,
+            "allergens": [],
+            "condiments": []
+          }
+        ],
+        "round": 2,
+        "table": null,
+        "checkSeq": "83334",
+        "checkName": "205",
+        "checkNumber": "1099",
+        "reservationId": "R-900641"
+      },
+      "id": 21,
+      "key": "pos.check.round_sent:3:1099:83334:2",
+      "occurredAt": "2026-10-16T16:32:14.891629+04:00",
+      "type": "pos.check.round_sent"
+    },
+    {
+      "data": {
+        "amount": 12,
+        "lineId": "F-9001958",
+        "source": "POS",
+        "description": "Room Service check 1099",
+        "reservationId": "R-900641"
+      },
+      "id": 22,
+      "key": "folio.posted:F-9001958",
+      "occurredAt": "2026-10-16T16:32:15.244941+04:00",
+      "type": "folio.posted"
+    },
+    {
+      "data": {
+        "rvc": 3,
+        "amount": 12,
+        "tender": "10",
+        "checkSeq": "83334",
+        "tenderType": "ROOM_CHARGE",
+        "checkNumber": "1099",
+        "totalDueRaw": 0,
+        "reservationId": "R-900641",
+        "transactionId": "15bcaf8b-a6f6-4e8d-bf1d-7f00bf7ee4df"
+      },
+      "id": 23,
+      "key": "pos.check.paid:3:1099:83334:15bcaf8b-a6f6-4e8d-bf1d-7f00bf7ee4df",
+      "occurredAt": "2026-10-16T16:32:15.251505+04:00",
+      "type": "pos.check.paid"
+    },
+    {
+      "data": {
+        "rvc": 3,
+        "checkSeq": "83334",
+        "checkNumber": "1099",
+        "totalDueRaw": 0,
+        "reservationId": "R-900641"
+      },
+      "id": 24,
+      "key": "pos.check.closed:3:1099:83334",
+      "occurredAt": "2026-10-16T16:32:15.255463+04:00",
+      "type": "pos.check.closed"
+    }
+  ],
+  "message": null,
+  "nextSince": 24
+}

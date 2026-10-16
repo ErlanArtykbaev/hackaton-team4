@@ -1,0 +1,52 @@
+{
+  "success": true,
+  "check": {
+    "checkCloseTime": null,
+    "checkName": "205",
+    "checkNumber": "1099",
+    "checkOpenTime": "2026-10-16T16:32:14.285638+04:00",
+    "checkSeq": "83334",
+    "covers": 1,
+    "details": [
+      {
+        "allergens": [],
+        "amount": 6,
+        "code": "2011",
+        "condiments": [],
+        "name": "Borjomi mineral water",
+        "pos": 1,
+        "quantity": 1,
+        "reference": null,
+        "round": 1,
+        "sentAt": "2026-10-16T16:32:14.303542+04:00",
+        "type": "ITEM",
+        "unitPrice": 6
+      },
+      {
+        "allergens": [],
+        "amount": 6,
+        "code": "2014",
+        "condiments": [],
+        "name": "Espresso",
+        "pos": 2,
+        "quantity": 1,
+        "reference": null,
+        "round": 2,
+        "sentAt": "2026-10-16T16:32:14.887274675+04:00",
+        "type": "ITEM",
+        "unitPrice": 6
+      }
+    ],
+    "employeeCode": "W01",
+    "orderType": "3",
+    "payments": [],
+    "reservationId": "R-900641",
+    "rvc": 3,
+    "status": "OPEN",
+    "table": null,
+    "totalDue": "GEL 12.00",
+    "totalDueRaw": 12,
+    "totalRaw": 12
+  },
+  "message": null
+}

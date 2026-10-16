@@ -1,0 +1,5 @@
+{
+  "success": false,
+  "message": "Missing or invalid X-API-KEY",
+  "code": "UNAUTHORIZED"
+}

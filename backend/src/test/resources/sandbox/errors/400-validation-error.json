@@ -1,0 +1,5 @@
+{
+  "success": false,
+  "message": "Invalid value '2026-13-01' for parameter 'from'",
+  "code": "VALIDATION_ERROR"
+}

@@ -1,0 +1,16 @@
+{
+  "success": true,
+  "guest": {
+    "allergies": [],
+    "country": "PL",
+    "firstName": "Szymon",
+    "id": "G-900641",
+    "language": "pl",
+    "lastName": "Kowalski",
+    "marketingConsent": false,
+    "preferences": [],
+    "stayCount": 5,
+    "vip": false
+  },
+  "message": null
+}

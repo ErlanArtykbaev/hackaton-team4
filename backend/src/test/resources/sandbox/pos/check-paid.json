@@ -1,0 +1,62 @@
+{
+  "success": true,
+  "check": {
+    "checkCloseTime": "2026-10-16T16:32:15.218084623+04:00",
+    "checkName": "205",
+    "checkNumber": "1099",
+    "checkOpenTime": "2026-10-16T16:32:14.285638+04:00",
+    "checkSeq": "83334",
+    "covers": 1,
+    "details": [
+      {
+        "allergens": [],
+        "amount": 6,
+        "code": "2011",
+        "condiments": [],
+        "name": "Borjomi mineral water",
+        "pos": 1,
+        "quantity": 1,
+        "reference": null,
+        "round": 1,
+        "sentAt": "2026-10-16T16:32:14.303542+04:00",
+        "type": "ITEM",
+        "unitPrice": 6
+      },
+      {
+        "allergens": [],
+        "amount": 6,
+        "code": "2014",
+        "condiments": [],
+        "name": "Espresso",
+        "pos": 2,
+        "quantity": 1,
+        "reference": null,
+        "round": 2,
+        "sentAt": "2026-10-16T16:32:14.887275+04:00",
+        "type": "ITEM",
+        "unitPrice": 6
+      }
+    ],
+    "employeeCode": "W01",
+    "orderType": "3",
+    "payments": [
+      {
+        "amount": 12,
+        "paidAt": "2026-10-16T16:32:15.218084623+04:00",
+        "paymentAccount": "R-900641",
+        "postingGuid": "bd6348ea-6908-433c-8f8f-d7399970846f",
+        "tender": "10",
+        "tenderType": "ROOM_CHARGE",
+        "transactionId": "15bcaf8b-a6f6-4e8d-bf1d-7f00bf7ee4df"
+      }
+    ],
+    "reservationId": "R-900641",
+    "rvc": 3,
+    "status": "CLOSED",
+    "table": null,
+    "totalDue": "GEL 0.00",
+    "totalDueRaw": 0,
+    "totalRaw": 12
+  },
+  "message": null
+}

@@ -1,0 +1,13 @@
+{
+  "success": true,
+  "message": null,
+  "room": {
+    "attendantId": null,
+    "currentReservationId": "R-900641",
+    "floor": 2,
+    "number": "205",
+    "occupied": true,
+    "roomTypeCode": "STD",
+    "status": "CLEAN"
+  }
+}

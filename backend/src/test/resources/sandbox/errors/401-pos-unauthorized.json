@@ -1,0 +1,5 @@
+{
+  "success": false,
+  "message": "Missing, invalid or expired Bearer token",
+  "code": "UNAUTHORIZED"
+}

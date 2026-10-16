@@ -1,0 +1,870 @@
+{
+  "success": true,
+  "elements": [
+    {
+      "allergens": [
+        "GLUTEN",
+        "MILK",
+        "EGGS"
+      ],
+      "code": "1010",
+      "condiments": [],
+      "discountPercent": null,
+      "groupL1": "Food",
+      "groupL2": "Bakery",
+      "groupL3": null,
+      "name": "აჭარული ხაჭაპური",
+      "price": 28,
+      "type": "ITEM"
+    },
+    {
+      "allergens": [
+        "GLUTEN",
+        "MILK"
+      ],
+      "code": "1011",
+      "condiments": [],
+      "discountPercent": null,
+      "groupL1": "Food",
+      "groupL2": "Bakery",
+      "groupL3": null,
+      "name": "იმერული ხაჭაპური",
+      "price": 22,
+      "type": "ITEM"
+    },
+    {
+      "allergens": [
+        "GLUTEN"
+      ],
+      "code": "1012",
+      "condiments": [],
+      "discountPercent": null,
+      "groupL1": "Food",
+      "groupL2": "Mains",
+      "groupL3": "Dumplings",
+      "name": "ხინკალი ხორცით (5 ც)",
+      "price": 15,
+      "type": "ITEM"
+    },
+    {
+      "allergens": [],
+      "code": "1014",
+      "condiments": [
+        {
+          "code": "SIDE",
+          "items": [
+            {
+              "allergens": [],
+              "code": "7011",
+              "name": "კარტოფილი ფრი",
+              "price": 6
+            },
+            {
+              "allergens": [
+                "MILK"
+              ],
+              "code": "7012",
+              "name": "კარტოფილის პიურე",
+              "price": 6
+            },
+            {
+              "allergens": [],
+              "code": "7013",
+              "name": "გრილზე შემწვარი ბოსტნეული",
+              "price": 8
+            },
+            {
+              "allergens": [],
+              "code": "7014",
+              "name": "ბრინჯი",
+              "price": 5
+            },
+            {
+              "allergens": [
+                "MUSTARD"
+              ],
+              "code": "7015",
+              "name": "სალათი",
+              "price": 7
+            }
+          ],
+          "maxSelect": 2,
+          "minSelect": 0,
+          "name": "გარნირი"
+        },
+        {
+          "code": "SAUCE",
+          "items": [
+            {
+              "allergens": [
+                "MILK"
+              ],
+              "code": "7031",
+              "name": "წიწაკის სოუსი",
+              "price": 4
+            },
+            {
+              "allergens": [
+                "MILK",
+                "EGGS"
+              ],
+              "code": "7032",
+              "name": "ნივრის სოუსი",
+              "price": 3
+            },
+            {
+              "allergens": [],
+              "code": "7033",
+              "name": "ტყემალი",
+              "price": 3
+            },
+            {
+              "allergens": [],
+              "code": "7034",
+              "name": "ცხარე სოუსი",
+              "price": 2
+            }
+          ],
+          "maxSelect": 1,
+          "minSelect": 0,
+          "name": "სოუსი"
+        }
+      ],
+      "discountPercent": null,
+      "groupL1": "Food",
+      "groupL2": "Mains",
+      "groupL3": "Grill",
+      "name": "ღორის მწვადი",
+      "price": 32,
+      "type": "ITEM"
+    },
+    {
+      "allergens": [],
+      "code": "1015",
+      "condiments": [
+        {
+          "code": "DONE",
+          "items": [
+            {
+              "allergens": [],
+              "code": "7001",
+              "name": "სისხლიანი",
+              "price": 0
+            },
+            {
+              "allergens": [],
+              "code": "7002",
+              "name": "ნახევრად სისხლიანი",
+              "price": 0
+            },
+            {
+              "allergens": [],
+              "code": "7003",
+              "name": "საშუალო",
+              "price": 0
+            },
+            {
+              "allergens": [],
+              "code": "7004",
+              "name": "კარგად შემწვარი",
+              "price": 0
+            }
+          ],
+          "maxSelect": 1,
+          "minSelect": 1,
+          "name": "მოხარშვის ხარისხი"
+        },
+        {
+          "code": "SIDE",
+          "items": [
+            {
+              "allergens": [],
+              "code": "7011",
+              "name": "კარტოფილი ფრი",
+              "price": 6
+            },
+            {
+              "allergens": [
+                "MILK"
+              ],
+              "code": "7012",
+              "name": "კარტოფილის პიურე",
+              "price": 6
+            },
+            {
+              "allergens": [],
+              "code": "7013",
+              "name": "გრილზე შემწვარი ბოსტნეული",
+              "price": 8
+            },
+            {
+              "allergens": [],
+              "code": "7014",
+              "name": "ბრინჯი",
+              "price": 5
+            },
+            {
+              "allergens": [
+                "MUSTARD"
+              ],
+              "code": "7015",
+              "name": "სალათი",
+              "price": 7
+            }
+          ],
+          "maxSelect": 2,
+          "minSelect": 0,
+          "name": "გარნირი"
+        },
+        {
+          "code": "SAUCE",
+          "items": [
+            {
+              "allergens": [
+                "MILK"
+              ],
+              "code": "7031",
+              "name": "წიწაკის სოუსი",
+              "price": 4
+            },
+            {
+              "allergens": [
+                "MILK",
+                "EGGS"
+              ],
+              "code": "7032",
+              "name": "ნივრის სოუსი",
+              "price": 3
+            },
+            {
+              "allergens": [],
+              "code": "7033",
+              "name": "ტყემალი",
+              "price": 3
+            },
+            {
+              "allergens": [],
+              "code": "7034",
+              "name": "ცხარე სოუსი",
+              "price": 2
+            }
+          ],
+          "maxSelect": 1,
+          "minSelect": 0,
+          "name": "სოუსი"
+        }
+      ],
+      "discountPercent": null,
+      "groupL1": "Food",
+      "groupL2": "Mains",
+      "groupL3": "Grill",
+      "name": "რიბაი სტეიკი 300 გ",
+      "price": 75,
+      "type": "ITEM"
+    },
+    {
+      "allergens": [
+        "MILK"
+      ],
+      "code": "1016",
+      "condiments": [
+        {
+          "code": "SIDE",
+          "items": [
+            {
+              "allergens": [],
+              "code": "7011",
+              "name": "კარტოფილი ფრი",
+              "price": 6
+            },
+            {
+              "allergens": [
+                "MILK"
+              ],
+              "code": "7012",
+              "name": "კარტოფილის პიურე",
+              "price": 6
+            },
+            {
+              "allergens": [],
+              "code": "7013",
+              "name": "გრილზე შემწვარი ბოსტნეული",
+              "price": 8
+            },
+            {
+              "allergens": [],
+              "code": "7014",
+              "name": "ბრინჯი",
+              "price": 5
+            },
+            {
+              "allergens": [
+                "MUSTARD"
+              ],
+              "code": "7015",
+              "name": "სალათი",
+              "price": 7
+            }
+          ],
+          "maxSelect": 2,
+          "minSelect": 0,
+          "name": "გარნირი"
+        }
+      ],
+      "discountPercent": null,
+      "groupL1": "Food",
+      "groupL2": "Mains",
+      "groupL3": null,
+      "name": "შქმერული",
+      "price": 38,
+      "type": "ITEM"
+    },
+    {
+      "allergens": [
+        "NUTS"
+      ],
+      "code": "1022",
+      "condiments": [],
+      "discountPercent": null,
+      "groupL1": "Food",
+      "groupL2": "Starters",
+      "groupL3": "Salads",
+      "name": "ქართული სალათი ნიგვზით",
+      "price": 16,
+      "type": "ITEM"
+    },
+    {
+      "allergens": [],
+      "code": "1023",
+      "condiments": [],
+      "discountPercent": null,
+      "groupL1": "Food",
+      "groupL2": "Starters",
+      "groupL3": "Salads",
+      "name": "პომიდვრის და კიტრის სალათი",
+      "price": 12,
+      "type": "ITEM"
+    },
+    {
+      "allergens": [
+        "NUTS",
+        "CELERY"
+      ],
+      "code": "1028",
+      "condiments": [],
+      "discountPercent": null,
+      "groupL1": "Food",
+      "groupL2": "Soups",
+      "groupL3": null,
+      "name": "ხარჩო",
+      "price": 17,
+      "type": "ITEM"
+    },
+    {
+      "allergens": [
+        "EGGS",
+        "GLUTEN"
+      ],
+      "code": "1029",
+      "condiments": [],
+      "discountPercent": null,
+      "groupL1": "Food",
+      "groupL2": "Soups",
+      "groupL3": null,
+      "name": "ჩიხირთმა",
+      "price": 15,
+      "type": "ITEM"
+    },
+    {
+      "allergens": [
+        "GLUTEN",
+        "EGGS",
+        "MUSTARD"
+      ],
+      "code": "1030",
+      "condiments": [],
+      "discountPercent": null,
+      "groupL1": "Food",
+      "groupL2": "Snacks",
+      "groupL3": null,
+      "name": "კლაბ სენდვიჩი",
+      "price": 26,
+      "type": "ITEM"
+    },
+    {
+      "allergens": [
+        "GLUTEN",
+        "EGGS",
+        "FISH",
+        "MILK"
+      ],
+      "code": "1031",
+      "condiments": [],
+      "discountPercent": null,
+      "groupL1": "Food",
+      "groupL2": "Starters",
+      "groupL3": "Salads",
+      "name": "ცეზარის სალათი ქათმით",
+      "price": 24,
+      "type": "ITEM"
+    },
+    {
+      "allergens": [
+        "GLUTEN",
+        "EGGS",
+        "MILK"
+      ],
+      "code": "1034",
+      "condiments": [],
+      "discountPercent": null,
+      "groupL1": "Food",
+      "groupL2": "Desserts",
+      "groupL3": null,
+      "name": "თაფლის ნამცხვარი",
+      "price": 14,
+      "type": "ITEM"
+    },
+    {
+      "allergens": [],
+      "code": "1035",
+      "condiments": [],
+      "discountPercent": null,
+      "groupL1": "Food",
+      "groupL2": "Desserts",
+      "groupL3": null,
+      "name": "სეზონური ხილის თეფში",
+      "price": 18,
+      "type": "ITEM"
+    },
+    {
+      "allergens": [
+        "SULPHITES"
+      ],
+      "code": "2002",
+      "condiments": [],
+      "discountPercent": null,
+      "groupL1": "Beverages",
+      "groupL2": "Wine",
+      "groupL3": "Red",
+      "name": "მუკუზანი, ბოთლი",
+      "price": 95,
+      "type": "ITEM"
+    },
+    {
+      "allergens": [
+        "SULPHITES"
+      ],
+      "code": "2006",
+      "condiments": [],
+      "discountPercent": null,
+      "groupL1": "Beverages",
+      "groupL2": "Wine",
+      "groupL3": "White",
+      "name": "წინანდალი, ბოთლი",
+      "price": 85,
+      "type": "ITEM"
+    },
+    {
+      "allergens": [
+        "GLUTEN"
+      ],
+      "code": "2009",
+      "condiments": [],
+      "discountPercent": null,
+      "groupL1": "Beverages",
+      "groupL2": "Beer",
+      "groupL3": null,
+      "name": "ნატახტარი, 0.5 ლ",
+      "price": 9,
+      "type": "ITEM"
+    },
+    {
+      "allergens": [],
+      "code": "2011",
+      "condiments": [],
+      "discountPercent": null,
+      "groupL1": "Beverages",
+      "groupL2": "Soft drinks",
+      "groupL3": null,
+      "name": "ბორჯომი",
+      "price": 6,
+      "type": "ITEM"
+    },
+    {
+      "allergens": [],
+      "code": "2012",
+      "condiments": [],
+      "discountPercent": null,
+      "groupL1": "Beverages",
+      "groupL2": "Soft drinks",
+      "groupL3": null,
+      "name": "ლაღიძის ტარხუნა",
+      "price": 7,
+      "type": "ITEM"
+    },
+    {
+      "allergens": [],
+      "code": "2013",
+      "condiments": [],
+      "discountPercent": null,
+      "groupL1": "Beverages",
+      "groupL2": "Soft drinks",
+      "groupL3": null,
+      "name": "ფორთოხლის წვენი",
+      "price": 12,
+      "type": "ITEM"
+    },
+    {
+      "allergens": [],
+      "code": "2014",
+      "condiments": [
+        {
+          "code": "MILK",
+          "items": [
+            {
+              "allergens": [
+                "MILK"
+              ],
+              "code": "7021",
+              "name": "ნატურალური რძე",
+              "price": 0
+            },
+            {
+              "allergens": [
+                "GLUTEN"
+              ],
+              "code": "7022",
+              "name": "შვრიის რძე",
+              "price": 2
+            },
+            {
+              "allergens": [
+                "NUTS"
+              ],
+              "code": "7023",
+              "name": "ნუშის რძე",
+              "price": 2.5
+            },
+            {
+              "allergens": [
+                "SOYBEANS"
+              ],
+              "code": "7024",
+              "name": "სოიოს რძე",
+              "price": 2
+            }
+          ],
+          "maxSelect": 1,
+          "minSelect": 0,
+          "name": "რძე"
+        }
+      ],
+      "discountPercent": null,
+      "groupL1": "Beverages",
+      "groupL2": "Coffee",
+      "groupL3": null,
+      "name": "ესპრესო",
+      "price": 6,
+      "type": "ITEM"
+    },
+    {
+      "allergens": [
+        "MILK"
+      ],
+      "code": "2015",
+      "condiments": [
+        {
+          "code": "MILK",
+          "items": [
+            {
+              "allergens": [
+                "MILK"
+              ],
+              "code": "7021",
+              "name": "ნატურალური რძე",
+              "price": 0
+            },
+            {
+              "allergens": [
+                "GLUTEN"
+              ],
+              "code": "7022",
+              "name": "შვრიის რძე",
+              "price": 2
+            },
+            {
+              "allergens": [
+                "NUTS"
+              ],
+              "code": "7023",
+              "name": "ნუშის რძე",
+              "price": 2.5
+            },
+            {
+              "allergens": [
+                "SOYBEANS"
+              ],
+              "code": "7024",
+              "name": "სოიოს რძე",
+              "price": 2
+            }
+          ],
+          "maxSelect": 1,
+          "minSelect": 0,
+          "name": "რძე"
+        }
+      ],
+      "discountPercent": null,
+      "groupL1": "Beverages",
+      "groupL2": "Coffee",
+      "groupL3": null,
+      "name": "კაპუჩინო",
+      "price": 9,
+      "type": "ITEM"
+    },
+    {
+      "allergens": [
+        "MILK"
+      ],
+      "code": "2016",
+      "condiments": [
+        {
+          "code": "MILK",
+          "items": [
+            {
+              "allergens": [
+                "MILK"
+              ],
+              "code": "7021",
+              "name": "ნატურალური რძე",
+              "price": 0
+            },
+            {
+              "allergens": [
+                "GLUTEN"
+              ],
+              "code": "7022",
+              "name": "შვრიის რძე",
+              "price": 2
+            },
+            {
+              "allergens": [
+                "NUTS"
+              ],
+              "code": "7023",
+              "name": "ნუშის რძე",
+              "price": 2.5
+            },
+            {
+              "allergens": [
+                "SOYBEANS"
+              ],
+              "code": "7024",
+              "name": "სოიოს რძე",
+              "price": 2
+            }
+          ],
+          "maxSelect": 1,
+          "minSelect": 0,
+          "name": "რძე"
+        }
+      ],
+      "discountPercent": null,
+      "groupL1": "Beverages",
+      "groupL2": "Coffee",
+      "groupL3": null,
+      "name": "ფლეთ უაითი",
+      "price": 10,
+      "type": "ITEM"
+    },
+    {
+      "allergens": [],
+      "code": "2017",
+      "condiments": [
+        {
+          "code": "MILK",
+          "items": [
+            {
+              "allergens": [
+                "MILK"
+              ],
+              "code": "7021",
+              "name": "ნატურალური რძე",
+              "price": 0
+            },
+            {
+              "allergens": [
+                "GLUTEN"
+              ],
+              "code": "7022",
+              "name": "შვრიის რძე",
+              "price": 2
+            },
+            {
+              "allergens": [
+                "NUTS"
+              ],
+              "code": "7023",
+              "name": "ნუშის რძე",
+              "price": 2.5
+            },
+            {
+              "allergens": [
+                "SOYBEANS"
+              ],
+              "code": "7024",
+              "name": "სოიოს რძე",
+              "price": 2
+            }
+          ],
+          "maxSelect": 1,
+          "minSelect": 0,
+          "name": "რძე"
+        }
+      ],
+      "discountPercent": null,
+      "groupL1": "Beverages",
+      "groupL2": "Tea",
+      "groupL3": null,
+      "name": "ქართული შავი ჩაი",
+      "price": 6,
+      "type": "ITEM"
+    },
+    {
+      "allergens": [
+        "GLUTEN",
+        "MILK"
+      ],
+      "code": "2025",
+      "condiments": [],
+      "discountPercent": null,
+      "groupL1": "Food",
+      "groupL2": "Mains",
+      "groupL3": null,
+      "name": "პიცა მარგარიტა",
+      "price": 24,
+      "type": "ITEM"
+    },
+    {
+      "allergens": [
+        "GLUTEN",
+        "EGGS",
+        "SESAME"
+      ],
+      "code": "2026",
+      "condiments": [
+        {
+          "code": "SAUCE",
+          "items": [
+            {
+              "allergens": [
+                "MILK"
+              ],
+              "code": "7031",
+              "name": "წიწაკის სოუსი",
+              "price": 4
+            },
+            {
+              "allergens": [
+                "MILK",
+                "EGGS"
+              ],
+              "code": "7032",
+              "name": "ნივრის სოუსი",
+              "price": 3
+            },
+            {
+              "allergens": [],
+              "code": "7033",
+              "name": "ტყემალი",
+              "price": 3
+            },
+            {
+              "allergens": [],
+              "code": "7034",
+              "name": "ცხარე სოუსი",
+              "price": 2
+            }
+          ],
+          "maxSelect": 1,
+          "minSelect": 0,
+          "name": "სოუსი"
+        }
+      ],
+      "discountPercent": null,
+      "groupL1": "Food",
+      "groupL2": "Mains",
+      "groupL3": null,
+      "name": "ქათმის ბურგერი",
+      "price": 28,
+      "type": "ITEM"
+    },
+    {
+      "allergens": [],
+      "code": "2027",
+      "condiments": [],
+      "discountPercent": null,
+      "groupL1": "Beverages",
+      "groupL2": "Tea",
+      "groupL3": null,
+      "name": "მცენარეული ჩაი",
+      "price": 7,
+      "type": "ITEM"
+    },
+    {
+      "allergens": [],
+      "code": "9001",
+      "condiments": [],
+      "discountPercent": 100,
+      "groupL1": "Discounts",
+      "groupL2": "Discounts",
+      "groupL3": null,
+      "name": "კომპლიმენტი 100%",
+      "price": 0,
+      "type": "DISCOUNT"
+    },
+    {
+      "allergens": [],
+      "code": "9002",
+      "condiments": [],
+      "discountPercent": 100,
+      "groupL1": "Discounts",
+      "groupL2": "Discounts",
+      "groupL3": null,
+      "name": "მისასალმებელი სასმელი 100%",
+      "price": 0,
+      "type": "DISCOUNT"
+    },
+    {
+      "allergens": [],
+      "code": "9010",
+      "condiments": [],
+      "discountPercent": 10,
+      "groupL1": "Discounts",
+      "groupL2": "Discounts",
+      "groupL3": null,
+      "name": "შეთავაზება 10%",
+      "price": 0,
+      "type": "DISCOUNT"
+    },
+    {
+      "allergens": [],
+      "code": "9015",
+      "condiments": [],
+      "discountPercent": 15,
+      "groupL1": "Discounts",
+      "groupL2": "Discounts",
+      "groupL3": null,
+      "name": "შეთავაზება 15%",
+      "price": 0,
+      "type": "DISCOUNT"
+    }
+  ],
+  "message": null,
+  "pageMetadata": {
+    "number": 0,
+    "size": 31,
+    "totalElements": 31,
+    "totalPages": 1
+  }
+}

@@ -1,0 +1,198 @@
+{
+  "success": true,
+  "elements": [
+    {
+      "arrivals": 9,
+      "breakfastGuests": 13,
+      "date": "2026-10-16",
+      "departures": 5,
+      "groups": [],
+      "inHouseGuests": 26,
+      "isActual": false,
+      "occupancyPct": 94.7,
+      "roomsAvailable": 19,
+      "roomsOccupied": 18
+    },
+    {
+      "arrivals": 6,
+      "breakfastGuests": 16,
+      "date": "2026-10-17",
+      "departures": 6,
+      "groups": [],
+      "inHouseGuests": 27,
+      "isActual": false,
+      "occupancyPct": 94.7,
+      "roomsAvailable": 19,
+      "roomsOccupied": 18
+    },
+    {
+      "arrivals": 7,
+      "breakfastGuests": 18,
+      "date": "2026-10-18",
+      "departures": 11,
+      "groups": [],
+      "inHouseGuests": 21,
+      "isActual": false,
+      "occupancyPct": 73.7,
+      "roomsAvailable": 19,
+      "roomsOccupied": 14
+    },
+    {
+      "arrivals": 5,
+      "breakfastGuests": 15,
+      "date": "2026-10-19",
+      "departures": 8,
+      "groups": [],
+      "inHouseGuests": 19,
+      "isActual": false,
+      "occupancyPct": 57.9,
+      "roomsAvailable": 19,
+      "roomsOccupied": 11
+    },
+    {
+      "arrivals": 8,
+      "breakfastGuests": 16,
+      "date": "2026-10-20",
+      "departures": 8,
+      "groups": [],
+      "inHouseGuests": 17,
+      "isActual": false,
+      "occupancyPct": 57.9,
+      "roomsAvailable": 19,
+      "roomsOccupied": 11
+    },
+    {
+      "arrivals": 16,
+      "breakfastGuests": 12,
+      "date": "2026-10-21",
+      "departures": 9,
+      "groups": [
+        {
+          "code": "CWT-1021",
+          "name": "Caucasus Wine Tour (group)",
+          "rooms": 15
+        }
+      ],
+      "inHouseGuests": 28,
+      "isActual": false,
+      "occupancyPct": 94.7,
+      "roomsAvailable": 19,
+      "roomsOccupied": 18
+    },
+    {
+      "arrivals": 2,
+      "breakfastGuests": 25,
+      "date": "2026-10-22",
+      "departures": 1,
+      "groups": [
+        {
+          "code": "CWT-1021",
+          "name": "Caucasus Wine Tour (group)",
+          "rooms": 15
+        }
+      ],
+      "inHouseGuests": 30,
+      "isActual": false,
+      "occupancyPct": 100,
+      "roomsAvailable": 19,
+      "roomsOccupied": 19
+    },
+    {
+      "arrivals": 0,
+      "breakfastGuests": 28,
+      "date": "2026-10-23",
+      "departures": 0,
+      "groups": [
+        {
+          "code": "CWT-1021",
+          "name": "Caucasus Wine Tour (group)",
+          "rooms": 15
+        }
+      ],
+      "inHouseGuests": 30,
+      "isActual": false,
+      "occupancyPct": 100,
+      "roomsAvailable": 19,
+      "roomsOccupied": 19
+    },
+    {
+      "arrivals": 16,
+      "breakfastGuests": 28,
+      "date": "2026-10-24",
+      "departures": 17,
+      "groups": [],
+      "inHouseGuests": 30,
+      "isActual": false,
+      "occupancyPct": 94.7,
+      "roomsAvailable": 19,
+      "roomsOccupied": 18
+    },
+    {
+      "arrivals": 4,
+      "breakfastGuests": 18,
+      "date": "2026-10-25",
+      "departures": 7,
+      "groups": [],
+      "inHouseGuests": 24,
+      "isActual": false,
+      "occupancyPct": 78.9,
+      "roomsAvailable": 19,
+      "roomsOccupied": 15
+    },
+    {
+      "arrivals": 5,
+      "breakfastGuests": 14,
+      "date": "2026-10-26",
+      "departures": 4,
+      "groups": [],
+      "inHouseGuests": 26,
+      "isActual": false,
+      "occupancyPct": 84.2,
+      "roomsAvailable": 19,
+      "roomsOccupied": 16
+    },
+    {
+      "arrivals": 8,
+      "breakfastGuests": 12,
+      "date": "2026-10-27",
+      "departures": 9,
+      "groups": [],
+      "inHouseGuests": 25,
+      "isActual": false,
+      "occupancyPct": 78.9,
+      "roomsAvailable": 19,
+      "roomsOccupied": 15
+    },
+    {
+      "arrivals": 3,
+      "breakfastGuests": 15,
+      "date": "2026-10-28",
+      "departures": 8,
+      "groups": [],
+      "inHouseGuests": 18,
+      "isActual": false,
+      "occupancyPct": 52.6,
+      "roomsAvailable": 19,
+      "roomsOccupied": 10
+    },
+    {
+      "arrivals": 4,
+      "breakfastGuests": 15,
+      "date": "2026-10-29",
+      "departures": 3,
+      "groups": [],
+      "inHouseGuests": 21,
+      "isActual": false,
+      "occupancyPct": 57.9,
+      "roomsAvailable": 19,
+      "roomsOccupied": 11
+    }
+  ],
+  "message": null,
+  "pageMetadata": {
+    "number": 0,
+    "size": 14,
+    "totalElements": 14,
+    "totalPages": 1
+  }
+}

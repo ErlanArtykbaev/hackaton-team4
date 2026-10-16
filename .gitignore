@@ -1,0 +1,23 @@
+# Secrets (CLAUDE.md §6)
+.env
+*.env
+!.env.example
+
+# Backend
+backend/target/
+backend/data/
+*.log
+
+# Frontend
+node_modules/
+frontend/dist/
+
+# IDE and OS
+.idea/
+*.iml
+.vscode/
+.DS_Store
+Thumbs.db
+
+# CI
+.m2/

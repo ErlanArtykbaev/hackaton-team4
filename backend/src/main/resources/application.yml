@@ -1,0 +1,54 @@
+spring:
+  application:
+    name: team4-backend
+  config:
+    # Secrets and per-laptop values: backend/.env (git-ignored), see .env.example.
+    import: optional:file:.env[.properties]
+  datasource:
+    url: jdbc:h2:file:./data/team4;AUTO_SERVER=TRUE
+    username: sa
+    password: ""
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        jdbc:
+          time_zone: UTC
+  liquibase:
+    change-log: classpath:db/changelog/db.changelog-master.yaml
+  mvc:
+    problemdetails:
+      enabled: true
+
+server:
+  port: 8080
+
+sandbox:
+  base-url: ${SANDBOX_BASE_URL:https://hackathon2026.tyngo.com}
+  api-key: ${SANDBOX_API_KEY:}
+  access-code: ${SANDBOX_ACCESS_CODE:}
+  pin: ${SANDBOX_PIN:}
+  device-id: ${SANDBOX_DEVICE_ID:team4-backend}
+  connect-timeout: 2s
+  read-timeout: 5s
+  reset-read-timeout: 40s
+  rate-limit-per-second: 8
+  retry:
+    max-attempts: 3
+    initial-backoff: 200ms
+  events:
+    enabled: ${SANDBOX_EVENTS_ENABLED:true}
+    poll-interval: PT3S
+    batch-size: 100
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html

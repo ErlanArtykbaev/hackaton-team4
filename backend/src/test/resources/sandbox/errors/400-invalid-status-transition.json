@@ -1,0 +1,5 @@
+{
+  "success": false,
+  "message": "Cannot check in: reservation R-900641 is IN_HOUSE",
+  "code": "INVALID_STATUS_TRANSITION"
+}

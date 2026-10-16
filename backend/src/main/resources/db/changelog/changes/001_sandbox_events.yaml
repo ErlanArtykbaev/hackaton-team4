@@ -1,0 +1,31 @@
+databaseChangeLog:
+  - changeSet:
+      id: 001_sandbox_events
+      author: Sergey Zubov
+      changes:
+        - createTable:
+            tableName: sandbox_event_cursor
+            columns:
+              - column:
+                  name: feed
+                  type: varchar(32)
+                  constraints:
+                    primaryKey: true
+              - column:
+                  name: next_since
+                  type: bigint
+                  constraints:
+                    nullable: false
+        - createTable:
+            tableName: sandbox_processed_event
+            columns:
+              - column:
+                  name: event_key
+                  type: varchar(255)
+                  constraints:
+                    primaryKey: true
+              - column:
+                  name: processed_at
+                  type: timestamp with time zone
+                  constraints:
+                    nullable: false

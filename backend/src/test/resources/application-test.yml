@@ -1,0 +1,15 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:team4-test;DB_CLOSE_DELAY=-1
+
+sandbox:
+  # base-url is set by SandboxTestBase to the WireMock server
+  api-key: test-key
+  access-code: TEST-CODE
+  pin: "0000"
+  device-id: test-device
+  rate-limit-per-second: 1000
+  retry:
+    initial-backoff: 1ms
+  events:
+    enabled: false

@@ -1,0 +1,5 @@
+{
+  "success": false,
+  "message": "Check 1099 (seq 83334) is closed",
+  "code": "CHECK_CLOSED"
+}

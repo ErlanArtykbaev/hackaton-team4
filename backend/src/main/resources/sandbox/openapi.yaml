@@ -1,0 +1,1840 @@
+openapi: 3.0.3
+info:
+  title: Lumen Hospitality Sandbox API (mini-PMS + mini-POS)
+  version: 1.0.0
+  description: |
+    Sandbox for the hackathon. Your team key gives you one hotel with synthetic data.
+    20 endpoints in total: 10 PMS, 8 POS, 2 platform.
+
+    ## Quickstart
+    1. PMS and platform endpoints: send `X-API-KEY: <team key>`.
+    2. POS endpoints (`/v1/pos/**`): log in as an employee with `POST /v1/auth/token`
+       (team key + PIN + access code), then send `Authorization: Bearer <token>` (valid 12 h).
+       `POST /v1/pos/checks` also needs `X-Device-Id`.
+    3. Keys, PINs and tokens stay on your backend. Never ship them to a browser.
+    4. Broke your data? `POST /v1/sandbox/reset` restores your hotel.
+
+    ## Conventions
+    - Success: `{ "success": true, "message": null, ... }`. Single objects come in a named field
+      (`hotel`, `room`, `reservation`, `guest`, `folio`, `check`). Lists come as `elements` + `pageMetadata`;
+      `page` is 0-based, `size` defaults to 50 (max 200). Unpaged lists return everything as one page.
+      Exception: `POST /v1/auth/token` returns `AuthToken` without the envelope.
+    - Errors: `{ "success": false, "message": "...", "code": "CREDIT_LIMIT_EXCEEDED" }`
+      with HTTP 400, 401, 404, 429 or 503. Branch on `code`, not on `message`.
+      A malformed parameter (wrong type, unknown enum value, bad date) gives 400 `VALIDATION_ERROR`;
+      an `rvc-on` that is not a revenue center of your hotel gives 404 `NOT_FOUND`.
+    - Dates (`YYYY-MM-DD`) are hotel-local business dates. Timestamps are ISO-8601 with the hotel offset.
+    - Money: numbers with 2 decimals in the hotel currency (see `GET /v1/pms/hotel`).
+    - `Accept-Language`: `en` (default) or the hotel's local language; affects menu and outlet names.
+    - Folio postings are idempotent by `postingGuid`: repeating a request with the same GUID
+      returns the original result and never posts twice.
+    - Rate limit: 10 requests/second per key (429 `RATE_LIMITED`).
+    - The sandbox may get slow or fail on purpose (503). Build for it.
+    - Real time: poll `GET /v1/events?since=<last id>`. Events can arrive twice; deduplicate by `key`.
+
+    ## Charge to room in four calls
+    1. `POST /v1/auth/token`
+    2. `POST /v1/pos/checks?rvc-on=2` with items
+    3. `GET /v1/pos/dict/pms/lookup?rvc-on=2&query=305`
+    4. `PUT /v1/pos/checks/{checkNum}?rvc-on=2&seq=...` with `tender: "10"`, `tenderAmount`,
+       `paymentAccount: <reservationId>` and `postingGuid`. The POS posts the amount to the guest folio.
+
+    Fields and parameters marked `x-sandbox: true` do not exist in the real POS Staff App API.
+servers:
+  - url: https://hackathon2026.tyngo.com
+    description: Hackathon sandbox
+tags:
+  - name: PMS
+    description: Mini-PMS. Auth with X-API-KEY.
+  - name: POS
+    description: Mini-POS modelled on the POS Staff App API. Auth with a Bearer token from POST /v1/auth/token.
+  - name: Platform
+    description: Events feed and tenant reset. Auth with X-API-KEY.
+
+paths:
+  # ---------------------------------------------------------------- PMS
+  /v1/pms/hotel:
+    get:
+      tags: [PMS]
+      operationId: getHotel
+      summary: Hotel profile and reference data
+      description: Business date, currency, time zone, room types, rate plans and housekeepers.
+      security:
+        - ApiKeyAuth: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HotelResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '503':
+          $ref: '#/components/responses/Unavailable'
+
+  /v1/pms/rooms:
+    get:
+      tags: [PMS]
+      operationId: listRooms
+      summary: List rooms with housekeeping status
+      security:
+        - ApiKeyAuth: []
+      parameters:
+        - name: status
+          in: query
+          schema:
+            $ref: '#/components/schemas/RoomStatus'
+        - name: floor
+          in: query
+          schema:
+            type: integer
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/Size'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RoomListResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '503':
+          $ref: '#/components/responses/Unavailable'
+
+  /v1/pms/rooms/{number}:
+    patch:
+      tags: [PMS]
+      operationId: updateRoom
+      summary: Change housekeeping status and/or assign an attendant
+      description: |
+        - Any status change is allowed, except setting `OUT_OF_ORDER` on an occupied room (`ROOM_OCCUPIED`).
+        - `attendantId: null` unassigns the room. An unknown attendant gives `VALIDATION_ERROR`.
+        - Emits `room.status_changed` when the status changes.
+      security:
+        - ApiKeyAuth: []
+      parameters:
+        - name: number
+          in: path
+          required: true
+          schema:
+            type: string
+          example: '305'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RoomPatch'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RoomResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '503':
+          $ref: '#/components/responses/Unavailable'
+
+  /v1/pms/reservations:
+    get:
+      tags: [PMS]
+      operationId: listReservations
+      summary: Search reservations (guest profile embedded)
+      description: |
+        Typical queries:
+        - In-house guests: `status=IN_HOUSE`
+        - Today's arrivals: `status=BOOKED&arrivalFrom=<businessDate>&arrivalTo=<businessDate>`
+        - Today's departures: `status=IN_HOUSE&departureDate=<businessDate>`
+
+        Sorted by `arrivalDate`, then `id`.
+      security:
+        - ApiKeyAuth: []
+      parameters:
+        - name: status
+          in: query
+          schema:
+            $ref: '#/components/schemas/ReservationStatus'
+        - name: arrivalFrom
+          in: query
+          schema:
+            type: string
+            format: date
+        - name: arrivalTo
+          in: query
+          schema:
+            type: string
+            format: date
+        - name: departureDate
+          in: query
+          schema:
+            type: string
+            format: date
+        - name: roomNumber
+          in: query
+          schema:
+            type: string
+        - name: lastName
+          in: query
+          description: Case-insensitive prefix, Latin or local script.
+          schema:
+            type: string
+        - name: groupCode
+          in: query
+          schema:
+            type: string
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/Size'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReservationListResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '503':
+          $ref: '#/components/responses/Unavailable'
+
+  /v1/pms/reservations/{reservationId}:
+    get:
+      tags: [PMS]
+      operationId: getReservation
+      summary: Get one reservation
+      security:
+        - ApiKeyAuth: []
+      parameters:
+        - $ref: '#/components/parameters/ReservationId'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReservationResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '503':
+          $ref: '#/components/responses/Unavailable'
+    patch:
+      tags: [PMS]
+      operationId: updateReservation
+      summary: Check in, check out, move room, late checkout
+      description: |
+        Fields are applied in this order, atomically: `roomNumber`, `departureTime`, `status`.
+        - `roomNumber` (BOOKED or IN_HOUSE): target room must exist, not be `OUT_OF_ORDER`
+          and not be occupied by another reservation (`ROOM_OCCUPIED`). For IN_HOUSE moves the old room becomes `DIRTY`.
+        - `departureTime` (`HH:mm`, BOOKED or IN_HOUSE): late checkout.
+        - `status: IN_HOUSE` (check-in): reservation is BOOKED, `arrivalDate` is the business date,
+          a room is assigned and is `CLEAN` or `INSPECTED` (else `ROOM_NOT_READY`) and not occupied.
+        - `status: CHECKED_OUT`: reservation is IN_HOUSE. The room becomes `DIRTY` and unassigned from its attendant.
+          The folio does not need to be settled.
+        - Any other transition gives `INVALID_STATUS_TRANSITION`.
+
+        Emits `reservation.checked_in`, `reservation.checked_out` or `reservation.updated`.
+      security:
+        - ApiKeyAuth: []
+      parameters:
+        - $ref: '#/components/parameters/ReservationId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReservationPatch'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReservationResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '503':
+          $ref: '#/components/responses/Unavailable'
+
+  /v1/pms/guests/{guestId}:
+    patch:
+      tags: [PMS]
+      operationId: updateGuest
+      summary: Update allergies, preferences, consent
+      description: Sent fields replace the stored values (arrays are replaced as a whole). Emits `guest.updated`.
+      security:
+        - ApiKeyAuth: []
+      parameters:
+        - name: guestId
+          in: path
+          required: true
+          schema:
+            type: string
+          example: G-004211
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GuestPatch'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GuestResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '503':
+          $ref: '#/components/responses/Unavailable'
+
+  /v1/pms/reservations/{reservationId}/folio:
+    get:
+      tags: [PMS]
+      operationId: getFolio
+      summary: Guest folio (room nights, POS charges, manual postings)
+      security:
+        - ApiKeyAuth: []
+      parameters:
+        - $ref: '#/components/parameters/ReservationId'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FolioResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '503':
+          $ref: '#/components/responses/Unavailable'
+    post:
+      tags: [PMS]
+      operationId: postToFolio
+      summary: Post a charge or an adjustment to the folio
+      description: |
+        - Positive amount (charge): reservation must be IN_HOUSE (`GUEST_NOT_IN_HOUSE`),
+          `postingAllowed` must be true (`POSTING_BLOCKED`) and `balance + amount <= creditLimit`
+          (`CREDIT_LIMIT_EXCEEDED`).
+        - Negative amount (adjustment, e.g. a disputed charge): allowed for IN_HOUSE and CHECKED_OUT reservations.
+        - Idempotent by `postingGuid`: 201 on first posting, 200 with the same folio on a repeat.
+
+        Emits `folio.posted`.
+      security:
+        - ApiKeyAuth: []
+      parameters:
+        - $ref: '#/components/parameters/ReservationId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FolioPostingRequest'
+      responses:
+        '200':
+          description: Repeated postingGuid, nothing posted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FolioResponse'
+        '201':
+          description: Posted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FolioResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '503':
+          $ref: '#/components/responses/Unavailable'
+
+  /v1/pms/forecast:
+    get:
+      tags: [PMS]
+      operationId: getForecast
+      summary: Daily occupancy, arrivals and breakfast guests
+      description: |
+        One element per date. Past dates are actuals (`isActual: true`), future dates come from current bookings.
+        `breakfastGuests` on date D counts guests with breakfast included who stayed the night before D.
+        Range is at most 62 days.
+      security:
+        - ApiKeyAuth: []
+      parameters:
+        - name: from
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date
+        - name: to
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForecastListResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '503':
+          $ref: '#/components/responses/Unavailable'
+
+  # ---------------------------------------------------------------- POS
+  /v1/auth/token:
+    post:
+      tags: [POS]
+      operationId: createToken
+      summary: Employee login (PIN), returns a Bearer token for /v1/pos/**
+      description: |
+        Uses the team key, not a Bearer token. Each team gets an access code and a PIN sheet.
+        Guest-facing backends log in with the integration employee (`INT01`).
+        Wrong PIN or access code gives 401 `AUTH_INVALID`.
+      security:
+        - ApiKeyAuth: []
+      parameters:
+        - name: device-id
+          in: query
+          required: false
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginDetailsDTO'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthToken'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '503':
+          $ref: '#/components/responses/Unavailable'
+
+  /v1/pos/dict/outlets:
+    get:
+      tags: [POS]
+      operationId: listOutlets
+      summary: Revenue centers with their tables, order types and tenders
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/AcceptLanguage'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OutletListResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '503':
+          $ref: '#/components/responses/Unavailable'
+
+  /v1/pos/dict/menu:
+    get:
+      tags: [POS]
+      operationId: listMenu
+      summary: Menu of a revenue center, including discount items
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/RvcOn'
+        - $ref: '#/components/parameters/AcceptLanguage'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MenuListResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '503':
+          $ref: '#/components/responses/Unavailable'
+
+  /v1/pos/dict/pms/lookup:
+    get:
+      tags: [POS]
+      operationId: pmsLookup
+      summary: Find in-house guests for a room charge
+      description: |
+        `query` is an exact room number or a last-name prefix (2+ characters, Latin or local script).
+        Returns IN_HOUSE reservations only.
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/RvcOn'
+        - name: query
+          in: query
+          required: true
+          schema:
+            type: string
+          example: '305'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LookupListResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '503':
+          $ref: '#/components/responses/Unavailable'
+
+  /v1/pos/checks:
+    get:
+      tags: [POS]
+      operationId: listChecks
+      summary: Open checks, or closed check history
+      description: Sorted by `checkOpenTime`, newest first. Each check includes details and payments.
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: rvc-on
+          in: query
+          required: false
+          description: Revenue center object number. Omit for all revenue centers.
+          schema:
+            type: integer
+        - name: status
+          in: query
+          description: Default OPEN. CLOSED returns history.
+          x-sandbox: true
+          schema:
+            $ref: '#/components/schemas/CheckStatus'
+        - name: from
+          in: query
+          description: Business date of checkOpenTime, inclusive.
+          x-sandbox: true
+          schema:
+            type: string
+            format: date
+        - name: to
+          in: query
+          description: Business date of checkOpenTime, inclusive.
+          x-sandbox: true
+          schema:
+            type: string
+            format: date
+        - name: reservationId
+          in: query
+          x-sandbox: true
+          schema:
+            type: string
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/Size'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CheckListResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '503':
+          $ref: '#/components/responses/Unavailable'
+    post:
+      tags: [POS]
+      operationId: createCheck
+      summary: Open a check, optionally with a first round of items and a payment
+      description: |
+        Opens the check, then applies the body exactly like `PUT /v1/pos/checks/{checkNum}`.
+        - `orderType` must be offered by the revenue center (`UNKNOWN_ORDER_TYPE`).
+        - Dine-in needs a `table` of this revenue center without another open check (`OCCUPIED_TABLE`).
+        - Room service: leave `table` empty and put the room number in `checkName`.
+        - `reservationId` links the check to an in-house guest before payment.
+
+        Emits `pos.check.opened`.
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/RvcOn'
+        - $ref: '#/components/parameters/DeviceIdHeader'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BeginCheckResource'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CheckResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '503':
+          $ref: '#/components/responses/Unavailable'
+
+  /v1/pos/checks/{checkNum}:
+    get:
+      tags: [POS]
+      operationId: getCheck
+      summary: Get one check
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/CheckNum'
+        - $ref: '#/components/parameters/RvcOn'
+        - $ref: '#/components/parameters/Seq'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CheckResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '503':
+          $ref: '#/components/responses/Unavailable'
+    put:
+      tags: [POS]
+      operationId: updateCheck
+      summary: Add a round of items and/or take a payment
+      description: |
+        One request is applied atomically: if any part fails, nothing changes.
+        1. The check must be OPEN (`CHECK_CLOSED`).
+        2. `details`, if present, become a new round and are sent to the kitchen (`pos.check.round_sent`).
+           Codes must exist in this revenue center's menu (`UNKNOWN_MENU_ITEM`). Condiment selections must respect
+           each group's `minSelect`/`maxSelect` (`VALIDATION_ERROR`).
+           A `DISCOUNT` detail with `reference` = `pos` of an item line discounts that line; without `reference`
+           it discounts the whole check, including items added later (max one check-level discount).
+           To remove an item, comp it with a 100% line discount.
+        3. `tender`, if present, takes a payment: tender must belong to the revenue center (`UNKNOWN_TENDER`),
+           `0 < tenderAmount <= totalDueRaw` (`PAYMENT_EXCEEDS_DUE`). Partial payments are allowed,
+           so a check can be split between tenders or rooms.
+           Room charge (tender type `ROOM_CHARGE`) needs `paymentAccount` (a reservationId) and `postingGuid`;
+           the POS posts to the PMS folio with the PMS rules (`GUEST_NOT_IN_HOUSE`, `POSTING_BLOCKED`,
+           `CREDIT_LIMIT_EXCEEDED`) and may fail with 503 `PMS_UNAVAILABLE`.
+        4. When `totalDueRaw` reaches 0 and the check has at least one item, it closes (`pos.check.closed`).
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/CheckNum'
+        - $ref: '#/components/parameters/RvcOn'
+        - $ref: '#/components/parameters/Seq'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BeginCheckResource'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CheckResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '503':
+          $ref: '#/components/responses/Unavailable'
+
+  # ---------------------------------------------------------------- Platform
+  /v1/events:
+    get:
+      tags: [Platform]
+      operationId: listEvents
+      summary: Change feed for your hotel (poll every few seconds)
+      description: |
+        Returns events with `id > since`, oldest first. Store `nextSince` and pass it on the next call.
+        Delivery is at-least-once: the same business event may appear twice with a new `id` but the same `key`.
+      security:
+        - ApiKeyAuth: []
+      parameters:
+        - name: since
+          in: query
+          schema:
+            type: integer
+            format: int64
+            default: 0
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 500
+            default: 100
+        - name: types
+          in: query
+          description: Comma-separated event types to include.
+          schema:
+            type: string
+          example: pos.check.round_sent,guest.updated
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EventListResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '503':
+          $ref: '#/components/responses/Unavailable'
+
+  /v1/sandbox/reset:
+    post:
+      tags: [Platform]
+      operationId: resetSandbox
+      summary: Restore your hotel to its seed state
+      description: |
+        Re-creates all PMS and POS data for your hotel from the deterministic seed (relative to today).
+        Tokens stay valid. Event ids keep increasing, so your `since` cursor stays valid.
+        Allowed once per minute. Takes up to 30 seconds.
+      security:
+        - ApiKeyAuth: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseBase'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-API-KEY
+    BearerAuth:
+      type: http
+      scheme: bearer
+      description: Opaque session token from POST /v1/auth/token, valid 12 hours.
+
+  parameters:
+    Page:
+      name: page
+      in: query
+      schema:
+        type: integer
+        minimum: 0
+        default: 0
+    Size:
+      name: size
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 200
+        default: 50
+    ReservationId:
+      name: reservationId
+      in: path
+      required: true
+      schema:
+        type: string
+      example: R-100234
+    RvcOn:
+      name: rvc-on
+      in: query
+      required: true
+      description: Revenue center (outlet) object number.
+      schema:
+        type: integer
+      example: 2
+    CheckNum:
+      name: checkNum
+      in: path
+      required: true
+      schema:
+        type: integer
+      example: 1017
+    Seq:
+      name: seq
+      in: query
+      required: true
+      description: Check sequence (checkSeq).
+      schema:
+        type: integer
+        format: int64
+      example: 88231
+    AcceptLanguage:
+      name: Accept-Language
+      in: header
+      required: false
+      schema:
+        type: string
+      example: ka
+    DeviceIdHeader:
+      name: X-Device-Id
+      in: header
+      required: true
+      schema:
+        type: string
+        maxLength: 64
+      example: team3-tablet
+
+  responses:
+    BadRequest:
+      description: Validation or business rule error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    Unauthorized:
+      description: Missing or invalid key/token (UNAUTHORIZED), or wrong PIN/access code (AUTH_INVALID)
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    NotFound:
+      description: Not found in your hotel
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    TooManyRequests:
+      description: Rate limit exceeded (RATE_LIMITED)
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    Unavailable:
+      description: Sandbox or PMS interface temporarily unavailable (SERVICE_UNAVAILABLE, PMS_UNAVAILABLE). Retry with backoff.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+
+  schemas:
+    # ------------------------------------------------------------ envelope
+    ResponseBase:
+      type: object
+      required: [success]
+      properties:
+        success:
+          type: boolean
+        message:
+          type: string
+          nullable: true
+    Page:
+      type: object
+      properties:
+        size:
+          type: integer
+        totalElements:
+          type: integer
+          format: int64
+        totalPages:
+          type: integer
+        number:
+          type: integer
+          description: Current page, 0-based
+    ErrorCode:
+      type: string
+      enum:
+        - VALIDATION_ERROR
+        - UNAUTHORIZED
+        - AUTH_INVALID
+        - NOT_FOUND
+        - RATE_LIMITED
+        - SERVICE_UNAVAILABLE
+        - PMS_UNAVAILABLE
+        - ROOM_NOT_READY
+        - ROOM_OCCUPIED
+        - INVALID_STATUS_TRANSITION
+        - GUEST_NOT_IN_HOUSE
+        - POSTING_BLOCKED
+        - CREDIT_LIMIT_EXCEEDED
+        - OCCUPIED_TABLE
+        - UNKNOWN_ORDER_TYPE
+        - UNKNOWN_MENU_ITEM
+        - UNKNOWN_TENDER
+        - CHECK_CLOSED
+        - PAYMENT_EXCEEDS_DUE
+    ErrorResponse:
+      type: object
+      required: [success, message, code]
+      properties:
+        success:
+          type: boolean
+          example: false
+        message:
+          type: string
+          example: Credit limit exceeded for reservation R-100234
+        code:
+          $ref: '#/components/schemas/ErrorCode'
+
+    # ------------------------------------------------------------ PMS
+    Hotel:
+      type: object
+      properties:
+        code:
+          type: string
+          example: tbs
+        name:
+          type: string
+          example: TYNGO Boutique Tbilisi
+        city:
+          type: string
+        timezone:
+          type: string
+          example: Asia/Tbilisi
+        currency:
+          type: string
+          example: GEL
+        localLanguage:
+          type: string
+          example: ka
+        businessDate:
+          type: string
+          format: date
+        totalRooms:
+          type: integer
+        roomTypes:
+          type: array
+          items:
+            $ref: '#/components/schemas/RoomType'
+        ratePlans:
+          type: array
+          items:
+            $ref: '#/components/schemas/RatePlan'
+        housekeepers:
+          type: array
+          items:
+            $ref: '#/components/schemas/Housekeeper'
+    RoomType:
+      type: object
+      properties:
+        code:
+          type: string
+          example: DLX
+        name:
+          type: string
+          example: Deluxe Double
+        maxOccupancy:
+          type: integer
+        baseRate:
+          type: number
+          description: Typical nightly rate
+    RatePlan:
+      type: object
+      properties:
+        code:
+          type: string
+          example: BB
+        name:
+          type: string
+          example: Bed & Breakfast
+        breakfastIncluded:
+          type: boolean
+    Housekeeper:
+      type: object
+      properties:
+        id:
+          type: string
+          example: HK-03
+        name:
+          type: string
+    RoomStatus:
+      type: string
+      enum: [CLEAN, DIRTY, INSPECTED, OUT_OF_ORDER]
+    Room:
+      type: object
+      properties:
+        number:
+          type: string
+          example: '305'
+        floor:
+          type: integer
+        roomTypeCode:
+          type: string
+        status:
+          $ref: '#/components/schemas/RoomStatus'
+        occupied:
+          type: boolean
+        attendantId:
+          type: string
+          nullable: true
+        currentReservationId:
+          type: string
+          nullable: true
+    RoomPatch:
+      type: object
+      properties:
+        status:
+          $ref: '#/components/schemas/RoomStatus'
+        attendantId:
+          type: string
+          nullable: true
+    ReservationStatus:
+      type: string
+      enum: [BOOKED, IN_HOUSE, CHECKED_OUT, CANCELLED]
+    Reservation:
+      type: object
+      properties:
+        id:
+          type: string
+          example: R-100234
+        status:
+          $ref: '#/components/schemas/ReservationStatus'
+        roomNumber:
+          type: string
+          nullable: true
+        roomTypeCode:
+          type: string
+        arrivalDate:
+          type: string
+          format: date
+        departureDate:
+          type: string
+          format: date
+        departureTime:
+          type: string
+          example: '12:00'
+          description: HH:mm, later than 12:00 means late checkout
+        adults:
+          type: integer
+        children:
+          type: integer
+        ratePlanCode:
+          type: string
+        breakfastIncluded:
+          type: boolean
+        nightlyRate:
+          type: number
+        source:
+          type: string
+          enum: [DIRECT, OTA, CORPORATE, GROUP]
+        groupCode:
+          type: string
+          nullable: true
+        notes:
+          type: string
+          nullable: true
+        creditLimit:
+          type: number
+        balance:
+          type: number
+        postingAllowed:
+          type: boolean
+          description: False for cash-only guests; charges to the room are refused
+        guest:
+          $ref: '#/components/schemas/Guest'
+    ReservationPatch:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: [IN_HOUSE, CHECKED_OUT]
+        roomNumber:
+          type: string
+        departureTime:
+          type: string
+          pattern: '^([01][0-9]|2[0-3]):[0-5][0-9]$'
+    Allergen:
+      type: string
+      description: The 14 EU allergens
+      enum: [GLUTEN, CRUSTACEANS, EGGS, FISH, PEANUTS, SOYBEANS, MILK, NUTS, CELERY, MUSTARD, SESAME, SULPHITES, LUPIN, MOLLUSCS]
+    Guest:
+      type: object
+      properties:
+        id:
+          type: string
+          example: G-004211
+        firstName:
+          type: string
+        lastName:
+          type: string
+        language:
+          type: string
+          example: en
+        country:
+          type: string
+          description: ISO 3166-1 alpha-2
+          example: DE
+        vip:
+          type: boolean
+        stayCount:
+          type: integer
+          description: Stays including the current one
+        allergies:
+          type: array
+          items:
+            $ref: '#/components/schemas/Allergen'
+        preferences:
+          type: array
+          items:
+            type: string
+          example: [high floor, feather-free pillow]
+        marketingConsent:
+          type: boolean
+    GuestPatch:
+      type: object
+      properties:
+        allergies:
+          type: array
+          items:
+            $ref: '#/components/schemas/Allergen'
+        preferences:
+          type: array
+          items:
+            type: string
+        marketingConsent:
+          type: boolean
+    FolioLine:
+      type: object
+      properties:
+        id:
+          type: string
+        postedAt:
+          type: string
+          format: date-time
+        description:
+          type: string
+          example: Rooftop Wine Bar check 1017
+        amount:
+          type: number
+          description: Negative for adjustments
+        source:
+          type: string
+          enum: [ROOM, POS, MANUAL]
+        reference:
+          type: string
+          nullable: true
+          example: POS:2/1017/88231
+        postingGuid:
+          type: string
+          format: uuid
+          nullable: true
+    Folio:
+      type: object
+      properties:
+        reservationId:
+          type: string
+        currency:
+          type: string
+        creditLimit:
+          type: number
+        balance:
+          type: number
+        postingAllowed:
+          type: boolean
+        lines:
+          type: array
+          items:
+            $ref: '#/components/schemas/FolioLine'
+    FolioPostingRequest:
+      type: object
+      required: [description, amount, postingGuid]
+      properties:
+        description:
+          type: string
+          maxLength: 120
+          example: Late checkout 16:00
+        amount:
+          type: number
+          description: Non-zero. Negative for adjustments.
+        postingGuid:
+          type: string
+          format: uuid
+        reference:
+          type: string
+          maxLength: 64
+    ForecastDay:
+      type: object
+      properties:
+        date:
+          type: string
+          format: date
+        isActual:
+          type: boolean
+        roomsAvailable:
+          type: integer
+        roomsOccupied:
+          type: integer
+        occupancyPct:
+          type: number
+        arrivals:
+          type: integer
+        departures:
+          type: integer
+        inHouseGuests:
+          type: integer
+        breakfastGuests:
+          type: integer
+        groups:
+          type: array
+          items:
+            type: object
+            properties:
+              code:
+                type: string
+              name:
+                type: string
+              rooms:
+                type: integer
+
+    HotelResponse:
+      allOf:
+        - $ref: '#/components/schemas/ResponseBase'
+        - type: object
+          properties:
+            hotel:
+              $ref: '#/components/schemas/Hotel'
+    RoomResponse:
+      allOf:
+        - $ref: '#/components/schemas/ResponseBase'
+        - type: object
+          properties:
+            room:
+              $ref: '#/components/schemas/Room'
+    RoomListResponse:
+      allOf:
+        - $ref: '#/components/schemas/ResponseBase'
+        - type: object
+          properties:
+            elements:
+              type: array
+              items:
+                $ref: '#/components/schemas/Room'
+            pageMetadata:
+              $ref: '#/components/schemas/Page'
+    ReservationResponse:
+      allOf:
+        - $ref: '#/components/schemas/ResponseBase'
+        - type: object
+          properties:
+            reservation:
+              $ref: '#/components/schemas/Reservation'
+    ReservationListResponse:
+      allOf:
+        - $ref: '#/components/schemas/ResponseBase'
+        - type: object
+          properties:
+            elements:
+              type: array
+              items:
+                $ref: '#/components/schemas/Reservation'
+            pageMetadata:
+              $ref: '#/components/schemas/Page'
+    GuestResponse:
+      allOf:
+        - $ref: '#/components/schemas/ResponseBase'
+        - type: object
+          properties:
+            guest:
+              $ref: '#/components/schemas/Guest'
+    FolioResponse:
+      allOf:
+        - $ref: '#/components/schemas/ResponseBase'
+        - type: object
+          properties:
+            folio:
+              $ref: '#/components/schemas/Folio'
+    ForecastListResponse:
+      allOf:
+        - $ref: '#/components/schemas/ResponseBase'
+        - type: object
+          properties:
+            elements:
+              type: array
+              items:
+                $ref: '#/components/schemas/ForecastDay'
+            pageMetadata:
+              $ref: '#/components/schemas/Page'
+
+    # ------------------------------------------------------------ POS
+    LoginDetailsDTO:
+      type: object
+      required: [pinCode, accessCode]
+      properties:
+        pinCode:
+          type: string
+          example: '4821'
+        accessCode:
+          type: string
+          example: TYNGO-TBS
+        deviceInfo:
+          $ref: '#/components/schemas/DeviceInfo'
+    DeviceInfo:
+      type: object
+      properties:
+        name:
+          type: string
+        model:
+          type: string
+        os:
+          type: string
+        osVersion:
+          type: string
+        appVersion:
+          type: string
+    AuthToken:
+      type: object
+      properties:
+        token:
+          type: string
+          description: Opaque session token, valid 12 hours. Keep it on your backend.
+        code:
+          type: string
+          description: Employee code
+          example: W07
+        authenticated:
+          type: boolean
+    DictionaryElement:
+      type: object
+      properties:
+        code:
+          type: string
+          example: '1'
+        name:
+          type: string
+          example: Dine In
+    TenderElement:
+      type: object
+      properties:
+        code:
+          type: string
+          example: '10'
+        name:
+          type: string
+          example: Room Charge
+        type:
+          type: string
+          enum: [CASH, CARD, ROOM_CHARGE]
+    OutletDictionaryElement:
+      type: object
+      properties:
+        objectNumber:
+          type: integer
+          description: Use as rvc-on
+          example: 2
+        name:
+          type: string
+          example: Rooftop Wine Bar
+        kind:
+          type: string
+          enum: [RESTAURANT, BAR, ROOM_SERVICE]
+        tables:
+          type: array
+          x-sandbox: true
+          items:
+            type: string
+          example: [B1, B2, B3, B4]
+        orderTypes:
+          type: array
+          x-sandbox: true
+          items:
+            $ref: '#/components/schemas/DictionaryElement'
+        tenders:
+          type: array
+          x-sandbox: true
+          items:
+            $ref: '#/components/schemas/TenderElement'
+    CondimentOptionDTO:
+      type: object
+      properties:
+        code:
+          type: string
+          example: '7003'
+        name:
+          type: string
+          example: Medium rare
+        price:
+          type: number
+        allergens:
+          type: array
+          x-sandbox: true
+          items:
+            $ref: '#/components/schemas/Allergen'
+    CondimentGroupDTO:
+      type: object
+      properties:
+        code:
+          type: string
+        name:
+          type: string
+          example: Doneness
+        minSelect:
+          type: integer
+          example: 1
+        maxSelect:
+          type: integer
+          example: 1
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/CondimentOptionDTO'
+    MenuItemDTO:
+      type: object
+      properties:
+        code:
+          type: string
+          example: '1042'
+        name:
+          type: string
+          example: Khachapuri Adjaruli
+        groupL1:
+          type: string
+          example: Food
+        groupL2:
+          type: string
+          example: Bakery
+        groupL3:
+          type: string
+          nullable: true
+        type:
+          type: string
+          enum: [ITEM, DISCOUNT]
+          x-sandbox: true
+        price:
+          type: number
+          description: 0 for DISCOUNT items
+          x-sandbox: true
+        discountPercent:
+          type: number
+          nullable: true
+          description: Only for DISCOUNT items, e.g. 100 for a comp
+          x-sandbox: true
+        allergens:
+          type: array
+          x-sandbox: true
+          items:
+            $ref: '#/components/schemas/Allergen'
+        condiments:
+          type: array
+          items:
+            $ref: '#/components/schemas/CondimentGroupDTO'
+    PmsReservationInfo:
+      type: object
+      properties:
+        reservationId:
+          type: string
+          description: Use as paymentAccount
+        roomNumber:
+          type: string
+        guestName:
+          type: string
+        departureDate:
+          type: string
+          format: date
+        postingAllowed:
+          type: boolean
+        creditLimitRemaining:
+          type: number
+    CondimentItem:
+      type: object
+      required: [code]
+      properties:
+        code:
+          type: string
+        quantity:
+          type: number
+          default: 1
+    Detail:
+      type: object
+      required: [code, quantity]
+      properties:
+        code:
+          type: string
+          description: Menu item code
+        quantity:
+          type: number
+          minimum: 0
+          exclusiveMinimum: true
+        condimentItems:
+          type: array
+          items:
+            $ref: '#/components/schemas/CondimentItem'
+        type:
+          type: string
+          enum: [ITEM, DISCOUNT]
+          default: ITEM
+        reference:
+          type: string
+          description: For DISCOUNT, the `pos` of the item line to discount. Omit for a check-level discount.
+    BeginCheckResource:
+      type: object
+      description: Same body for opening a check (POST) and for each later round or payment (PUT).
+      properties:
+        table:
+          type: string
+          example: B4
+        covers:
+          type: integer
+          example: 2
+        checkName:
+          type: string
+        orderType:
+          type: string
+          description: Order type code, required on POST
+          example: '1'
+        reservationId:
+          type: string
+          description: Links the check to an in-house guest (POST only)
+          x-sandbox: true
+        details:
+          type: array
+          items:
+            $ref: '#/components/schemas/Detail'
+        tender:
+          type: string
+          description: Tender code; set it to take a payment
+          example: '10'
+        tenderAmount:
+          type: number
+        paymentAccount:
+          type: string
+          description: reservationId, required for ROOM_CHARGE
+        postingGuid:
+          type: string
+          format: uuid
+          description: Required for ROOM_CHARGE; idempotency key of the folio posting
+    CheckStatus:
+      type: string
+      enum: [OPEN, CLOSED]
+    CheckDetailDTO:
+      type: object
+      properties:
+        pos:
+          type: integer
+          description: Line position, referenced by DISCOUNT details
+        round:
+          type: integer
+          x-sandbox: true
+        code:
+          type: string
+        name:
+          type: string
+        type:
+          type: string
+          enum: [ITEM, DISCOUNT]
+        quantity:
+          type: number
+        unitPrice:
+          type: number
+        amount:
+          type: number
+          description: Line total including condiments; negative for discounts
+        reference:
+          type: string
+          nullable: true
+        allergens:
+          type: array
+          x-sandbox: true
+          items:
+            $ref: '#/components/schemas/Allergen'
+        condiments:
+          type: array
+          items:
+            type: object
+            properties:
+              code:
+                type: string
+              name:
+                type: string
+              price:
+                type: number
+        sentAt:
+          type: string
+          format: date-time
+    CheckPayment:
+      type: object
+      properties:
+        transactionId:
+          type: string
+          format: uuid
+        tender:
+          type: string
+        tenderType:
+          type: string
+          enum: [CASH, CARD, ROOM_CHARGE]
+        amount:
+          type: number
+        paymentAccount:
+          type: string
+          nullable: true
+        postingGuid:
+          type: string
+          format: uuid
+          nullable: true
+        paidAt:
+          type: string
+          format: date-time
+    CheckDTO:
+      type: object
+      properties:
+        checkNumber:
+          type: string
+          example: '1017'
+        checkSeq:
+          type: string
+          example: '88231'
+        rvc:
+          type: integer
+          x-sandbox: true
+        status:
+          x-sandbox: true
+          allOf:
+            - $ref: '#/components/schemas/CheckStatus'
+        checkName:
+          type: string
+          nullable: true
+        table:
+          type: string
+          nullable: true
+        covers:
+          type: integer
+          x-sandbox: true
+        orderType:
+          type: string
+        employeeCode:
+          type: string
+          x-sandbox: true
+        reservationId:
+          type: string
+          nullable: true
+          x-sandbox: true
+        checkOpenTime:
+          type: string
+          format: date-time
+        checkCloseTime:
+          type: string
+          format: date-time
+          nullable: true
+          x-sandbox: true
+        totalRaw:
+          type: number
+          description: Check total after discounts
+          x-sandbox: true
+        totalDue:
+          type: string
+          description: Amount still due, formatted
+          example: GEL 54.00
+        totalDueRaw:
+          type: number
+          example: 54.0
+        details:
+          type: array
+          items:
+            $ref: '#/components/schemas/CheckDetailDTO'
+        payments:
+          type: array
+          items:
+            $ref: '#/components/schemas/CheckPayment'
+    CheckResponse:
+      allOf:
+        - $ref: '#/components/schemas/ResponseBase'
+        - type: object
+          properties:
+            check:
+              $ref: '#/components/schemas/CheckDTO'
+    CheckListResponse:
+      allOf:
+        - $ref: '#/components/schemas/ResponseBase'
+        - type: object
+          properties:
+            elements:
+              type: array
+              items:
+                $ref: '#/components/schemas/CheckDTO'
+            pageMetadata:
+              $ref: '#/components/schemas/Page'
+    OutletListResponse:
+      allOf:
+        - $ref: '#/components/schemas/ResponseBase'
+        - type: object
+          properties:
+            elements:
+              type: array
+              items:
+                $ref: '#/components/schemas/OutletDictionaryElement'
+            pageMetadata:
+              $ref: '#/components/schemas/Page'
+    MenuListResponse:
+      allOf:
+        - $ref: '#/components/schemas/ResponseBase'
+        - type: object
+          properties:
+            elements:
+              type: array
+              items:
+                $ref: '#/components/schemas/MenuItemDTO'
+            pageMetadata:
+              $ref: '#/components/schemas/Page'
+    LookupListResponse:
+      allOf:
+        - $ref: '#/components/schemas/ResponseBase'
+        - type: object
+          properties:
+            elements:
+              type: array
+              items:
+                $ref: '#/components/schemas/PmsReservationInfo'
+            pageMetadata:
+              $ref: '#/components/schemas/Page'
+
+    # ------------------------------------------------------------ Platform
+    EventType:
+      type: string
+      enum:
+        - reservation.created
+        - reservation.updated
+        - reservation.checked_in
+        - reservation.checked_out
+        - room.status_changed
+        - guest.updated
+        - folio.posted
+        - pos.check.opened
+        - pos.check.round_sent
+        - pos.check.paid
+        - pos.check.closed
+    Event:
+      type: object
+      description: |
+        `data` by type:
+        - `reservation.*`: `reservationId`, `roomNumber`, `guestId`
+        - `room.status_changed`: `roomNumber`, `from`, `to`
+        - `guest.updated`: `guestId`, `changedFields`
+        - `folio.posted`: `reservationId`, `lineId`, `amount`, `description`, `source`
+        - `pos.check.opened` / `paid` / `closed`: `rvc`, `checkNumber`, `checkSeq`, `reservationId`, `totalDueRaw`
+        - `pos.check.round_sent`: `rvc`, `checkNumber`, `checkSeq`, `round`, `table`, `checkName`, `reservationId`,
+          `items` (code, name, quantity, allergens, condiments)
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: Feed position, strictly increasing
+        key:
+          type: string
+          description: Stable business key; duplicates share it
+          example: pos.check.closed:2:1017:88231
+        type:
+          $ref: '#/components/schemas/EventType'
+        occurredAt:
+          type: string
+          format: date-time
+        data:
+          type: object
+          additionalProperties: true
+    EventListResponse:
+      allOf:
+        - $ref: '#/components/schemas/ResponseBase'
+        - type: object
+          properties:
+            elements:
+              type: array
+              items:
+                $ref: '#/components/schemas/Event'
+            nextSince:
+              type: integer
+              format: int64

@@ -1,0 +1,274 @@
+{
+  "success": true,
+  "elements": [
+    {
+      "checkCloseTime": "2026-10-16T11:56:14.036564+04:00",
+      "checkName": "205",
+      "checkNumber": "1098",
+      "checkOpenTime": "2026-10-16T11:56:12.738604+04:00",
+      "checkSeq": "83333",
+      "covers": 1,
+      "details": [
+        {
+          "allergens": [],
+          "amount": 6,
+          "code": "2011",
+          "condiments": [],
+          "name": "Borjomi mineral water",
+          "pos": 1,
+          "quantity": 1,
+          "reference": null,
+          "round": 1,
+          "sentAt": "2026-10-16T11:56:12.751239+04:00",
+          "type": "ITEM",
+          "unitPrice": 6
+        },
+        {
+          "allergens": [],
+          "amount": 6,
+          "code": "2014",
+          "condiments": [],
+          "name": "Espresso",
+          "pos": 2,
+          "quantity": 1,
+          "reference": null,
+          "round": 1,
+          "sentAt": "2026-10-16T11:56:12.751239+04:00",
+          "type": "ITEM",
+          "unitPrice": 6
+        }
+      ],
+      "employeeCode": "W01",
+      "orderType": "3",
+      "payments": [
+        {
+          "amount": 12,
+          "paidAt": "2026-10-16T11:56:14.036564+04:00",
+          "paymentAccount": "R-900641",
+          "postingGuid": "b79d8039-ca11-42e7-8b0b-e2f751feb1fc",
+          "tender": "10",
+          "tenderType": "ROOM_CHARGE",
+          "transactionId": "e696b569-e670-493a-be5f-453bb4b2e8d7"
+        }
+      ],
+      "reservationId": "R-900641",
+      "rvc": 3,
+      "status": "CLOSED",
+      "table": null,
+      "totalDue": "GEL 0.00",
+      "totalDueRaw": 0,
+      "totalRaw": 12
+    },
+    {
+      "checkCloseTime": "2026-10-15T23:58:10+04:00",
+      "checkName": null,
+      "checkNumber": "3335",
+      "checkOpenTime": "2026-10-15T21:46:10+04:00",
+      "checkSeq": "83331",
+      "covers": 2,
+      "details": [
+        {
+          "allergens": [
+            "MILK"
+          ],
+          "amount": 22,
+          "code": "1026",
+          "condiments": [],
+          "name": "Sulguni cheese plate",
+          "pos": 1,
+          "quantity": 1,
+          "reference": null,
+          "round": 1,
+          "sentAt": "2026-10-15T21:46:10+04:00",
+          "type": "ITEM",
+          "unitPrice": 22
+        },
+        {
+          "allergens": [
+            "NUTS"
+          ],
+          "amount": 16,
+          "code": "1022",
+          "condiments": [],
+          "name": "Georgian salad with walnut dressing",
+          "pos": 2,
+          "quantity": 1,
+          "reference": null,
+          "round": 1,
+          "sentAt": "2026-10-15T21:46:10+04:00",
+          "type": "ITEM",
+          "unitPrice": 16
+        },
+        {
+          "allergens": [],
+          "amount": 5,
+          "code": "1025",
+          "condiments": [],
+          "name": "Mchadi corn bread",
+          "pos": 3,
+          "quantity": 1,
+          "reference": null,
+          "round": 1,
+          "sentAt": "2026-10-15T21:46:10+04:00",
+          "type": "ITEM",
+          "unitPrice": 5
+        },
+        {
+          "allergens": [],
+          "amount": 7,
+          "code": "2027",
+          "condiments": [],
+          "name": "Herbal tea",
+          "pos": 4,
+          "quantity": 1,
+          "reference": null,
+          "round": 2,
+          "sentAt": "2026-10-15T22:13:10+04:00",
+          "type": "ITEM",
+          "unitPrice": 7
+        },
+        {
+          "allergens": [
+            "GLUTEN"
+          ],
+          "amount": 8,
+          "code": "2014",
+          "condiments": [
+            {
+              "code": "7022",
+              "name": "Oat milk",
+              "price": 2
+            }
+          ],
+          "name": "Espresso",
+          "pos": 5,
+          "quantity": 1,
+          "reference": null,
+          "round": 2,
+          "sentAt": "2026-10-15T22:13:10+04:00",
+          "type": "ITEM",
+          "unitPrice": 6
+        },
+        {
+          "allergens": [],
+          "amount": 7,
+          "code": "2012",
+          "condiments": [],
+          "name": "Lagidze tarragon lemonade",
+          "pos": 6,
+          "quantity": 1,
+          "reference": null,
+          "round": 3,
+          "sentAt": "2026-10-15T22:39:10+04:00",
+          "type": "ITEM",
+          "unitPrice": 7
+        }
+      ],
+      "employeeCode": "W03",
+      "orderType": "1",
+      "payments": [
+        {
+          "amount": 65,
+          "paidAt": "2026-10-15T23:58:10+04:00",
+          "paymentAccount": null,
+          "postingGuid": null,
+          "tender": "2",
+          "tenderType": "CARD",
+          "transactionId": "a09973bc-5f2a-466b-b3f7-39d60036f85f"
+        }
+      ],
+      "reservationId": null,
+      "rvc": 1,
+      "status": "CLOSED",
+      "table": "T2",
+      "totalDue": "GEL 0.00",
+      "totalDueRaw": 0,
+      "totalRaw": 65
+    },
+    {
+      "checkCloseTime": "2026-10-15T22:31:44+04:00",
+      "checkName": null,
+      "checkNumber": "3334",
+      "checkOpenTime": "2026-10-15T21:35:44+04:00",
+      "checkSeq": "83330",
+      "covers": 4,
+      "details": [
+        {
+          "allergens": [
+            "SULPHITES"
+          ],
+          "amount": 17,
+          "code": "2005",
+          "condiments": [],
+          "name": "Mtsvane, glass",
+          "pos": 1,
+          "quantity": 1,
+          "reference": null,
+          "round": 1,
+          "sentAt": "2026-10-15T21:35:44+04:00",
+          "type": "ITEM",
+          "unitPrice": 17
+        },
+        {
+          "allergens": [
+            "NUTS"
+          ],
+          "amount": 16,
+          "code": "1022",
+          "condiments": [],
+          "name": "Georgian salad with walnut dressing",
+          "pos": 2,
+          "quantity": 1,
+          "reference": null,
+          "round": 1,
+          "sentAt": "2026-10-15T21:35:44+04:00",
+          "type": "ITEM",
+          "unitPrice": 16
+        },
+        {
+          "allergens": [
+            "SULPHITES"
+          ],
+          "amount": 22,
+          "code": "2004",
+          "condiments": [],
+          "name": "Rkatsiteli qvevri amber, glass",
+          "pos": 3,
+          "quantity": 1,
+          "reference": null,
+          "round": 1,
+          "sentAt": "2026-10-15T21:35:44+04:00",
+          "type": "ITEM",
+          "unitPrice": 22
+        }
+      ],
+      "employeeCode": "W02",
+      "orderType": "2",
+      "payments": [
+        {
+          "amount": 55,
+          "paidAt": "2026-10-15T22:31:44+04:00",
+          "paymentAccount": null,
+          "postingGuid": null,
+          "tender": "2",
+          "tenderType": "CARD",
+          "transactionId": "458aafc1-1cb5-49d9-825f-488dfa337135"
+        }
+      ],
+      "reservationId": "R-900662",
+      "rvc": 1,
+      "status": "CLOSED",
+      "table": null,
+      "totalDue": "GEL 0.00",
+      "totalDueRaw": 0,
+      "totalRaw": 55
+    }
+  ],
+  "message": null,
+  "pageMetadata": {
+    "number": 0,
+    "size": 3,
+    "totalElements": 3333,
+    "totalPages": 1111
+  }
+}

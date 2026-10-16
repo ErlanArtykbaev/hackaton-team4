@@ -62,6 +62,10 @@ Run from `backend/` (on Windows `mvnw.cmd`):
 ./mvnw test                                   # whole backend suite
 ./mvnw test -Dtest=SandboxClientTest          # one class
 ./mvnw verify                                 # what CI runs
+./mvnw test -Dtest=LiveSandboxSmokeTest -Dsandbox.live=true   # read-only check of the live sandbox (.env values)
+node scripts/record-fixtures.mjs              # re-record the fixtures (small, mostly reverted writes to the hotel)
 ```
+
+- Run the live smoke test first thing on the event day, as soon as the new team key is in `.env`.
 
 - Frontend: TODO, after the frontend developers choose the tools.

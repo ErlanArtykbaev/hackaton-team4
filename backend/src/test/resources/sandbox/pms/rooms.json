@@ -1,0 +1,192 @@
+{
+  "success": true,
+  "elements": [
+    {
+      "attendantId": null,
+      "currentReservationId": "R-900645",
+      "floor": 1,
+      "number": "101",
+      "occupied": true,
+      "roomTypeCode": "STD",
+      "status": "CLEAN"
+    },
+    {
+      "attendantId": null,
+      "currentReservationId": null,
+      "floor": 1,
+      "number": "102",
+      "occupied": false,
+      "roomTypeCode": "STD",
+      "status": "INSPECTED"
+    },
+    {
+      "attendantId": null,
+      "currentReservationId": "R-900646",
+      "floor": 1,
+      "number": "103",
+      "occupied": true,
+      "roomTypeCode": "STD",
+      "status": "DIRTY"
+    },
+    {
+      "attendantId": null,
+      "currentReservationId": null,
+      "floor": 1,
+      "number": "104",
+      "occupied": false,
+      "roomTypeCode": "STD",
+      "status": "OUT_OF_ORDER"
+    },
+    {
+      "attendantId": null,
+      "currentReservationId": "R-900651",
+      "floor": 1,
+      "number": "105",
+      "occupied": true,
+      "roomTypeCode": "STD",
+      "status": "CLEAN"
+    },
+    {
+      "attendantId": null,
+      "currentReservationId": "R-900652",
+      "floor": 1,
+      "number": "106",
+      "occupied": true,
+      "roomTypeCode": "TWN",
+      "status": "CLEAN"
+    },
+    {
+      "attendantId": null,
+      "currentReservationId": "R-900658",
+      "floor": 1,
+      "number": "107",
+      "occupied": true,
+      "roomTypeCode": "TWN",
+      "status": "CLEAN"
+    },
+    {
+      "attendantId": null,
+      "currentReservationId": null,
+      "floor": 1,
+      "number": "108",
+      "occupied": false,
+      "roomTypeCode": "TWN",
+      "status": "CLEAN"
+    },
+    {
+      "attendantId": "HK-01",
+      "currentReservationId": null,
+      "floor": 1,
+      "number": "109",
+      "occupied": false,
+      "roomTypeCode": "DLX",
+      "status": "DIRTY"
+    },
+    {
+      "attendantId": null,
+      "currentReservationId": "R-900653",
+      "floor": 1,
+      "number": "110",
+      "occupied": true,
+      "roomTypeCode": "DLX",
+      "status": "DIRTY"
+    },
+    {
+      "attendantId": null,
+      "currentReservationId": "R-900659",
+      "floor": 2,
+      "number": "201",
+      "occupied": true,
+      "roomTypeCode": "STD",
+      "status": "CLEAN"
+    },
+    {
+      "attendantId": null,
+      "currentReservationId": "R-900660",
+      "floor": 2,
+      "number": "202",
+      "occupied": true,
+      "roomTypeCode": "STD",
+      "status": "CLEAN"
+    },
+    {
+      "attendantId": null,
+      "currentReservationId": "R-900661",
+      "floor": 2,
+      "number": "203",
+      "occupied": true,
+      "roomTypeCode": "STD",
+      "status": "CLEAN"
+    },
+    {
+      "attendantId": null,
+      "currentReservationId": null,
+      "floor": 2,
+      "number": "204",
+      "occupied": false,
+      "roomTypeCode": "STD",
+      "status": "DIRTY"
+    },
+    {
+      "attendantId": null,
+      "currentReservationId": "R-900641",
+      "floor": 2,
+      "number": "205",
+      "occupied": true,
+      "roomTypeCode": "STD",
+      "status": "CLEAN"
+    },
+    {
+      "attendantId": null,
+      "currentReservationId": "R-900642",
+      "floor": 2,
+      "number": "206",
+      "occupied": true,
+      "roomTypeCode": "TWN",
+      "status": "CLEAN"
+    },
+    {
+      "attendantId": null,
+      "currentReservationId": "R-900643",
+      "floor": 2,
+      "number": "207",
+      "occupied": true,
+      "roomTypeCode": "TWN",
+      "status": "DIRTY"
+    },
+    {
+      "attendantId": "HK-02",
+      "currentReservationId": "R-900649",
+      "floor": 2,
+      "number": "208",
+      "occupied": true,
+      "roomTypeCode": "TWN",
+      "status": "DIRTY"
+    },
+    {
+      "attendantId": null,
+      "currentReservationId": "R-900662",
+      "floor": 2,
+      "number": "209",
+      "occupied": true,
+      "roomTypeCode": "DLX",
+      "status": "CLEAN"
+    },
+    {
+      "attendantId": null,
+      "currentReservationId": null,
+      "floor": 2,
+      "number": "210",
+      "occupied": false,
+      "roomTypeCode": "DLX",
+      "status": "CLEAN"
+    }
+  ],
+  "message": null,
+  "pageMetadata": {
+    "number": 0,
+    "size": 200,
+    "totalElements": 20,
+    "totalPages": 1
+  }
+}

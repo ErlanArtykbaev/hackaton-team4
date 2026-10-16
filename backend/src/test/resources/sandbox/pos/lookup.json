@@ -1,0 +1,20 @@
+{
+  "success": true,
+  "elements": [
+    {
+      "creditLimitRemaining": 709,
+      "departureDate": "2026-10-17",
+      "guestName": "Szymon Kowalski",
+      "postingAllowed": true,
+      "reservationId": "R-900641",
+      "roomNumber": "205"
+    }
+  ],
+  "message": null,
+  "pageMetadata": {
+    "number": 0,
+    "size": 1,
+    "totalElements": 1,
+    "totalPages": 1
+  }
+}

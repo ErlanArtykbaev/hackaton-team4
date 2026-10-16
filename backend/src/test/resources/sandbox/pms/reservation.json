@@ -1,0 +1,36 @@
+{
+  "success": true,
+  "message": null,
+  "reservation": {
+    "adults": 1,
+    "arrivalDate": "2026-10-12",
+    "balance": 951,
+    "breakfastIncluded": true,
+    "children": 0,
+    "creditLimit": 1660,
+    "departureDate": "2026-10-17",
+    "departureTime": "12:00",
+    "groupCode": null,
+    "guest": {
+      "allergies": [],
+      "country": "PL",
+      "firstName": "Szymon",
+      "id": "G-900641",
+      "language": "pl",
+      "lastName": "Kowalski",
+      "marketingConsent": false,
+      "preferences": [],
+      "stayCount": 5,
+      "vip": false
+    },
+    "id": "R-900641",
+    "nightlyRate": 221,
+    "notes": null,
+    "postingAllowed": true,
+    "ratePlanCode": "BB",
+    "roomNumber": "205",
+    "roomTypeCode": "STD",
+    "source": "DIRECT",
+    "status": "IN_HOUSE"
+  }
+}

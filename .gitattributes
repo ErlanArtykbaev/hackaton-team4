@@ -1,0 +1,7 @@
+# Mixed Windows / macOS team: LF in the repository, native scripts keep their own endings.
+* text=auto eol=lf
+*.cmd text eol=crlf
+*.bat text eol=crlf
+*.jar binary
+*.png binary
+*.jpg binary

@@ -1,0 +1,711 @@
+{
+  "success": true,
+  "elements": [
+    {
+      "allergens": [
+        "GLUTEN",
+        "MILK"
+      ],
+      "code": "1011",
+      "condiments": [],
+      "discountPercent": null,
+      "groupL1": "Food",
+      "groupL2": "Bakery",
+      "groupL3": null,
+      "name": "Khachapuri Imeruli",
+      "price": 22,
+      "type": "ITEM"
+    },
+    {
+      "allergens": [
+        "NUTS"
+      ],
+      "code": "1020",
+      "condiments": [],
+      "discountPercent": null,
+      "groupL1": "Food",
+      "groupL2": "Starters",
+      "groupL3": null,
+      "name": "Badrijani nigvzit (aubergine with walnuts)",
+      "price": 18,
+      "type": "ITEM"
+    },
+    {
+      "allergens": [
+        "NUTS"
+      ],
+      "code": "1021",
+      "condiments": [],
+      "discountPercent": null,
+      "groupL1": "Food",
+      "groupL2": "Starters",
+      "groupL3": null,
+      "name": "Pkhali selection",
+      "price": 20,
+      "type": "ITEM"
+    },
+    {
+      "allergens": [
+        "NUTS"
+      ],
+      "code": "1022",
+      "condiments": [],
+      "discountPercent": null,
+      "groupL1": "Food",
+      "groupL2": "Starters",
+      "groupL3": "Salads",
+      "name": "Georgian salad with walnut dressing",
+      "price": 16,
+      "type": "ITEM"
+    },
+    {
+      "allergens": [],
+      "code": "1023",
+      "condiments": [],
+      "discountPercent": null,
+      "groupL1": "Food",
+      "groupL2": "Starters",
+      "groupL3": "Salads",
+      "name": "Tomato and cucumber salad",
+      "price": 12,
+      "type": "ITEM"
+    },
+    {
+      "allergens": [],
+      "code": "1025",
+      "condiments": [],
+      "discountPercent": null,
+      "groupL1": "Food",
+      "groupL2": "Bakery",
+      "groupL3": null,
+      "name": "Mchadi corn bread",
+      "price": 5,
+      "type": "ITEM"
+    },
+    {
+      "allergens": [
+        "MILK"
+      ],
+      "code": "1026",
+      "condiments": [],
+      "discountPercent": null,
+      "groupL1": "Food",
+      "groupL2": "Starters",
+      "groupL3": "Cheese",
+      "name": "Sulguni cheese plate",
+      "price": 22,
+      "type": "ITEM"
+    },
+    {
+      "allergens": [
+        "GLUTEN",
+        "EGGS",
+        "MUSTARD"
+      ],
+      "code": "1030",
+      "condiments": [],
+      "discountPercent": null,
+      "groupL1": "Food",
+      "groupL2": "Snacks",
+      "groupL3": null,
+      "name": "Club sandwich with fries",
+      "price": 26,
+      "type": "ITEM"
+    },
+    {
+      "allergens": [
+        "GLUTEN",
+        "EGGS",
+        "FISH",
+        "MILK"
+      ],
+      "code": "1031",
+      "condiments": [],
+      "discountPercent": null,
+      "groupL1": "Food",
+      "groupL2": "Starters",
+      "groupL3": "Salads",
+      "name": "Caesar salad with chicken",
+      "price": 24,
+      "type": "ITEM"
+    },
+    {
+      "allergens": [
+        "NUTS"
+      ],
+      "code": "1032",
+      "condiments": [],
+      "discountPercent": null,
+      "groupL1": "Food",
+      "groupL2": "Desserts",
+      "groupL3": null,
+      "name": "Churchkhela",
+      "price": 8,
+      "type": "ITEM"
+    },
+    {
+      "allergens": [],
+      "code": "1035",
+      "condiments": [],
+      "discountPercent": null,
+      "groupL1": "Food",
+      "groupL2": "Desserts",
+      "groupL3": null,
+      "name": "Seasonal fruit plate",
+      "price": 18,
+      "type": "ITEM"
+    },
+    {
+      "allergens": [
+        "SULPHITES"
+      ],
+      "code": "2001",
+      "condiments": [],
+      "discountPercent": null,
+      "groupL1": "Beverages",
+      "groupL2": "Wine",
+      "groupL3": "Red",
+      "name": "Saperavi, glass",
+      "price": 18,
+      "type": "ITEM"
+    },
+    {
+      "allergens": [
+        "SULPHITES"
+      ],
+      "code": "2002",
+      "condiments": [],
+      "discountPercent": null,
+      "groupL1": "Beverages",
+      "groupL2": "Wine",
+      "groupL3": "Red",
+      "name": "Saperavi Mukuzani, bottle",
+      "price": 95,
+      "type": "ITEM"
+    },
+    {
+      "allergens": [
+        "SULPHITES"
+      ],
+      "code": "2003",
+      "condiments": [],
+      "discountPercent": null,
+      "groupL1": "Beverages",
+      "groupL2": "Wine",
+      "groupL3": "Red",
+      "name": "Kindzmarauli, glass",
+      "price": 20,
+      "type": "ITEM"
+    },
+    {
+      "allergens": [
+        "SULPHITES"
+      ],
+      "code": "2004",
+      "condiments": [],
+      "discountPercent": null,
+      "groupL1": "Beverages",
+      "groupL2": "Wine",
+      "groupL3": "Amber",
+      "name": "Rkatsiteli qvevri amber, glass",
+      "price": 22,
+      "type": "ITEM"
+    },
+    {
+      "allergens": [
+        "SULPHITES"
+      ],
+      "code": "2005",
+      "condiments": [],
+      "discountPercent": null,
+      "groupL1": "Beverages",
+      "groupL2": "Wine",
+      "groupL3": "White",
+      "name": "Mtsvane, glass",
+      "price": 17,
+      "type": "ITEM"
+    },
+    {
+      "allergens": [
+        "SULPHITES"
+      ],
+      "code": "2006",
+      "condiments": [],
+      "discountPercent": null,
+      "groupL1": "Beverages",
+      "groupL2": "Wine",
+      "groupL3": "White",
+      "name": "Tsinandali, bottle",
+      "price": 85,
+      "type": "ITEM"
+    },
+    {
+      "allergens": [
+        "SULPHITES"
+      ],
+      "code": "2007",
+      "condiments": [],
+      "discountPercent": null,
+      "groupL1": "Beverages",
+      "groupL2": "Wine",
+      "groupL3": "Sparkling",
+      "name": "Pet-nat sparkling, glass",
+      "price": 24,
+      "type": "ITEM"
+    },
+    {
+      "allergens": [],
+      "code": "2008",
+      "condiments": [],
+      "discountPercent": null,
+      "groupL1": "Beverages",
+      "groupL2": "Spirits",
+      "groupL3": null,
+      "name": "Chacha, 50 ml",
+      "price": 12,
+      "type": "ITEM"
+    },
+    {
+      "allergens": [
+        "GLUTEN"
+      ],
+      "code": "2009",
+      "condiments": [],
+      "discountPercent": null,
+      "groupL1": "Beverages",
+      "groupL2": "Beer",
+      "groupL3": null,
+      "name": "Natakhtari lager, 0.5 l",
+      "price": 9,
+      "type": "ITEM"
+    },
+    {
+      "allergens": [
+        "GLUTEN"
+      ],
+      "code": "2010",
+      "condiments": [],
+      "discountPercent": null,
+      "groupL1": "Beverages",
+      "groupL2": "Beer",
+      "groupL3": null,
+      "name": "Craft IPA, 0.33 l",
+      "price": 14,
+      "type": "ITEM"
+    },
+    {
+      "allergens": [],
+      "code": "2011",
+      "condiments": [],
+      "discountPercent": null,
+      "groupL1": "Beverages",
+      "groupL2": "Soft drinks",
+      "groupL3": null,
+      "name": "Borjomi mineral water",
+      "price": 6,
+      "type": "ITEM"
+    },
+    {
+      "allergens": [],
+      "code": "2012",
+      "condiments": [],
+      "discountPercent": null,
+      "groupL1": "Beverages",
+      "groupL2": "Soft drinks",
+      "groupL3": null,
+      "name": "Lagidze tarragon lemonade",
+      "price": 7,
+      "type": "ITEM"
+    },
+    {
+      "allergens": [],
+      "code": "2013",
+      "condiments": [],
+      "discountPercent": null,
+      "groupL1": "Beverages",
+      "groupL2": "Soft drinks",
+      "groupL3": null,
+      "name": "Fresh orange juice",
+      "price": 12,
+      "type": "ITEM"
+    },
+    {
+      "allergens": [],
+      "code": "2014",
+      "condiments": [
+        {
+          "code": "MILK",
+          "items": [
+            {
+              "allergens": [
+                "MILK"
+              ],
+              "code": "7021",
+              "name": "Whole milk",
+              "price": 0
+            },
+            {
+              "allergens": [
+                "GLUTEN"
+              ],
+              "code": "7022",
+              "name": "Oat milk",
+              "price": 2
+            },
+            {
+              "allergens": [
+                "NUTS"
+              ],
+              "code": "7023",
+              "name": "Almond milk",
+              "price": 2.5
+            },
+            {
+              "allergens": [
+                "SOYBEANS"
+              ],
+              "code": "7024",
+              "name": "Soy milk",
+              "price": 2
+            }
+          ],
+          "maxSelect": 1,
+          "minSelect": 0,
+          "name": "Milk"
+        }
+      ],
+      "discountPercent": null,
+      "groupL1": "Beverages",
+      "groupL2": "Coffee",
+      "groupL3": null,
+      "name": "Espresso",
+      "price": 6,
+      "type": "ITEM"
+    },
+    {
+      "allergens": [
+        "MILK"
+      ],
+      "code": "2015",
+      "condiments": [
+        {
+          "code": "MILK",
+          "items": [
+            {
+              "allergens": [
+                "MILK"
+              ],
+              "code": "7021",
+              "name": "Whole milk",
+              "price": 0
+            },
+            {
+              "allergens": [
+                "GLUTEN"
+              ],
+              "code": "7022",
+              "name": "Oat milk",
+              "price": 2
+            },
+            {
+              "allergens": [
+                "NUTS"
+              ],
+              "code": "7023",
+              "name": "Almond milk",
+              "price": 2.5
+            },
+            {
+              "allergens": [
+                "SOYBEANS"
+              ],
+              "code": "7024",
+              "name": "Soy milk",
+              "price": 2
+            }
+          ],
+          "maxSelect": 1,
+          "minSelect": 0,
+          "name": "Milk"
+        }
+      ],
+      "discountPercent": null,
+      "groupL1": "Beverages",
+      "groupL2": "Coffee",
+      "groupL3": null,
+      "name": "Cappuccino",
+      "price": 9,
+      "type": "ITEM"
+    },
+    {
+      "allergens": [
+        "MILK"
+      ],
+      "code": "2016",
+      "condiments": [
+        {
+          "code": "MILK",
+          "items": [
+            {
+              "allergens": [
+                "MILK"
+              ],
+              "code": "7021",
+              "name": "Whole milk",
+              "price": 0
+            },
+            {
+              "allergens": [
+                "GLUTEN"
+              ],
+              "code": "7022",
+              "name": "Oat milk",
+              "price": 2
+            },
+            {
+              "allergens": [
+                "NUTS"
+              ],
+              "code": "7023",
+              "name": "Almond milk",
+              "price": 2.5
+            },
+            {
+              "allergens": [
+                "SOYBEANS"
+              ],
+              "code": "7024",
+              "name": "Soy milk",
+              "price": 2
+            }
+          ],
+          "maxSelect": 1,
+          "minSelect": 0,
+          "name": "Milk"
+        }
+      ],
+      "discountPercent": null,
+      "groupL1": "Beverages",
+      "groupL2": "Coffee",
+      "groupL3": null,
+      "name": "Flat white",
+      "price": 10,
+      "type": "ITEM"
+    },
+    {
+      "allergens": [],
+      "code": "2017",
+      "condiments": [
+        {
+          "code": "MILK",
+          "items": [
+            {
+              "allergens": [
+                "MILK"
+              ],
+              "code": "7021",
+              "name": "Whole milk",
+              "price": 0
+            },
+            {
+              "allergens": [
+                "GLUTEN"
+              ],
+              "code": "7022",
+              "name": "Oat milk",
+              "price": 2
+            },
+            {
+              "allergens": [
+                "NUTS"
+              ],
+              "code": "7023",
+              "name": "Almond milk",
+              "price": 2.5
+            },
+            {
+              "allergens": [
+                "SOYBEANS"
+              ],
+              "code": "7024",
+              "name": "Soy milk",
+              "price": 2
+            }
+          ],
+          "maxSelect": 1,
+          "minSelect": 0,
+          "name": "Milk"
+        }
+      ],
+      "discountPercent": null,
+      "groupL1": "Beverages",
+      "groupL2": "Tea",
+      "groupL3": null,
+      "name": "Georgian black tea",
+      "price": 6,
+      "type": "ITEM"
+    },
+    {
+      "allergens": [
+        "SULPHITES"
+      ],
+      "code": "2018",
+      "condiments": [],
+      "discountPercent": null,
+      "groupL1": "Beverages",
+      "groupL2": "Cocktails",
+      "groupL3": null,
+      "name": "Aperol spritz",
+      "price": 22,
+      "type": "ITEM"
+    },
+    {
+      "allergens": [
+        "EGGS"
+      ],
+      "code": "2019",
+      "condiments": [],
+      "discountPercent": null,
+      "groupL1": "Beverages",
+      "groupL2": "Cocktails",
+      "groupL3": null,
+      "name": "Chacha sour",
+      "price": 24,
+      "type": "ITEM"
+    },
+    {
+      "allergens": [],
+      "code": "2020",
+      "condiments": [],
+      "discountPercent": null,
+      "groupL1": "Beverages",
+      "groupL2": "Cocktails",
+      "groupL3": null,
+      "name": "Negroni",
+      "price": 25,
+      "type": "ITEM"
+    },
+    {
+      "allergens": [
+        "SULPHITES"
+      ],
+      "code": "2021",
+      "condiments": [],
+      "discountPercent": null,
+      "groupL1": "Beverages",
+      "groupL2": "Wine",
+      "groupL3": "Flights",
+      "name": "Wine tasting flight (4 x 50 ml)",
+      "price": 40,
+      "type": "ITEM"
+    },
+    {
+      "allergens": [
+        "MILK",
+        "SULPHITES"
+      ],
+      "code": "2022",
+      "condiments": [],
+      "discountPercent": null,
+      "groupL1": "Food",
+      "groupL2": "Snacks",
+      "groupL3": null,
+      "name": "Cheese and charcuterie board",
+      "price": 38,
+      "type": "ITEM"
+    },
+    {
+      "allergens": [
+        "NUTS"
+      ],
+      "code": "2023",
+      "condiments": [],
+      "discountPercent": null,
+      "groupL1": "Food",
+      "groupL2": "Snacks",
+      "groupL3": null,
+      "name": "Spiced walnuts",
+      "price": 9,
+      "type": "ITEM"
+    },
+    {
+      "allergens": [],
+      "code": "2024",
+      "condiments": [],
+      "discountPercent": null,
+      "groupL1": "Food",
+      "groupL2": "Snacks",
+      "groupL3": null,
+      "name": "Olives",
+      "price": 8,
+      "type": "ITEM"
+    },
+    {
+      "allergens": [],
+      "code": "2027",
+      "condiments": [],
+      "discountPercent": null,
+      "groupL1": "Beverages",
+      "groupL2": "Tea",
+      "groupL3": null,
+      "name": "Herbal tea",
+      "price": 7,
+      "type": "ITEM"
+    },
+    {
+      "allergens": [],
+      "code": "9001",
+      "condiments": [],
+      "discountPercent": 100,
+      "groupL1": "Discounts",
+      "groupL2": "Discounts",
+      "groupL3": null,
+      "name": "Comp 100%",
+      "price": 0,
+      "type": "DISCOUNT"
+    },
+    {
+      "allergens": [],
+      "code": "9002",
+      "condiments": [],
+      "discountPercent": 100,
+      "groupL1": "Discounts",
+      "groupL2": "Discounts",
+      "groupL3": null,
+      "name": "Welcome drink 100%",
+      "price": 0,
+      "type": "DISCOUNT"
+    },
+    {
+      "allergens": [],
+      "code": "9010",
+      "condiments": [],
+      "discountPercent": 10,
+      "groupL1": "Discounts",
+      "groupL2": "Discounts",
+      "groupL3": null,
+      "name": "Offer 10%",
+      "price": 0,
+      "type": "DISCOUNT"
+    },
+    {
+      "allergens": [],
+      "code": "9015",
+      "condiments": [],
+      "discountPercent": 15,
+      "groupL1": "Discounts",
+      "groupL2": "Discounts",
+      "groupL3": null,
+      "name": "Offer 15%",
+      "price": 0,
+      "type": "DISCOUNT"
+    }
+  ],
+  "message": null,
+  "pageMetadata": {
+    "number": 0,
+    "size": 40,
+    "totalElements": 40,
+    "totalPages": 1
+  }
+}

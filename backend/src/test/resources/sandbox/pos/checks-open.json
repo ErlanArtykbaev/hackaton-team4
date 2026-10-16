@@ -1,0 +1,49 @@
+{
+  "success": true,
+  "elements": [
+    {
+      "checkCloseTime": null,
+      "checkName": null,
+      "checkNumber": "1901",
+      "checkOpenTime": "2026-10-16T00:20:00+04:00",
+      "checkSeq": "83332",
+      "covers": 2,
+      "details": [
+        {
+          "allergens": [
+            "GLUTEN",
+            "MILK"
+          ],
+          "amount": 44,
+          "code": "1011",
+          "condiments": [],
+          "name": "Khachapuri Imeruli",
+          "pos": 1,
+          "quantity": 2,
+          "reference": null,
+          "round": 1,
+          "sentAt": "2026-10-16T00:20:00+04:00",
+          "type": "ITEM",
+          "unitPrice": 22
+        }
+      ],
+      "employeeCode": "B01",
+      "orderType": "1",
+      "payments": [],
+      "reservationId": null,
+      "rvc": 2,
+      "status": "OPEN",
+      "table": "B4",
+      "totalDue": "GEL 44.00",
+      "totalDueRaw": 44,
+      "totalRaw": 44
+    }
+  ],
+  "message": null,
+  "pageMetadata": {
+    "number": 0,
+    "size": 200,
+    "totalElements": 1,
+    "totalPages": 1
+  }
+}
