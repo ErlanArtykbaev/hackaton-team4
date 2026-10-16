@@ -20,6 +20,7 @@ Minimum per feature (`CLAUDE.md` §3, item 4):
 | Our API | `@WebMvcTest` + MockMvc | Request validation gives 400 `ProblemDetail` with `code`; sandbox error codes map to the right status and `code` (`BACKEND.md` §3). |
 | Model features | stubbed `LlmClient` | The validation layer rejects unsafe proposals (a dangerous allergen, a price or time the hotel does not offer); the fallback works when the model fails. Never assert on the model's wording. |
 | Application | one `@SpringBootTest` | The context starts with WireMock as the sandbox, a stubbed `LlmClient` and in-memory H2. |
+| Demo path | one `@SpringBootTest` | All demo steps in order through our API over WireMock fixtures: the executable spec of the demo, written as soon as the API contract is frozen. |
 
 Cross-cutting sandbox tests, written once in the skeleton (`BACKEND.md` §5.2):
 
@@ -53,6 +54,7 @@ Not tested: generated client code, records without logic, layout and styling.
 
 - Owned by the frontend developers (`FRONTEND.md` §6, question 9).
 - Minimum until they decide: type check, lint and build pass in CI.
+- One Playwright happy path of the demo path, written after the UI is stable (14:30), run by hand before rehearsals against the live sandbox; not in CI.
 
 ## §6. Commands
 

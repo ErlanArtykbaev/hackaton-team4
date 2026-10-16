@@ -62,7 +62,7 @@ backend/
 - **Validation.** Simple constraints on request records (`jakarta.validation`); invariants in services. Request and response records are separate types.
 - **Persistence.** Domain entities: app-generated UUID id, `created_at`, `updated_at`; `@Version` where two people may edit the same row. Repositories only query: no logic, no `@Transactional` (it lives in services). `existsBy`/`countBy` instead of loading; no `findAll()` + filtering in memory; `Optional` for a single result; no N+1 (fetch join or `@EntityGraph`).
 - **Logging.** SLF4J with `{}` placeholders. ERROR: a person must act, throwable attached. WARN: survived (fallback, retry). INFO: a business action with its ids. DEBUG: diagnostics. Log an exception once, where it is handled, with the throwable (never only `getMessage()`). No logging inside loops: one summary line plus one per failure. Never log secrets or request bodies.
-- Schema changes go through Liquibase only, as YAML: one file per change, `db/changelog/changes/<NNN>_<description>.yaml` (`NNN` is the next free number), changeset id = the file name without extension, author = the developer's name. The master changelog includes `changes/` in order. Changesets are append-only: never edit one that has been pushed.
+- Schema changes go through Liquibase only, as YAML: one file per change, `db/changelog/changes/<NNN>_<description>.yaml` (`NNN` from the author's range: 001–099 skeleton, 100–199 BE-A, 200–299 BE-B — so two developers never take the same number), changeset id = the file name without extension, author = the developer's name. The master changelog includes `changes/` in order. Changesets are append-only: never edit one that has been pushed.
 
 ## §5. The hotel sandbox (PMS / POS)
 

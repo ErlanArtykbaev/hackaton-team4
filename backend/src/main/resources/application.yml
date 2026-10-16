@@ -34,7 +34,8 @@ sandbox:
   connect-timeout: 2s
   read-timeout: 5s
   reset-read-timeout: 40s
-  rate-limit-per-second: 8
+  # The key's 10 req/s is shared by the whole team: lower it in each developer's .env (PLAN.md, Shared resources).
+  rate-limit-per-second: ${SANDBOX_RATE_LIMIT:8}
   retry:
     max-attempts: 3
     initial-backoff: 200ms

@@ -49,6 +49,7 @@ A feature is done when all of these hold:
 ## 5. How you work
 
 - Before code: read the relevant rules and the code you will touch; state a short plan (files, tests).
+- Work by task ID from `PLAN.md`: read its row first, touch only that task's feature files, change status only in your own section.
 - Minimal, targeted changes; match existing patterns; no drive-by refactoring.
 - Ambiguity: ask, or take the most restrictive reading. Name your uncertainty in the report, never hide it.
 - Before reporting done: check §3. Report failures plainly.

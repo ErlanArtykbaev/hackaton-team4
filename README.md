@@ -31,6 +31,11 @@ cd backend
 node scripts/record-fixtures.mjs                           # re-record sandbox fixtures (writes a little to the hotel)
 ```
 
+## Event day
+
+- Plan, owners and task statuses: [`PLAN.md`](PLAN.md).
+- Demo state: `node scripts/prepare-demo.mjs` (dry run) and `--reset` (BE-A only; resets the hotel for the whole team).
+
 ## Layout
 
 ```text

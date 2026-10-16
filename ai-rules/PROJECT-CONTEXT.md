@@ -21,12 +21,14 @@
 
 ## §2. Team
 
-| Member | Company | Side | Role on the day |
+| Member | Company | Side | Slot in `PLAN.md` |
 |---|---|---|---|
-| Artykbaev Erlan | Sonata | FE | TODO |
-| Dudko Aleksandr | Sonata | BE | TODO |
-| Zubov Sergey | TYNGO | BE | TODO |
-| Chzhen Gennadii | TYNGO | FE | TODO |
+| Zubov Sergey | TYNGO | BE | BE-A, tech lead |
+| Dudko Aleksandr | Sonata | BE | BE-B — **participation not confirmed**: the team is 3 or 4 people, or a substitute joins |
+| Chzhen Gennadii | TYNGO | FE | FE-A |
+| Artykbaev Erlan | Sonata | FE | FE-B |
+
+Roles per team mode (3 people, 4 people, a substitute): `PLAN.md`, "Team mode".
 
 ## §3. Topic
 

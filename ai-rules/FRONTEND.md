@@ -39,6 +39,7 @@ frontend/
 
 - The browser calls only our backend, never the sandbox or the model directly (keys stay on the backend).
 - Errors: show a message chosen by the ProblemDetail `code`, in one place in `shared/` (`BACKEND.md` §3).
+- Every element on the demo path gets a `data-testid` (`<feature>-<element>`), so the Playwright test is quick to write.
 - TODO: state, styling, forms, lint and format (§6).
 
 ## §5. Tests
@@ -66,7 +67,7 @@ Each question has a default: if nobody objects, the default stands. Block A bloc
 2. Localisation of guest screens. Default: i18next on guest screens only; language from `guest.language` with a switcher.
 3. Device targets. Default: guest and room-attendant screens phone-first; front desk, kitchen and manager desktop or tablet. No PWA.
 4. Forms and validation. Default: the UI kit's form helpers + Zod.
-5. Tests. Default: Vitest for logic with rules (formatting, mapping); type check, lint and build in CI; no end-to-end test.
+5. Tests. Default: Vitest for logic with rules (formatting, mapping); type check, lint and build in CI; one Playwright happy path of the demo path, run by hand (`TESTING.md` §5). Install the Playwright browsers before Sunday.
 6. How the frontend runs in the demo. Default: Vite dev server with the proxy; the backend runs separately.
 7. Formatting of money and time. Default: `Intl` with the hotel currency and time zone from the backend.
 
