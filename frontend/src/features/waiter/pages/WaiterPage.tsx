@@ -1,3 +1,4 @@
+import { ErrorAlert } from '../../../shared/ErrorAlert'
 import { errorMessage } from '../../../shared/errors'
 import { Alert, Button, Grid, Group, Loader, Paper, Stack, Text, Title } from '@mantine/core'
 import { notifications } from '@mantine/notifications'
@@ -122,7 +123,21 @@ export function WaiterPage() {
           ) : passport.isLoading ? (
             <Loader />
           ) : passport.isError ? (
-            <Alert color="red">{errorMessage(passport.error)}</Alert>
+            <Paper withBorder p="md">
+              <Group justify="space-between">
+                <Text fw={700} size="lg">
+                  Room {party.roomNumber} · {party.guestName}
+                </Text>
+                <Button variant="subtle" onClick={() => choose(null)} data-testid="waiter-party-change">
+                  Change party
+                </Button>
+              </Group>
+              <ErrorAlert
+                error={passport.error}
+                onRetry={() => void passport.refetch()}
+                testId="waiter-passport-error"
+              />
+            </Paper>
           ) : (
             passport.data && (
               <PartyHeader
