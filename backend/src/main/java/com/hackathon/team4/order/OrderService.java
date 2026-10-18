@@ -11,6 +11,7 @@ import com.hackathon.team4.kitchen.KitchenTicketService;
 import com.hackathon.team4.kitchen.KitchenTicketService.Round;
 import com.hackathon.team4.kitchen.KitchenTicketService.RoundLine;
 import com.hackathon.team4.menu.MenuService;
+import com.hackathon.team4.menu.OutletService;
 import com.hackathon.team4.menu.dto.CondimentOption;
 import com.hackathon.team4.menu.dto.MenuItem;
 import com.hackathon.team4.order.OrderRejectedException.Reason;
@@ -62,6 +63,7 @@ public class OrderService {
     private static final String LANGUAGE = "en";
 
     private final MenuService menus;
+    private final OutletService outlets;
     private final PassportService passports;
     private final AllergenEngine engine;
     private final PosGateway pos;
@@ -69,9 +71,10 @@ public class OrderService {
     private final SafetyLogService safetyLog;
     private final Clock clock;
 
-    OrderService(MenuService menus, PassportService passports, AllergenEngine engine, PosGateway pos,
-            KitchenTicketService kitchen, SafetyLogService safetyLog, Clock clock) {
+    OrderService(MenuService menus, OutletService outlets, PassportService passports, AllergenEngine engine,
+            PosGateway pos, KitchenTicketService kitchen, SafetyLogService safetyLog, Clock clock) {
         this.menus = menus;
+        this.outlets = outlets;
         this.passports = passports;
         this.engine = engine;
         this.pos = pos;
@@ -100,7 +103,7 @@ public class OrderService {
 
         CheckDTO check = pos.openCheck(order.rvc(), beginCheck(order, party, lines));
         int round = round(check);
-        String outletName = menus.outletName(order.rvc()).orElse(null);
+        String outletName = outlets.outletName(order.rvc()).orElse(null);
         // A walk-in's round reaches the kitchen through the POS event feed, as a check without a reservation.
         if (party != null) {
             kitchen.recordCheckedRound(new Round(order.rvc(), outletName, check.getCheckNumber(), check.getCheckSeq(),

@@ -18,6 +18,7 @@ import com.hackathon.team4.allergen.Severity;
 import com.hackathon.team4.allergen.Verdict;
 import com.hackathon.team4.kitchen.KitchenTicketService;
 import com.hackathon.team4.menu.MenuService;
+import com.hackathon.team4.menu.OutletService;
 import com.hackathon.team4.menu.dto.CondimentGroup;
 import com.hackathon.team4.menu.dto.CondimentOption;
 import com.hackathon.team4.menu.dto.MenuItem;
@@ -52,8 +53,9 @@ class OrderServiceTest {
     private final MenuService menus = mock(MenuService.class);
     private final PassportService passports = mock(PassportService.class);
     private final PosGateway pos = mock(PosGateway.class);
-    private final OrderService orders = new OrderService(menus, passports, new AllergenEngine(), pos,
-            mock(KitchenTicketService.class), mock(SafetyLogService.class), Clock.systemUTC());
+    private final OrderService orders = new OrderService(menus, mock(OutletService.class), passports,
+            new AllergenEngine(), pos, mock(KitchenTicketService.class), mock(SafetyLogService.class),
+            Clock.systemUTC());
 
     @BeforeEach
     void poolBarMenuAndKuznetsovParty() {

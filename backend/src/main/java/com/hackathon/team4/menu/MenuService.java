@@ -9,7 +9,6 @@ import com.hackathon.team4.allergen.Verdict;
 import com.hackathon.team4.menu.dto.CondimentGroup;
 import com.hackathon.team4.menu.dto.CondimentOption;
 import com.hackathon.team4.menu.dto.MenuItem;
-import com.hackathon.team4.menu.dto.Outlet;
 import com.hackathon.team4.passport.PassportService;
 import com.hackathon.team4.sandbox.generated.model.CondimentGroupDTO;
 import com.hackathon.team4.sandbox.generated.model.CondimentOptionDTO;
@@ -22,7 +21,6 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import org.slf4j.Logger;
@@ -30,10 +28,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 /**
- * Outlets and their menus with a verdict per item and per condiment for the party.
+ * The menu of an outlet with a verdict per item and per condiment for the party.
  *
  * <p>The menu comes from the POS, cached per outlet for {@link #MENU_TTL}; verdicts, "for whom" and safe
- * alternatives come from the allergen engine with the reservation's party. Outlets are fixed data until BE-A3.
+ * alternatives come from the allergen engine with the reservation's party.
  */
 @Service
 public class MenuService {
@@ -46,12 +44,6 @@ public class MenuService {
     /** Staff screens are in English. */
     private static final String LANGUAGE = "en";
 
-    private static final List<Outlet> OUTLETS = List.of(
-            new Outlet(1, "Main Restaurant", OutletKind.RESTAURANT, List.of("T1", "T2", "T3", "T4", "T5", "T6")),
-            new Outlet(2, "Beach Bar", OutletKind.BAR, List.of("B1", "B2", "B3", "B4", "B5", "B6")),
-            new Outlet(3, "Room Service", OutletKind.ROOM_SERVICE, List.of()),
-            new Outlet(4, "Pool Bar", OutletKind.BAR, List.of("P1", "P2", "P3", "P4", "P5", "P6")));
-
     private final PosGateway pos;
     private final PassportService passports;
     private final AllergenEngine engine;
@@ -63,15 +55,6 @@ public class MenuService {
         this.passports = passports;
         this.engine = engine;
         this.clock = clock;
-    }
-
-    public List<Outlet> outlets() {
-        return OUTLETS;
-    }
-
-    /** The outlet's name for logs; empty for an rvc the hotel does not have. */
-    public Optional<String> outletName(int rvc) {
-        return OUTLETS.stream().filter(outlet -> outlet.rvc() == rvc).map(Outlet::name).findFirst();
     }
 
     /**

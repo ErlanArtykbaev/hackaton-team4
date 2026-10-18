@@ -7,6 +7,7 @@ import static com.github.tomakehurst.wiremock.client.WireMock.postRequestedFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.tuple;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -21,6 +22,7 @@ import com.hackathon.team4.kitchen.KitchenTicket;
 import com.hackathon.team4.kitchen.KitchenTicketRepository;
 import com.hackathon.team4.kitchen.TicketLine;
 import com.hackathon.team4.kitchen.TicketSource;
+import com.hackathon.team4.menu.OutletService;
 import com.hackathon.team4.passport.PassportService;
 import com.hackathon.team4.safetylog.LogEntryType;
 import com.hackathon.team4.safetylog.SafetyLogEntry;
@@ -28,16 +30,19 @@ import com.hackathon.team4.safetylog.SafetyLogService;
 import com.hackathon.team4.sandbox.SandboxStubs;
 import com.hackathon.team4.sandbox.SandboxTestBase;
 import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.support.TransactionTemplate;
 
 /**
- * Orders over the stubbed POS. The menu cache lives as long as the shared Spring context, so every test uses its own
- * rvc; the menu, outlets and check fixtures are the practice hotel's.
+ * Orders over the stubbed POS. The menu cache lives as long as the Spring context, so every test uses its own rvc;
+ * the menu, outlets and check fixtures are the practice hotel's. Outlet names are mocked, so the practice outlets
+ * never reach the cache of the shared {@link OutletService} that other tests read.
  */
 @AutoConfigureMockMvc
 class OrderControllerTest extends SandboxTestBase {
@@ -57,9 +62,13 @@ class OrderControllerTest extends SandboxTestBase {
     @Autowired
     private TransactionTemplate transactions;
 
+    @MockitoBean
+    private OutletService outlets;
+
     @Test
     void shouldOpenALinkedPosCheckAndRecordTheKitchenTicketAndTheSafetyLog() throws Exception {
         TestParty party = TestParty.save(passports, SANDBOX, "R-990302");
+        when(outlets.outletName(2)).thenReturn(Optional.of("Rooftop Wine Bar"));
         posWithMenuAndOutlets().ok(WireMock.post(urlPathEqualTo("/v1/pos/checks")), 201, "pos/check-opened");
 
         mvc.perform(post("/api/orders").contentType(MediaType.APPLICATION_JSON).content("""
@@ -105,6 +114,7 @@ class OrderControllerTest extends SandboxTestBase {
                 .toList();
         assertThat(entries).extracting(SafetyLogEntry::type).containsExactlyInAnyOrder(
                 LogEntryType.ORDER_PLACED, LogEntryType.WAITER_CONFIRMED, LogEntryType.GUEST_CONSENT);
+        assertThat(entries).extracting(SafetyLogEntry::outletName).containsOnly("Rooftop Wine Bar");
         assertThat(entries).filteredOn(entry -> entry.type() == LogEntryType.GUEST_CONSENT).singleElement()
                 .satisfies(consent -> {
                     assertThat(consent.memberName()).isEqualTo("Anna");
