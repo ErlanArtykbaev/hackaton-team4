@@ -66,7 +66,7 @@ Statuses: `TODO` · `DOING` · `DONE` · `CUT`. Each person edits only their own
 | BE-A1 | New team key, live smoke test, slow-sandbox fix (done by Sergey) | — | — | DONE |
 | BE-A2 | The whole API contract as stub controllers + records, fixed data from the demo story; springdoc lists every endpoint — **by 13:00** | all | — | DONE |
 | BE-A3 | Reservation search, front-desk arrivals, outlets (filtered PMS calls, POS lookup) | 1, 2 | BE-A2 | DONE |
-| BE-A4 | Menu with verdicts (menu cached 5 min) + `POST /api/orders/check` + `POST /api/orders` → POS check linked to the reservation; enforce requirements; publish order, confirmation and consent entries | 2, 3 | BE-B2 | DOING |
+| BE-A4 | Menu with verdicts (menu cached 5 min) + `POST /api/orders/check` + `POST /api/orders` → POS check linked to the reservation; enforce requirements; publish order, confirmation and consent entries | 2, 3 | BE-B2 | DONE |
 | BE-A5 | Kitchen feed: listener on `pos.check.round_sent` → ticket through Erlan's service; SSE `/api/stream` from `TicketChanged`, `LogAppended`, `PassportChanged` | 4 | BE-B4 | DONE |
 | BE-A6 | `scripts/pos-order.mjs` (bartender order straight into the POS, PIN from `.env`) + demo prep steps in `prepare-demo.mjs` | 4 | — | DONE (Sergey) |
 
@@ -98,9 +98,9 @@ Progress: passport, kitchen ticket and safety-log endpoints run on the real serv
 | ID | Task | Demo step | Depends on | Status |
 |---|---|---|---|---|
 | FE-A1 | Frontend skeleton (block A defaults), routes, device setup, CI job — **by 12:45** | — | — | DONE |
-| FE-A2 | Waiter: party search (room or last name), badges per person, menu by group with verdict colours, "only safe" toggle, walk-in mode (allergens only) | 2 | FE-B1 | DOING |
-| FE-A3 | Waiter: condiment picker, "for whom", waiter-confirmation tap, **guest consent screen** (guest types their name), safe alternatives, quick passport update (add member or allergen), cart → send | 2, 3 | FE-A2 | DOING |
-| FE-A4 | Kitchen display: tickets live via SSE, allergen lines "for whom", consent and confirmation marks, "not checked at ordering" on top — no approval | 4 | FE-B1 | DOING |
+| FE-A2 | Waiter: party search (room or last name), badges per person, menu by group with verdict colours, "only safe" toggle, walk-in mode (allergens only) | 2 | FE-B1 | DONE |
+| FE-A3 | Waiter: condiment picker, "for whom", waiter-confirmation tap, **guest consent screen** (guest types their name), safe alternatives, quick passport update (add member or allergen), cart → send | 2, 3 | FE-A2 | DONE |
+| FE-A4 | Kitchen display: tickets live via SSE, allergen lines "for whom", consent and confirmation marks, "not checked at ordering" on top — no approval | 4 | FE-B1 | DONE |
 
 ### FE-B — Nikolai
 
@@ -108,10 +108,12 @@ Progress: passport, kitchen ticket and safety-log endpoints run on the real serv
 |---|---|---|---|---|
 | FE-B0 | Design in `shared/`: chips with icons for the 14 allergens, severity and verdict colours, party badge | all | FE-A1 | DONE |
 | FE-B1 | Generated API types (`npm run gen:api`) + `useStream` hook for `/api/stream` + error messages by `code` | — | BE-A2 | DONE |
-| FE-B2 | Front desk: arrivals worklist, search, a card per member (name, age, allergens, severity), save with "PMS updated" | 1 | FE-B1 | DOING |
-| FE-B3 | Manager: search by room or last name, timeline with consent records highlighted, KPIs, live via SSE | 5 | FE-B1 | DOING |
+| FE-B2 | Front desk: arrivals worklist, search, a card per member (name, age, allergens, severity), save with "PMS updated" | 1 | FE-B1 | DONE |
+| FE-B3 | Manager: search by room or last name, timeline with consent records highlighted, KPIs, live via SSE | 5 | FE-B1 | DONE |
 | FE-B4 | Playwright happy path (after 14:30), screen recording at 15:15 | all | UI stable | DOING |
 | FE-B5 | Stretch: guest passport page by QR | — | everything else DONE | CUT |
+
+**Status at 16:05:** every task is merged into `main`; backend 131 tests green, frontend typecheck, lint and build green. FE-B4: the Playwright test is in, the screen recording is pending. Functional check: the run-through on the demo laptop (`DEMO.md`).
 
 ## Checkpoints — 5 minutes, one sentence each: done / doing / blocked
 
