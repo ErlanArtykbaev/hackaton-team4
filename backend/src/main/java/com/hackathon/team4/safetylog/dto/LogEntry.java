@@ -3,7 +3,9 @@ package com.hackathon.team4.safetylog.dto;
 import com.hackathon.team4.allergen.Allergen;
 import com.hackathon.team4.allergen.Severity;
 import com.hackathon.team4.safetylog.LogEntryType;
+import com.hackathon.team4.safetylog.SafetyLogEntry;
 import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.util.UUID;
 
 /**
@@ -24,4 +26,10 @@ public record LogEntry(
         Severity severity,
         String actor,
         String statement) {
+
+    public static LogEntry from(SafetyLogEntry entry) {
+        return new LogEntry(entry.id(), entry.at().atOffset(ZoneOffset.UTC), entry.type(), entry.rvc(),
+                entry.outletName(), entry.reservationId(), entry.roomNumber(), entry.memberName(), entry.item(),
+                entry.allergen(), entry.severity(), entry.actor(), entry.statement());
+    }
 }

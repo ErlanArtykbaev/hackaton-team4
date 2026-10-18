@@ -3,6 +3,7 @@ package com.hackathon.team4.passport;
 import com.hackathon.team4.allergen.Allergen;
 import com.hackathon.team4.allergen.PartyMember;
 import com.hackathon.team4.allergen.Severity;
+import com.hackathon.team4.passport.dto.PassportResponse;
 import com.hackathon.team4.safetylog.LogEntryType;
 import com.hackathon.team4.safetylog.SafetyLogService;
 import com.hackathon.team4.sandbox.generated.model.Guest;
@@ -25,6 +26,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -46,12 +48,15 @@ public class PassportService {
     private final PassportRepository passports;
     private final PmsGateway pms;
     private final SafetyLogService safetyLog;
+    private final ApplicationEventPublisher events;
     private final Clock clock;
 
-    PassportService(PassportRepository passports, PmsGateway pms, SafetyLogService safetyLog, Clock clock) {
+    PassportService(PassportRepository passports, PmsGateway pms, SafetyLogService safetyLog,
+            ApplicationEventPublisher events, Clock clock) {
         this.passports = passports;
         this.pms = pms;
         this.safetyLog = safetyLog;
+        this.events = events;
         this.clock = clock;
     }
 
@@ -99,7 +104,7 @@ public class PassportService {
         Passport saved = store(reservation, stored, notes, members, updatedBy, source, rvc, outletName);
         Set<Allergen> union = union(members);
         syncPms(reservation.getGuest(), union);
-        return snapshot(saved, reservation, List.copyOf(union));
+        return published(snapshot(saved, reservation, List.copyOf(union)));
     }
 
     /**
@@ -118,9 +123,15 @@ public class PassportService {
             if (missing.isEmpty()) {
                 continue;
             }
-            store(reservation, Optional.of(passport), passport.notes(), withMissing(before, missing, reservation),
-                    "PMS", Source.PMS, null, null);
+            Passport saved = store(reservation, Optional.of(passport), passport.notes(),
+                    withMissing(before, missing, reservation), "PMS", Source.PMS, null, null);
+            published(snapshot(saved, reservation, pmsAllergens(reservation)));
         }
+    }
+
+    private PassportSnapshot published(PassportSnapshot snapshot) {
+        events.publishEvent(new PassportChanged(PassportResponse.from(snapshot)));
+        return snapshot;
     }
 
     private Passport store(Reservation reservation, Optional<Passport> stored, String notes,

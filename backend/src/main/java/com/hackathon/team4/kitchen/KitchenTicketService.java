@@ -6,6 +6,7 @@ import com.hackathon.team4.allergen.DangerFor;
 import com.hackathon.team4.allergen.ItemCheck;
 import com.hackathon.team4.allergen.PartyMember;
 import com.hackathon.team4.allergen.Verdict;
+import com.hackathon.team4.kitchen.dto.KitchenTicketResponse;
 import com.hackathon.team4.passport.Party;
 import com.hackathon.team4.passport.PassportService;
 import com.hackathon.team4.safetylog.LogEntryType;
@@ -23,6 +24,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -66,14 +68,16 @@ public class KitchenTicketService {
     private final PassportService passports;
     private final AllergenEngine engine;
     private final SafetyLogService safetyLog;
+    private final ApplicationEventPublisher events;
     private final Clock clock;
 
     KitchenTicketService(KitchenTicketRepository tickets, PassportService passports, AllergenEngine engine,
-            SafetyLogService safetyLog, Clock clock) {
+            SafetyLogService safetyLog, ApplicationEventPublisher events, Clock clock) {
         this.tickets = tickets;
         this.passports = passports;
         this.engine = engine;
         this.safetyLog = safetyLog;
+        this.events = events;
         this.clock = clock;
     }
 
@@ -95,7 +99,7 @@ public class KitchenTicketService {
         KitchenTicket ticket = tickets.save(ticket(round, TicketSource.CHECKED, party));
         log.info("Kitchen ticket for check {} round {} at rvc {} (checked)", round.checkNumber(), round.round(),
                 round.rvc());
-        return ticket;
+        return published(ticket);
     }
 
     /**
@@ -109,7 +113,7 @@ public class KitchenTicketService {
             return Optional.empty();
         }
         if (round.reservationId() == null) {
-            return Optional.of(tickets.save(ticket(round, TicketSource.UNLINKED, null)));
+            return Optional.of(published(tickets.save(ticket(round, TicketSource.UNLINKED, null))));
         }
         Party party = partyOrNull(round.reservationId());
         KitchenTicket ticket = tickets.save(ticket(round, TicketSource.UNCHECKED, party));
@@ -118,7 +122,12 @@ public class KitchenTicketService {
         }
         log.info("Kitchen ticket for check {} round {} at rvc {} (not checked at ordering)", round.checkNumber(),
                 round.round(), round.rvc());
-        return Optional.of(ticket);
+        return Optional.of(published(ticket));
+    }
+
+    private KitchenTicket published(KitchenTicket ticket) {
+        events.publishEvent(new TicketChanged(KitchenTicketResponse.from(ticket)));
+        return ticket;
     }
 
     private KitchenTicket ticket(Round round, TicketSource source, Party party) {

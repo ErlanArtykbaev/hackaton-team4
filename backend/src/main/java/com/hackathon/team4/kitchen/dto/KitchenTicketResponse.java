@@ -1,8 +1,10 @@
 package com.hackathon.team4.kitchen.dto;
 
+import com.hackathon.team4.kitchen.KitchenTicket;
 import com.hackathon.team4.kitchen.TicketSource;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.util.List;
 import java.util.UUID;
 
@@ -22,4 +24,11 @@ public record KitchenTicketResponse(
         TicketSource source,
         boolean hasAllergens,
         List<KitchenTicketLine> lines) {
+
+    public static KitchenTicketResponse from(KitchenTicket ticket) {
+        List<KitchenTicketLine> lines = ticket.lines().stream().map(KitchenTicketLine::from).toList();
+        return new KitchenTicketResponse(ticket.id(), ticket.rvc(), Integer.parseInt(ticket.checkNumber()),
+                ticket.table(), ticket.roomNumber(), ticket.guestName(), ticket.sentAt().atOffset(ZoneOffset.UTC),
+                ticket.source(), ticket.hasAllergens(), lines);
+    }
 }

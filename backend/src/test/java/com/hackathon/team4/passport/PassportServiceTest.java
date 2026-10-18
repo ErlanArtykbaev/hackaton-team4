@@ -36,10 +36,13 @@ import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.event.ApplicationEvents;
+import org.springframework.test.context.event.RecordApplicationEvents;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 @DataJpaTest
 @ActiveProfiles("test")
+@RecordApplicationEvents
 @Import({PassportService.class, SafetyLogService.class, PassportServiceTest.FixedClock.class})
 class PassportServiceTest {
 
@@ -62,6 +65,9 @@ class PassportServiceTest {
 
     @Autowired
     private SafetyLogRepository log;
+
+    @Autowired
+    private ApplicationEvents events;
 
     @BeforeEach
     void reservationWithPeanutsOnThePmsProfile() {
@@ -103,6 +109,8 @@ class PassportServiceTest {
                 .containsExactly("Mikhail", "Anna", "Misha");
         assertThat(saved.members().get(0).id()).isEqualTo(primaryId);
         assertThat(saved.pmsAllergens()).containsExactlyInAnyOrder(Allergen.MILK, Allergen.PEANUTS);
+        assertThat(events.stream(PassportChanged.class)).singleElement()
+                .satisfies(event -> assertThat(event.passport().members()).hasSize(3));
         assertThat(log.search(null, LogEntryType.PASSPORT_UPDATED, "518", null)).singleElement()
                 .satisfies(entry -> {
                     assertThat(entry.actor()).isEqualTo("W02");
@@ -182,6 +190,7 @@ class PassportServiceTest {
                 Map.of(Allergen.SESAME, Severity.SEVERE));
         assertThat(snapshot.members().get(1).allergies()).containsOnlyKeys(Allergen.PEANUTS);
         assertThat(snapshot.updatedBy()).isEqualTo("PMS");
+        assertThat(events.stream(PassportChanged.class)).hasSize(2);
         assertThat(log.search(null, LogEntryType.PASSPORT_UPDATED, null, null).get(0).statement())
                 .isEqualTo("PMS: Mikhail: +SESAME (severe)");
         verify(pms, never()).updateGuest(anyString(), any());
@@ -198,6 +207,7 @@ class PassportServiceTest {
 
         assertThat(log.search(null, LogEntryType.PASSPORT_UPDATED, null, null)).hasSize(1);
         assertThat(passports.get(RESERVATION).updatedBy()).isEqualTo("front-desk");
+        assertThat(events.stream(PassportChanged.class)).hasSize(1);
     }
 
     private static PassportSnapshot.Member member(UUID id, String name, Integer age, boolean primary,

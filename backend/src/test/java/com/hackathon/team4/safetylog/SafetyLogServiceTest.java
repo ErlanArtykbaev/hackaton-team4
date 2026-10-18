@@ -14,9 +14,12 @@ import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.event.ApplicationEvents;
+import org.springframework.test.context.event.RecordApplicationEvents;
 
 @DataJpaTest
 @ActiveProfiles("test")
+@RecordApplicationEvents
 @Import({SafetyLogService.class, SafetyLogServiceTest.FixedClock.class})
 class SafetyLogServiceTest {
 
@@ -32,6 +35,9 @@ class SafetyLogServiceTest {
 
     @Autowired
     private SafetyLogService safetyLog;
+
+    @Autowired
+    private ApplicationEvents events;
 
     @BeforeEach
     void entries() {
@@ -59,6 +65,12 @@ class SafetyLogServiceTest {
                 LogEntryType.POS_ORDER_UNCHECKED, LogEntryType.WAITER_CONFIRMED, LogEntryType.GUEST_CONSENT,
                 LogEntryType.ORDER_PLACED, LogEntryType.ORDER_PLACED);
         assertThat(safetyLog.search(null, 4, LogEntryType.GUEST_CONSENT)).hasSize(1);
+    }
+
+    @Test
+    void shouldPublishEveryAppendedEntry() {
+        assertThat(events.stream(LogAppended.class)).hasSize(5).first()
+                .satisfies(event -> assertThat(event.entry().roomNumber()).isEqualTo("518"));
     }
 
     @Test

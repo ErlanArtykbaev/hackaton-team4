@@ -2,7 +2,6 @@ package com.hackathon.team4.safetylog;
 
 import com.hackathon.team4.safetylog.dto.LogEntry;
 import com.hackathon.team4.safetylog.dto.SafetyLogSummary;
-import java.time.ZoneOffset;
 import java.util.List;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -30,7 +29,7 @@ public class SafetyLogController {
     public List<LogEntry> search(@RequestParam(required = false) String query,
                                  @RequestParam(required = false) Integer rvc,
                                  @RequestParam(required = false) LogEntryType type) {
-        return log.search(query, rvc, type).stream().map(SafetyLogController::toResponse).toList();
+        return log.search(query, rvc, type).stream().map(LogEntry::from).toList();
     }
 
     /** The last day. */
@@ -39,11 +38,5 @@ public class SafetyLogController {
         SafetyLogService.Counts counts = log.summary();
         return new SafetyLogSummary(counts.ordersChecked(), counts.linesWithAllergens(), counts.waiterConfirmations(),
                 counts.guestConsents(), counts.uncheckedPosOrders());
-    }
-
-    private static LogEntry toResponse(SafetyLogEntry entry) {
-        return new LogEntry(entry.id(), entry.at().atOffset(ZoneOffset.UTC), entry.type(), entry.rvc(),
-                entry.outletName(), entry.reservationId(), entry.roomNumber(), entry.memberName(), entry.item(),
-                entry.allergen(), entry.severity(), entry.actor(), entry.statement());
     }
 }

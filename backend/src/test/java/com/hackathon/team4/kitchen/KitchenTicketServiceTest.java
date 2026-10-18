@@ -35,11 +35,14 @@ import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.event.ApplicationEvents;
+import org.springframework.test.context.event.RecordApplicationEvents;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 /** Demo step 4: the Kuznetsov family at the Pool Bar. */
 @DataJpaTest
 @ActiveProfiles("test")
+@RecordApplicationEvents
 @Import({KitchenTicketService.class, PassportService.class, SafetyLogService.class, AllergenEngine.class,
         KitchenTicketServiceTest.FixedClock.class})
 class KitchenTicketServiceTest {
@@ -66,6 +69,9 @@ class KitchenTicketServiceTest {
 
     @Autowired
     private SafetyLogRepository log;
+
+    @Autowired
+    private ApplicationEvents events;
 
     private UUID mikhail;
     private UUID anna;
@@ -140,6 +146,7 @@ class KitchenTicketServiceTest {
         kitchen.recordPosRound(fromFeed);
 
         assertThat(kitchen.recordPosRound(fromFeed)).isEmpty();
+        assertThat(events.stream(TicketChanged.class)).hasSize(1);
         kitchen.recordCheckedRound(round("4", KUZNETSOV,
                 new RoundLine("Kids nuggets", 1, List.of(), Set.of(), mikhail, false, null)));
 
@@ -147,6 +154,8 @@ class KitchenTicketServiceTest {
             assertThat(ticket.source()).isEqualTo(TicketSource.CHECKED);
             assertThat(ticket.lines().get(0).forMemberName()).isEqualTo("Mikhail");
         });
+        assertThat(events.stream(TicketChanged.class)).hasSize(2).last()
+                .satisfies(event -> assertThat(event.ticket().source()).isEqualTo(TicketSource.CHECKED));
     }
 
     @Test

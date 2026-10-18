@@ -1,5 +1,6 @@
 package com.hackathon.team4.safetylog;
 
+import com.hackathon.team4.safetylog.dto.LogEntry;
 import java.time.Clock;
 import java.time.Duration;
 import java.time.Instant;
@@ -7,6 +8,7 @@ import java.util.List;
 import java.util.Locale;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,10 +25,12 @@ public class SafetyLogService {
     static final Duration SUMMARY_PERIOD = Duration.ofHours(24);
 
     private final SafetyLogRepository entries;
+    private final ApplicationEventPublisher events;
     private final Clock clock;
 
-    SafetyLogService(SafetyLogRepository entries, Clock clock) {
+    SafetyLogService(SafetyLogRepository entries, ApplicationEventPublisher events, Clock clock) {
         this.entries = entries;
+        this.events = events;
         this.clock = clock;
     }
 
@@ -39,6 +43,7 @@ public class SafetyLogService {
     public SafetyLogEntry append(SafetyLogEntry entry) {
         SafetyLogEntry saved = entries.save(entry);
         log.info("Safety log {} for reservation {} by {}", saved.type(), saved.reservationId(), saved.actor());
+        events.publishEvent(new LogAppended(LogEntry.from(saved)));
         return saved;
     }
 
