@@ -1,5 +1,6 @@
-import { Grid, Paper, Text, Title } from '@mantine/core'
+import { Grid, Title } from '@mantine/core'
 import { useState } from 'react'
+import { EmptyState } from '../../../shared/EmptyState'
 import { ArrivalsPanel } from '../components/ArrivalsPanel'
 import { PassportEditor } from '../components/PassportEditor'
 
@@ -18,11 +19,12 @@ export function FrontDeskPage() {
         {reservationId ? (
           <PassportEditor key={reservationId} reservationId={reservationId} />
         ) : (
-          <Paper withBorder p="xl" data-testid="front-desk-passport-empty">
-            <Text c="dimmed" ta="center">
-              Choose an arrival or search by room or last name to record the family’s allergies.
-            </Text>
-          </Paper>
+          <EmptyState
+            icon="🛎️"
+            title="No family selected."
+            hint="Choose an arrival or search by room or last name to record the family’s allergies."
+            testId="front-desk-passport-empty"
+          />
         )}
       </Grid.Col>
     </Grid>

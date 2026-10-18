@@ -52,7 +52,8 @@ export function App() {
           <Button
             variant="light"
             size="md"
-            maw={190}
+            maw={240}
+            px="sm"
             styles={{ label: { overflow: 'hidden' } }}
             title={deviceLabel}
             onClick={setup.open}

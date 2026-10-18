@@ -11,6 +11,9 @@ import {
 
 type Size = BadgeProps['size']
 
+/** Badge text sizes read at arm's length on a tablet; Mantine's badge text is 9–11 px. */
+const CHIP_FONT: Record<string, number> = { xs: 12, sm: 13, md: 14, lg: 15, xl: 17 }
+
 /**
  * One allergen with its icon. Without a severity it is neutral (what a dish contains);
  * with a severity it takes the severity colour (what a guest must avoid).
@@ -34,12 +37,13 @@ export function AllergenChip({
       color={mark?.color ?? 'gray'}
       variant={mark?.variant ?? 'outline'}
       leftSection={
-        <span aria-hidden style={{ fontSize: '1.6em', lineHeight: 1 }}>
+        <span aria-hidden style={{ fontSize: '1.3em', lineHeight: 1 }}>
           {meta.icon}
         </span>
       }
       h="auto"
       py={3}
+      fz={CHIP_FONT[size as string] ?? 13}
       tt="none"
       data-testid={testId ?? `allergen-${allergen}`}
       data-allergen={allergen}

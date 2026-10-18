@@ -1,6 +1,7 @@
-import { Badge, Chip, Group, Loader, Stack, Text, TextInput, Title } from '@mantine/core'
+import { Badge, Chip, Group, Loader, Stack, TextInput, Title } from '@mantine/core'
 import { useDebouncedValue } from '@mantine/hooks'
 import { useState } from 'react'
+import { EmptyState } from '../../../shared/EmptyState'
 import { ErrorAlert } from '../../../shared/ErrorAlert'
 import { LogEntryCard } from '../components/LogEntryCard'
 import { SummaryTiles } from '../components/SummaryTiles'
@@ -67,9 +68,16 @@ export function ManagerPage() {
       {log.isPending && <Loader size="sm" data-testid="manager-log-loading" />}
       {log.isError && <ErrorAlert error={log.error} onRetry={() => void log.refetch()} />}
       {log.data?.length === 0 && (
-        <Text c="dimmed" data-testid="manager-log-empty">
-          {filtered ? 'No records for this search.' : 'No records yet in this shift.'}
-        </Text>
+        <EmptyState
+          icon={filtered ? '🔍' : '📋'}
+          title={filtered ? 'No records for this search.' : 'No records yet in this shift.'}
+          hint={
+            filtered
+              ? 'Check the room number or last name, or clear the filters.'
+              : 'Orders, confirmations, consents and passport changes appear here.'
+          }
+          testId="manager-log-empty"
+        />
       )}
       <Stack gap="xs" data-testid="manager-log">
         {log.data?.map((entry) => (
