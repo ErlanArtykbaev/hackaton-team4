@@ -21,3 +21,4 @@ Thumbs.db
 
 # CI
 .m2/
+.npm/
