@@ -73,7 +73,7 @@ Statuses: `TODO` · `DOING` · `DONE` · `CUT`. Each person edits only their own
 Progress (details: `BE-A-PLAN.md`):
 - BE-A2 done: the whole contract is in `main` (`/v3/api-docs`, 11 paths, contract tests green). Stubs: reservations, arrivals, outlets, menu, orders (BE-A3/BE-A4 make them real). Passport, kitchen and safety-log controllers call Erlan's services. `GET /api/stream` is open; events follow in BE-A5. `PUT /api/passports/{id}` takes an optional `notes`.
 - BE-A4, step 2 of 4, on branch `claude/be-a4-2ece74` (not in `main` yet): the menu comes from the POS (cached 5 min) with the engine's verdicts; `POST /api/orders/check` goes through the engine; `POST /api/orders` rejects with 400 `WAITER_CONFIRMATION_REQUIRED` / `GUEST_CONSENT_REQUIRED` but still answers the fixed check 1017. Next: POS check, kitchen ticket, log entries.
-- BE-A5, step 1 of 2 in `main`: `/api/stream` now sends Erlan's `passport`, `ticket` and `log` events after commit. Next: `pos.check.round_sent` → kitchen tickets (not started).
+- BE-A5, steps 1–2 of 2: `/api/stream` sends Erlan's events after commit; `pos.check.round_sent` → kitchen tickets (`kitchen.feed`), tests green, not checked live (no round in the feed yet). Erlan: a PMS failure inside `recordPosRound` loses the ticket (rollback-only from `PassportService.party`), details in `BE-A-PLAN.md`.
 
 ### BE-B — Erlan
 
