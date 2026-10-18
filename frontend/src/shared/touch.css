@@ -1,4 +1,16 @@
-/* Touch behaviour for the staff tablets. */
+/* Touch behaviour and page surfaces for the staff tablets. */
+
+/* A light blue page so white cards and buttons stand out; the header one step darker.
+   Cards keep --mantine-color-body (white). */
+body,
+.mantine-AppShell-main {
+  background-color: #edf3fb;
+}
+
+.mantine-AppShell-header {
+  background-color: #dbe7f6;
+  border-bottom-color: #c5d6ec;
+}
 
 html {
   /* No double-tap zoom, so taps fire without the browser's delay. */

@@ -1,4 +1,4 @@
-import { AppShell, Button, Group, Title } from '@mantine/core'
+import { AppShell, Button, Group, Stack, Text, Title } from '@mantine/core'
 import { useDisclosure } from '@mantine/hooks'
 import { NavLink, Navigate, Route, Routes } from 'react-router'
 import { FrontDeskPage } from './features/front-desk/pages/FrontDeskPage'
@@ -27,9 +27,14 @@ export function App() {
       <AppShell.Header>
         <Group h="100%" px="md" justify="space-between" wrap="nowrap">
           <Group gap="xs" wrap="nowrap">
-            <Title order={4} mr="sm" style={{ whiteSpace: 'nowrap' }}>
-              Allergy passport
-            </Title>
+            <Stack gap={0} mr="xs" style={{ whiteSpace: 'nowrap' }}>
+              <Title order={4} lh={1.2} textWrap="nowrap">
+                Allergy passport
+              </Title>
+              <Text size="xs" c="dimmed" fw={600} data-testid="hotel-name">
+                TYNGO Resort Phuket
+              </Text>
+            </Stack>
             {STAFF_ROUTES.map((route) => (
               <Button
                 key={route.path}
@@ -37,14 +42,22 @@ export function App() {
                 to={route.path}
                 variant="subtle"
                 size="md"
-                px="sm"
+                px="xs"
                 data-testid={route.testId}
               >
                 {route.label}
               </Button>
             ))}
           </Group>
-          <Button variant="light" size="md" onClick={setup.open} data-testid="device-setup-open">
+          <Button
+            variant="light"
+            size="md"
+            maw={190}
+            styles={{ label: { overflow: 'hidden', textOverflow: 'ellipsis' } }}
+            title={deviceLabel}
+            onClick={setup.open}
+            data-testid="device-setup-open"
+          >
             {deviceLabel}
           </Button>
         </Group>

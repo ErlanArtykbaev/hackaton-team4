@@ -33,7 +33,13 @@ export function AllergenChip({
       size={size}
       color={mark?.color ?? 'gray'}
       variant={mark?.variant ?? 'outline'}
-      leftSection={<span aria-hidden>{meta.icon}</span>}
+      leftSection={
+        <span aria-hidden style={{ fontSize: '1.6em', lineHeight: 1 }}>
+          {meta.icon}
+        </span>
+      }
+      h="auto"
+      py={3}
       tt="none"
       data-testid={testId ?? `allergen-${allergen}`}
       data-allergen={allergen}

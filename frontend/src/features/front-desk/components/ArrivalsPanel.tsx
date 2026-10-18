@@ -107,9 +107,6 @@ function ReservationRow({
         </Group>
         {(r.pmsAllergens?.length ?? 0) > 0 && (
           <Group gap={6} mt={6}>
-            <Text size="xs" c="dimmed">
-              PMS:
-            </Text>
             <AllergenChips allergens={r.pmsAllergens ?? []} size="xs" />
           </Group>
         )}
