@@ -109,7 +109,7 @@ Progress: passport, kitchen ticket and safety-log endpoints run on the real serv
 | FE-B2 | Front desk: arrivals worklist, search, a card per member (name, age, allergens, severity), save with "PMS updated" | 1 | FE-B1 | DOING |
 | FE-B3 | Manager: search by room or last name, timeline with consent records highlighted, KPIs, live via SSE | 5 | FE-B1 | DOING |
 | FE-B4 | Playwright happy path (after 14:30), screen recording at 15:15 | all | UI stable | DOING |
-| FE-B5 | Stretch: guest passport page by QR | — | everything else DONE | TODO |
+| FE-B5 | Stretch: guest passport page by QR | — | everything else DONE | CUT |
 
 ## Checkpoints — 5 minutes, one sentence each: done / doing / blocked
 
