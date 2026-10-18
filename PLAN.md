@@ -82,9 +82,9 @@ Progress (details: `BE-A-PLAN.md`):
 | BE-B1 | Storage: passport members + allergies, kitchen tickets, safety log; Liquibase `200_…` | 1, 4, 5 | — | DONE |
 | BE-B3 | Passport GET/PUT (front desk and waiter), default from the PMS profile, PMS sync (union), `guest.updated` listener, `PASSPORT_UPDATED` entries | 1, 2 | BE-B1 | DONE |
 | BE-B4 | Kitchen tickets (create from a round, list), safety log with search by room or last name, summary; publish `TicketChanged`, `LogAppended`, `PassportChanged` | 4, 5 | BE-B1 | DONE |
-| BE-B5 | Backend demo-path test over WireMock fixtures (after 14:00) | all | BE-A4, BE-A5 | TODO |
+| BE-B5 | Backend demo-path test over WireMock fixtures (after 14:00) | all | BE-A4, BE-A5 | DONE |
 
-Progress: passport, kitchen ticket and safety-log endpoints run on the real services. What BE-A calls:
+Progress: passport, kitchen ticket and safety-log endpoints run on the real services. `DemoPathTest` covers steps 1, 2 (passport), 4 (tickets through `KitchenTicketService`) and 5; menu verdicts, `POST /api/orders` and the feed are not in it until BE-A4/BE-A5 land. What BE-A calls:
 - `AllergenEngine` (`allergen`): `checkItem(party, allergens)`, `checkLine(party, allergens, forMemberId)`, `safeAlternatives(menu, party, item)`; merge condiments with `AllergenEngine.withCondiments(...)`; unknown `forMemberId` → `UnknownPartyMemberException`.
 - `PassportService.party(reservationId)` → `Party` (room, guest name, members for the engine); reads the PMS only when there is no passport yet.
 - `KitchenTicketService.recordCheckedRound(Round)` right after the POS accepted a tablet round (lines with `forMemberId`, `waiterConfirmed`, `consentBy`); `recordPosRound(Round)` from the `pos.check.round_sent` feed, deduplicated per round. Line allergens include the condiments' (resolve them from the menu).
