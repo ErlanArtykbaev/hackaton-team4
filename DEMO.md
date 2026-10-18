@@ -2,15 +2,14 @@
 
 Story: Kuznetsov family, room 518 (R-203844), Pool Bar (rvc 4). Each step proves one acceptance criterion (AC) from the deck.
 
-## Format
+## Format — about 10 minutes
 
 | Part | Time | What |
 |---|---|---|
-| Slides 1–4 | ~1:30 | problem → solution → the six acceptance criteria |
-| **Live demo** | ~3:00 | five steps below, the presenter names the AC at each step |
-| Slide 5 | ~0:20 | engineering criteria and next steps, if time allows |
-
-If the two-minute deck is a separate round, the 16:00 slot is the live demo only, opened with one sentence on the criteria.
+| Slides 1–4 | 0:00–2:00 | problem → solution → the six acceptance criteria (the two-minute deck) |
+| **Live demo** | 2:00–7:00 | the five steps below, about a minute each, the presenter names the AC at each step |
+| How it is built | 7:00–8:00 | slide 5, then 20 s in the repository: green CI, tests, `PLAN.md` and the commit history |
+| Questions | 8:00–10:00 | answers below; if ahead of time, the bonus: a walk-in at the Beach Bar sees allergens only |
 
 ## Roles
 
@@ -53,6 +52,17 @@ Gennadii's laptop: `POS_BARTENDER_PIN` set in `backend/.env`; dry run `node scri
 | 5 | AC6 | Manager → search 518: passport changes (front desk, waiter W02), waiter confirmation, Anna's consent with time and waiter, the unchecked POS order, the shift numbers | "After an incident the hotel can prove it was the guest's decision, not a mistake by the waiter or the kitchen." |
 
 Close: "Six criteria, live on the hotel's real PMS and POS. Next: staff sign-in with the POS PIN, the guest's own passport by QR, translated screens."
+
+## Expected questions
+
+| Question | Answer |
+|---|---|
+| Who is the waiter? There is no sign-in. | Out of scope for today: the device names its staff member. Next step: sign-in with the staff member's own POS PIN, checked by the hotel's POS, so the log names a verified person. |
+| Why not block a dangerous dish? | The hosts decided: the guest decides. We make the danger impossible to miss and record the consent as proof. |
+| Allergies are health data. | Today we keep only allergens and severity per person, and the PMS gets only the union of allergens. For production: delete after checkout and limit access by role. |
+| What if the PMS or POS is down? | Safe calls retry with backoff; orders are never retried blindly, so no double check or charge; the screens show a clear message. |
+| What about a child's allergy the parents forgot? | The waiter adds it on the spot after asking; every outlet sees it at once. |
+| How fast is the kitchen? | The POS event reaches the kitchen screen within about 5 seconds (feed polled every 3 s, pushed to the screen). |
 
 ## When something goes wrong
 
