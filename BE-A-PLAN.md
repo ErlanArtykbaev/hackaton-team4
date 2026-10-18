@@ -66,7 +66,7 @@ All under `com.hackathon.team4`; request and response records in each package's 
    - Timestamps from BE-B's entities are sent in UTC (`Z`) until a hotel clock exists.
    - `checkNumber` is a number in our API (`OrderResponse`, `KitchenTicket`), as the frontend already expects; BE-B's ticket entity stores it as a string, so the mapping parses it.
    - The passport endpoints call the PMS, so they need `backend/.env`; kitchen and safety log read our database only.
-5. `stream`: the SSE connection.
+5. **Done.** `stream`: `GET /api/stream` (SSE) through `StreamHub`; `:connected` on open, `:heartbeat` every 15 s; `broadcast(StreamEvent, payload)` sends `ticket` / `log` / `passport` with the REST record as JSON, as `frontend/src/shared/stream.ts` expects. Nothing is broadcast yet: BE-B publishes no domain events so far, forwarding them is BE-A5.
 6. `ApiContractTest`, `./mvnw test` green; commit `feat(be): add API contract stubs (BE-A2)`, no AI co-author trailer (`CLAUDE.md` §7); review before the push.
 7. `git pull --rebase`, push; BE-A2 → `DONE`; tell the team "contract stubs are in".
 
