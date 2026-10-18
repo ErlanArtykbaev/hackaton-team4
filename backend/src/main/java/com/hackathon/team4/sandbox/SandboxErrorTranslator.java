@@ -24,10 +24,20 @@ class SandboxErrorTranslator {
             SandboxErrorCode code = codeOf(response.getResponseBodyAsString());
             return new SandboxException(code, status, "Sandbox answered " + status + " " + code, exception);
         }
-        if (exception instanceof ResourceAccessException) {
+        if (exception instanceof ResourceAccessException || causedByIo(exception)) {
+            // No response, or the body was cut off mid-stream (read timeout on a slow sandbox): transient.
             return new SandboxException(SandboxErrorCode.NETWORK_ERROR, 0, "Sandbox not reachable", exception);
         }
         return new SandboxException(SandboxErrorCode.UNKNOWN, 0, "Sandbox call failed", exception);
+    }
+
+    private static boolean causedByIo(Throwable exception) {
+        for (Throwable cause = exception.getCause(); cause != null; cause = cause.getCause()) {
+            if (cause instanceof IOException) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private SandboxErrorCode codeOf(String body) {

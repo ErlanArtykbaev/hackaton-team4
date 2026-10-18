@@ -32,7 +32,8 @@ sandbox:
   pin: ${SANDBOX_PIN:}
   device-id: ${SANDBOX_DEVICE_ID:team4-backend}
   connect-timeout: 2s
-  read-timeout: 5s
+  # The sandbox can take 8-11 s for a full reservations page; the timeout covers the whole body.
+  read-timeout: 20s
   reset-read-timeout: 40s
   # The key's 10 req/s is shared by the whole team: lower it in each developer's .env (PLAN.md, Shared resources).
   rate-limit-per-second: ${SANDBOX_RATE_LIMIT:8}
