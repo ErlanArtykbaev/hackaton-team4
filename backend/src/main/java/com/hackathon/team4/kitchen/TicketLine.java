@@ -41,17 +41,18 @@ public class TicketLine {
     @Column(name = "for_member_name")
     private String forMemberName;
 
-    @Column(name = "override_reason")
-    private String overrideReason;
+    @Column(name = "waiter_confirmed", nullable = false)
+    private boolean waiterConfirmed;
 
-    @Column(name = "waiter_code")
-    private String waiterCode;
+    /** The name the guest typed when consenting; {@code null} when no consent was needed or given. */
+    @Column(name = "consent_by")
+    private String consentBy;
 
     protected TicketLine() {
     }
 
     public TicketLine(String name, int quantity, List<String> condiments, List<Allergen> allergens, Verdict verdict,
-            List<DangerFor> dangerFor, String forMemberName, String overrideReason, String waiterCode) {
+            List<DangerFor> dangerFor, String forMemberName, boolean waiterConfirmed, String consentBy) {
         this.name = name;
         this.quantity = quantity;
         this.condiments = List.copyOf(condiments);
@@ -59,8 +60,8 @@ public class TicketLine {
         this.verdict = verdict;
         this.dangerFor = List.copyOf(dangerFor);
         this.forMemberName = forMemberName;
-        this.overrideReason = overrideReason;
-        this.waiterCode = waiterCode;
+        this.waiterConfirmed = waiterConfirmed;
+        this.consentBy = consentBy;
     }
 
     public String name() {
@@ -91,11 +92,11 @@ public class TicketLine {
         return forMemberName;
     }
 
-    public String overrideReason() {
-        return overrideReason;
+    public boolean waiterConfirmed() {
+        return waiterConfirmed;
     }
 
-    public String waiterCode() {
-        return waiterCode;
+    public String consentBy() {
+        return consentBy;
     }
 }

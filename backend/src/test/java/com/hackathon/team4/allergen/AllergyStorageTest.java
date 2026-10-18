@@ -1,11 +1,9 @@
 package com.hackathon.team4.allergen;
 
-import com.hackathon.team4.kitchen.AckAction;
 import com.hackathon.team4.kitchen.KitchenTicket;
 import com.hackathon.team4.kitchen.KitchenTicketRepository;
 import com.hackathon.team4.kitchen.TicketLine;
 import com.hackathon.team4.kitchen.TicketSource;
-import com.hackathon.team4.kitchen.TicketStatus;
 import com.hackathon.team4.passport.MemberAllergy;
 import com.hackathon.team4.passport.Passport;
 import com.hackathon.team4.passport.PassportMember;
@@ -13,7 +11,6 @@ import com.hackathon.team4.passport.PassportRepository;
 import com.hackathon.team4.safetylog.LogEntryType;
 import com.hackathon.team4.safetylog.SafetyLogEntry;
 import com.hackathon.team4.safetylog.SafetyLogRepository;
-import java.math.BigDecimal;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
@@ -99,83 +96,80 @@ class AllergyStorageTest {
     }
 
     @Test
-    void shouldStoreTicketLinesWithVerdictsAndAcknowledgement() {
+    void shouldStoreTicketLinesWithVerdictsConfirmationAndConsent() {
         DangerFor misha = new DangerFor(UUID.randomUUID(), "Misha", Allergen.PEANUTS, Severity.SEVERE);
+        DangerFor anna = new DangerFor(UUID.randomUUID(), "Anna", Allergen.MILK, Severity.INTOLERANCE);
         KitchenTicket ticket = new KitchenTicket(4, "1101", "83400", 1, "P3", "R-203844", "518", "Kuznetsov",
                 NOW, TicketSource.CHECKED, List.of(
                         new TicketLine("Chicken satay", 1, List.of("Peanut sauce"), List.of(Allergen.PEANUTS),
-                                Verdict.DANGER, List.of(misha), "Mikhail", "adult, served separately", "W02"),
+                                Verdict.DANGER, List.of(misha), "Mikhail", true, null),
+                        new TicketLine("Thai iced tea", 1, List.of(), List.of(Allergen.MILK), Verdict.WARNING,
+                                List.of(anna), "Anna", false, "Anna Kuznetsova"),
                         new TicketLine("Kids nuggets", 1, List.of(), List.of(Allergen.GLUTEN), Verdict.SAFE,
-                                List.of(), "Misha", null, "W02")),
+                                List.of(), "Misha", false, null)),
                 true, NOW);
         tickets.save(ticket);
         em.flush();
         em.clear();
 
-        KitchenTicket stored = tickets.findWithLinesById(ticket.id()).orElseThrow();
-        stored.acknowledge(AckAction.PREPARED_SEPARATELY, "Cook 1", NOW.plusSeconds(60));
-        em.flush();
-        em.clear();
+        KitchenTicket stored = tickets.findByRvcAndSentAtAfterOrderBySentAtDesc(4, NOW.minusSeconds(1)).get(0);
 
-        KitchenTicket acknowledged = tickets.findWithLinesById(ticket.id()).orElseThrow();
-        assertThat(acknowledged.status()).isEqualTo(TicketStatus.ACKNOWLEDGED);
-        assertThat(acknowledged.ackAction()).contains(AckAction.PREPARED_SEPARATELY);
-        assertThat(acknowledged.lines()).extracting(TicketLine::name).containsExactly("Chicken satay", "Kids nuggets");
-        TicketLine satay = acknowledged.lines().get(0);
+        assertThat(stored.hasAllergens()).isTrue();
+        assertThat(stored.lines()).extracting(TicketLine::name)
+                .containsExactly("Chicken satay", "Thai iced tea", "Kids nuggets");
+        TicketLine satay = stored.lines().get(0);
         assertThat(satay.condiments()).containsExactly("Peanut sauce");
         assertThat(satay.allergens()).containsExactly(Allergen.PEANUTS);
         assertThat(satay.dangerFor()).containsExactly(misha);
-        assertThat(satay.overrideReason()).isEqualTo("adult, served separately");
+        assertThat(satay.waiterConfirmed()).isTrue();
+        assertThat(stored.lines().get(1).consentBy()).isEqualTo("Anna Kuznetsova");
         assertThat(tickets.existsByRvcAndCheckSeqAndRound(4, "83400", 1)).isTrue();
         assertThat(tickets.existsByRvcAndCheckSeqAndRound(4, "83400", 2)).isFalse();
+        assertThat(tickets.countLines(NOW.minusSeconds(1), TicketSource.CHECKED,
+                List.of(Verdict.WARNING, Verdict.DANGER))).isEqualTo(2);
     }
 
     @Test
-    void shouldFindOnlyUnacknowledgedDangerousTicketsOlderThanTheLimit() {
-        KitchenTicket late = ticket("1", true, NOW.minus(Duration.ofMinutes(4)));
-        KitchenTicket fresh = ticket("2", true, NOW.minus(Duration.ofMinutes(1)));
-        KitchenTicket safe = ticket("3", false, NOW.minus(Duration.ofMinutes(10)));
-        KitchenTicket done = ticket("4", true, NOW.minus(Duration.ofMinutes(10)));
-        done.acknowledge(AckAction.DISH_CHANGED, "Cook 1", NOW);
-        tickets.saveAll(List.of(late, fresh, safe, done));
+    void shouldListOnlyTheOutletsTicketsOfTheShiftNewestFirst() {
+        tickets.saveAll(List.of(
+                ticket("1", 4, NOW.minus(Duration.ofHours(10))),
+                ticket("2", 4, NOW.minus(Duration.ofMinutes(5))),
+                ticket("3", 4, NOW.minus(Duration.ofMinutes(1))),
+                ticket("4", 1, NOW.minus(Duration.ofMinutes(1)))));
         em.flush();
         em.clear();
 
-        List<KitchenTicket> overdue = tickets.findByDangerousTrueAndStatusAndSentAtBefore(TicketStatus.NEW,
-                NOW.minus(Duration.ofMinutes(3)));
-
-        assertThat(overdue).extracting(KitchenTicket::checkSeq).containsExactly("1");
-        assertThat(tickets.countByDangerousTrueAndStatusNot(TicketStatus.ACKNOWLEDGED)).isEqualTo(2);
+        assertThat(tickets.findByRvcAndSentAtAfterOrderBySentAtDesc(4, NOW.minus(Duration.ofHours(8))))
+                .extracting(KitchenTicket::checkSeq).containsExactly("3", "2");
     }
 
     @Test
-    void shouldFilterLogNewestFirstAndAverageTimeToAcknowledge() {
-        Instant shift = NOW.minus(Duration.ofHours(8));
+    void shouldSearchLogByRoomOrNameNewestFirst() {
         log.saveAll(List.of(
                 SafetyLogEntry.of(LogEntryType.PASSPORT_UPDATED, NOW.minusSeconds(300))
-                        .reservation("R-203844", "518").actor("front-desk").build(),
-                SafetyLogEntry.of(LogEntryType.OVERRIDE, NOW.minusSeconds(200)).outlet(4, "Pool Bar")
-                        .member("Mikhail").item("Chicken satay", Allergen.PEANUTS).actor("W02")
-                        .reason("adult, served separately").build(),
-                SafetyLogEntry.of(LogEntryType.TICKET_ACKNOWLEDGED, NOW.minusSeconds(100)).outlet(4, "Pool Bar")
-                        .minutesToAck(new BigDecimal("1.5")).build(),
-                SafetyLogEntry.of(LogEntryType.TICKET_ACKNOWLEDGED, NOW).outlet(1, "Main Restaurant")
-                        .minutesToAck(new BigDecimal("2.5")).build()));
+                        .reservation("R-203844", "518", "Mikhail Kuznetsov").actor("front-desk").build(),
+                SafetyLogEntry.of(LogEntryType.GUEST_CONSENT, NOW.minusSeconds(200)).outlet(4, "Pool Bar")
+                        .reservation("R-203844", "518", "Mikhail Kuznetsov").member("Anna")
+                        .item("Thai iced tea").allergen(Allergen.MILK, Severity.INTOLERANCE).actor("W02")
+                        .statement("I know it contains MILK and I order it").build(),
+                SafetyLogEntry.of(LogEntryType.ORDER_PLACED, NOW).outlet(1, "Main Restaurant")
+                        .reservation("R-203478", "223", "Jane Doe").actor("W01").build()));
         em.flush();
         em.clear();
 
-        assertThat(log.findByAtAfterOrderByAtDesc(shift)).extracting(SafetyLogEntry::type).containsExactly(
-                LogEntryType.TICKET_ACKNOWLEDGED, LogEntryType.TICKET_ACKNOWLEDGED, LogEntryType.OVERRIDE,
-                LogEntryType.PASSPORT_UPDATED);
-        assertThat(log.findByAtAfterAndRvcAndTypeInOrderByAtDesc(shift, 4, List.of(LogEntryType.OVERRIDE)))
-                .singleElement().extracting(SafetyLogEntry::reason).isEqualTo("adult, served separately");
-        assertThat(log.countByAtAfterAndType(shift, LogEntryType.TICKET_ACKNOWLEDGED)).isEqualTo(2);
-        assertThat(log.averageMinutesToAck(shift, LogEntryType.TICKET_ACKNOWLEDGED)).isEqualTo(2.0);
-        assertThat(log.averageMinutesToAck(NOW, LogEntryType.TICKET_ACKNOWLEDGED)).isNull();
+        assertThat(log.search(null, null, null, null)).extracting(SafetyLogEntry::type).containsExactly(
+                LogEntryType.ORDER_PLACED, LogEntryType.GUEST_CONSENT, LogEntryType.PASSPORT_UPDATED);
+        assertThat(log.search(null, null, "518", null)).hasSize(2);
+        assertThat(log.search(null, null, null, "kuzn")).hasSize(2);
+        assertThat(log.search(4, LogEntryType.GUEST_CONSENT, null, null)).singleElement().satisfies(entry -> {
+            assertThat(entry.severity()).isEqualTo(Severity.INTOLERANCE);
+            assertThat(entry.statement()).isEqualTo("I know it contains MILK and I order it");
+        });
+        assertThat(log.countByAtAfterAndType(NOW.minusSeconds(250), LogEntryType.GUEST_CONSENT)).isEqualTo(1);
     }
 
-    private static KitchenTicket ticket(String checkSeq, boolean dangerous, Instant sentAt) {
-        return new KitchenTicket(4, checkSeq, checkSeq, 1, null, null, null, null, sentAt, TicketSource.UNLINKED,
-                List.of(), dangerous, sentAt);
+    private static KitchenTicket ticket(String checkSeq, int rvc, Instant sentAt) {
+        return new KitchenTicket(rvc, checkSeq, checkSeq, 1, null, null, null, null, sentAt, TicketSource.UNLINKED,
+                List.of(), false, sentAt);
     }
 }

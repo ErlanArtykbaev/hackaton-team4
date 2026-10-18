@@ -1,13 +1,13 @@
 package com.hackathon.team4.safetylog;
 
 import com.hackathon.team4.allergen.Allergen;
+import com.hackathon.team4.allergen.Severity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.UUID;
 
@@ -40,6 +40,9 @@ public class SafetyLogEntry {
     @Column(name = "room_number")
     private String roomNumber;
 
+    @Column(name = "guest_name")
+    private String guestName;
+
     @Column(name = "member_name")
     private String memberName;
 
@@ -50,17 +53,16 @@ public class SafetyLogEntry {
     @Column(name = "allergen")
     private Allergen allergen;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "severity")
+    private Severity severity;
+
     @Column(name = "actor")
     private String actor;
 
-    @Column(name = "reason")
-    private String reason;
-
-    @Column(name = "minutes_to_ack")
-    private BigDecimal minutesToAck;
-
-    @Column(name = "ticket_id")
-    private UUID ticketId;
+    /** What happened in words, e.g. the guest's consent statement. */
+    @Column(name = "statement")
+    private String statement;
 
     @Column(name = "created_at", nullable = false)
     private Instant createdAt;
@@ -79,13 +81,13 @@ public class SafetyLogEntry {
         this.outletName = builder.outletName;
         this.reservationId = builder.reservationId;
         this.roomNumber = builder.roomNumber;
+        this.guestName = builder.guestName;
         this.memberName = builder.memberName;
         this.item = builder.item;
         this.allergen = builder.allergen;
+        this.severity = builder.severity;
         this.actor = builder.actor;
-        this.reason = builder.reason;
-        this.minutesToAck = builder.minutesToAck;
-        this.ticketId = builder.ticketId;
+        this.statement = builder.statement;
         this.createdAt = builder.at;
         this.updatedAt = builder.at;
     }
@@ -122,6 +124,10 @@ public class SafetyLogEntry {
         return roomNumber;
     }
 
+    public String guestName() {
+        return guestName;
+    }
+
     public String memberName() {
         return memberName;
     }
@@ -134,20 +140,16 @@ public class SafetyLogEntry {
         return allergen;
     }
 
+    public Severity severity() {
+        return severity;
+    }
+
     public String actor() {
         return actor;
     }
 
-    public String reason() {
-        return reason;
-    }
-
-    public BigDecimal minutesToAck() {
-        return minutesToAck;
-    }
-
-    public UUID ticketId() {
-        return ticketId;
+    public String statement() {
+        return statement;
     }
 
     /** Most entries fill only a few fields, so they are built by name. */
@@ -159,13 +161,13 @@ public class SafetyLogEntry {
         private String outletName;
         private String reservationId;
         private String roomNumber;
+        private String guestName;
         private String memberName;
         private String item;
         private Allergen allergen;
+        private Severity severity;
         private String actor;
-        private String reason;
-        private BigDecimal minutesToAck;
-        private UUID ticketId;
+        private String statement;
 
         private Builder(LogEntryType type, Instant at) {
             this.type = type;
@@ -178,9 +180,10 @@ public class SafetyLogEntry {
             return this;
         }
 
-        public Builder reservation(String reservationId, String roomNumber) {
+        public Builder reservation(String reservationId, String roomNumber, String guestName) {
             this.reservationId = reservationId;
             this.roomNumber = roomNumber;
+            this.guestName = guestName;
             return this;
         }
 
@@ -189,9 +192,14 @@ public class SafetyLogEntry {
             return this;
         }
 
-        public Builder item(String item, Allergen allergen) {
+        public Builder item(String item) {
             this.item = item;
+            return this;
+        }
+
+        public Builder allergen(Allergen allergen, Severity severity) {
             this.allergen = allergen;
+            this.severity = severity;
             return this;
         }
 
@@ -200,18 +208,8 @@ public class SafetyLogEntry {
             return this;
         }
 
-        public Builder reason(String reason) {
-            this.reason = reason;
-            return this;
-        }
-
-        public Builder minutesToAck(BigDecimal minutesToAck) {
-            this.minutesToAck = minutesToAck;
-            return this;
-        }
-
-        public Builder ticket(UUID ticketId) {
-            this.ticketId = ticketId;
+        public Builder statement(String statement) {
+            this.statement = statement;
             return this;
         }
 

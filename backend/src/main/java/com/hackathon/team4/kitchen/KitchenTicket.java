@@ -14,11 +14,11 @@ import jakarta.persistence.Version;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 /**
- * One round sent to the kitchen ({@code pos.check.round_sent}), checked against the passport.
+ * One round sent to the kitchen ({@code pos.check.round_sent}), checked against the passport. The kitchen is
+ * notified only: a ticket is never acknowledged or approved.
  */
 @Entity
 @Table(name = "kitchen_ticket")
@@ -58,30 +58,13 @@ public class KitchenTicket {
     @Column(name = "source", nullable = false)
     private TicketSource source;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "status", nullable = false)
-    private TicketStatus status;
-
-    @Column(name = "dangerous", nullable = false)
-    private boolean dangerous;
+    @Column(name = "has_allergens", nullable = false)
+    private boolean hasAllergens;
 
     @ElementCollection
     @CollectionTable(name = "kitchen_ticket_line", joinColumns = @JoinColumn(name = "ticket_id"))
     @OrderColumn(name = "position")
     private List<TicketLine> lines = new ArrayList<>();
-
-    @Enumerated(EnumType.STRING)
-    @Column(name = "ack_action")
-    private AckAction ackAction;
-
-    @Column(name = "ack_cook")
-    private String ackCook;
-
-    @Column(name = "ack_at")
-    private Instant ackAt;
-
-    @Column(name = "escalated_at")
-    private Instant escalatedAt;
 
     @Version
     private long version;
@@ -97,7 +80,7 @@ public class KitchenTicket {
 
     public KitchenTicket(int rvc, String checkNumber, String checkSeq, int round, String table, String reservationId,
             String roomNumber, String guestName, Instant sentAt, TicketSource source, List<TicketLine> lines,
-            boolean dangerous, Instant now) {
+            boolean hasAllergens, Instant now) {
         this.id = UUID.randomUUID();
         this.rvc = rvc;
         this.checkNumber = checkNumber;
@@ -110,24 +93,8 @@ public class KitchenTicket {
         this.sentAt = sentAt;
         this.source = source;
         this.lines.addAll(lines);
-        this.dangerous = dangerous;
-        this.status = TicketStatus.NEW;
+        this.hasAllergens = hasAllergens;
         this.createdAt = now;
-        this.updatedAt = now;
-    }
-
-    /** The cook's acknowledgement; also closes an escalated ticket. */
-    public void acknowledge(AckAction action, String cook, Instant now) {
-        this.status = TicketStatus.ACKNOWLEDGED;
-        this.ackAction = action;
-        this.ackCook = cook;
-        this.ackAt = now;
-        this.updatedAt = now;
-    }
-
-    public void escalate(Instant now) {
-        this.status = TicketStatus.ESCALATED;
-        this.escalatedAt = now;
         this.updatedAt = now;
     }
 
@@ -175,31 +142,13 @@ public class KitchenTicket {
         return source;
     }
 
-    public TicketStatus status() {
-        return status;
-    }
-
-    public boolean dangerous() {
-        return dangerous;
+    /** At least one line contains an allergen of someone at the table (or any allergen when unlinked). */
+    public boolean hasAllergens() {
+        return hasAllergens;
     }
 
     public List<TicketLine> lines() {
         return List.copyOf(lines);
     }
 
-    public Optional<AckAction> ackAction() {
-        return Optional.ofNullable(ackAction);
-    }
-
-    public String ackCook() {
-        return ackCook;
-    }
-
-    public Optional<Instant> ackAt() {
-        return Optional.ofNullable(ackAt);
-    }
-
-    public Optional<Instant> escalatedAt() {
-        return Optional.ofNullable(escalatedAt);
-    }
 }

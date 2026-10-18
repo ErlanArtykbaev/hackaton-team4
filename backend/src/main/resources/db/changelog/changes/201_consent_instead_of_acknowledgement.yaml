@@ -1,0 +1,50 @@
+databaseChangeLog:
+  - changeSet:
+      id: 201_consent_instead_of_acknowledgement
+      author: Erlan Artykbaev
+      comment: The hosts confirmed that the kitchen is notified only and the guest consents at ordering.
+      changes:
+        - dropColumn:
+            tableName: kitchen_ticket
+            columns:
+              - column: {name: status}
+              - column: {name: ack_action}
+              - column: {name: ack_cook}
+              - column: {name: ack_at}
+              - column: {name: escalated_at}
+        - renameColumn:
+            tableName: kitchen_ticket
+            oldColumnName: dangerous
+            newColumnName: has_allergens
+            columnDataType: boolean
+        - dropColumn:
+            tableName: kitchen_ticket_line
+            columns:
+              - column: {name: override_reason}
+              - column: {name: waiter_code}
+        - addColumn:
+            tableName: kitchen_ticket_line
+            columns:
+              - column: {name: waiter_confirmed, type: boolean, defaultValueBoolean: false, constraints: {nullable: false}}
+              - column: {name: consent_by, type: varchar(255)}
+        - dropColumn:
+            tableName: safety_log_entry
+            columns:
+              - column: {name: minutes_to_ack}
+              - column: {name: ticket_id}
+        - renameColumn:
+            tableName: safety_log_entry
+            oldColumnName: reason
+            newColumnName: statement
+            columnDataType: varchar(1000)
+        - addColumn:
+            tableName: safety_log_entry
+            columns:
+              - column: {name: severity, type: varchar(16)}
+              # the reservation's guest, so the manager finds entries by last name
+              - column: {name: guest_name, type: varchar(255)}
+        - createIndex:
+            tableName: safety_log_entry
+            indexName: ix_log_room
+            columns:
+              - column: {name: room_number}
