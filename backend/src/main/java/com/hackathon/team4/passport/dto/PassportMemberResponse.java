@@ -5,8 +5,8 @@ import java.util.List;
 import java.util.UUID;
 
 /**
- * A card of the passport, one per person. {@code id} is {@code null} for the primary guest of a reservation
- * without a passport yet: the member is created on the first save. {@code age} is set for children.
+ * A card of the passport, one per person. Without a saved passport the primary guest already has a stable
+ * {@code id} and becomes the stored member on the first save. {@code age} is set for children.
  */
 @Schema(name = "PassportMember")
 public record PassportMemberResponse(

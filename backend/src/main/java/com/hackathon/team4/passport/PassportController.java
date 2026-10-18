@@ -1,8 +1,21 @@
 package com.hackathon.team4.passport;
 
+import com.hackathon.team4.allergen.Allergen;
+import com.hackathon.team4.allergen.Severity;
+import com.hackathon.team4.menu.MenuService;
+import com.hackathon.team4.passport.dto.MemberAllergyRequest;
+import com.hackathon.team4.passport.dto.MemberAllergyResponse;
+import com.hackathon.team4.passport.dto.PassportMemberRequest;
+import com.hackathon.team4.passport.dto.PassportMemberResponse;
 import com.hackathon.team4.passport.dto.PassportResponse;
 import com.hackathon.team4.passport.dto.PassportUpdateRequest;
 import jakarta.validation.Valid;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
+import java.util.EnumMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -18,21 +31,52 @@ import org.springframework.web.bind.annotation.RestController;
 public class PassportController {
 
     private final PassportService passports;
+    private final MenuService menus;
 
-    public PassportController(PassportService passports) {
+    public PassportController(PassportService passports, MenuService menus) {
         this.passports = passports;
+        this.menus = menus;
     }
 
     /** Without a saved passport: the primary guest with the PMS allergens as severe. */
     @GetMapping("/{reservationId}")
     public PassportResponse passport(@PathVariable String reservationId) {
-        return passports.passport(reservationId);
+        return toPassportResponse(passports.get(reservationId));
     }
 
     /** Saves all cards; the PMS profile gets the union of the members' allergens. */
     @PutMapping("/{reservationId}")
     public PassportResponse update(@PathVariable String reservationId,
                                    @Valid @RequestBody PassportUpdateRequest update) {
-        return passports.update(reservationId, update);
+        String outletName = update.rvc() == null ? null : menus.outletName(update.rvc()).orElse(null);
+        List<PassportSnapshot.Member> members = update.members().stream()
+                .map(PassportController::toMember)
+                .toList();
+        return toPassportResponse(passports.save(reservationId, update.notes(), members, update.updatedBy(),
+                update.source(), update.rvc(), outletName));
+    }
+
+    private static PassportSnapshot.Member toMember(PassportMemberRequest member) {
+        Map<Allergen, Severity> allergies = member.allergies().stream()
+                .collect(Collectors.toMap(MemberAllergyRequest::allergen, MemberAllergyRequest::severity,
+                        (first, second) -> second, () -> new EnumMap<>(Allergen.class)));
+        return new PassportSnapshot.Member(member.id(), member.name(), member.age(), member.primary(), allergies);
+    }
+
+    private static PassportResponse toPassportResponse(PassportSnapshot passport) {
+        List<PassportMemberResponse> members = passport.members().stream()
+                .map(PassportController::toMemberResponse)
+                .toList();
+        OffsetDateTime updatedAt = passport.updatedAt() == null ? null : passport.updatedAt().atOffset(ZoneOffset.UTC);
+        return new PassportResponse(passport.reservationId(), passport.roomNumber(), passport.guestName(),
+                passport.notes(), passport.pmsAllergens(), members, updatedAt, passport.updatedBy());
+    }
+
+    private static PassportMemberResponse toMemberResponse(PassportSnapshot.Member member) {
+        List<MemberAllergyResponse> allergies = member.allergies().entrySet().stream()
+                .sorted(Map.Entry.comparingByKey())
+                .map(allergy -> new MemberAllergyResponse(allergy.getKey(), allergy.getValue()))
+                .toList();
+        return new PassportMemberResponse(member.id(), member.name(), member.age(), member.primary(), allergies);
     }
 }

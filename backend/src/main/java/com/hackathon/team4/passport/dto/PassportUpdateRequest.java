@@ -1,6 +1,6 @@
 package com.hackathon.team4.passport.dto;
 
-import com.hackathon.team4.passport.PassportSource;
+import com.hackathon.team4.passport.PassportService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
@@ -12,7 +12,8 @@ import java.util.List;
  */
 public record PassportUpdateRequest(
         @NotEmpty @Valid List<PassportMemberRequest> members,
+        String notes,
         @NotBlank String updatedBy,
-        @NotNull PassportSource source,
+        @NotNull PassportService.Source source,
         Integer rvc) {
 }

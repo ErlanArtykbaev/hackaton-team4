@@ -10,6 +10,7 @@ import com.hackathon.team4.menu.dto.MenuItem;
 import com.hackathon.team4.menu.dto.Outlet;
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import org.springframework.stereotype.Service;
 
@@ -66,6 +67,11 @@ public class MenuService {
 
     public List<Outlet> outlets() {
         return OUTLETS;
+    }
+
+    /** The outlet's name for logs; empty for an rvc the hotel does not have. */
+    public Optional<String> outletName(int rvc) {
+        return OUTLETS.stream().filter(outlet -> outlet.rvc() == rvc).map(Outlet::name).findFirst();
     }
 
     /**
