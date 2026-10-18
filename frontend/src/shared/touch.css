@@ -1,0 +1,55 @@
+/* Touch behaviour for the staff tablets. */
+
+html {
+  /* No double-tap zoom, so taps fire without the browser's delay. */
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Long-press on a control must not select its text or open the callout menu. */
+.mantine-Button-root,
+.mantine-ActionIcon-root,
+.mantine-CloseButton-root,
+.mantine-Chip-label,
+.mantine-SegmentedControl-label,
+.mantine-AppShell-header {
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+}
+
+/* 44 px floor for tap targets, even where a screen asks for a small size. */
+.mantine-Button-root,
+.mantine-ActionIcon-root,
+.mantine-CloseButton-root {
+  min-height: 44px;
+  min-width: 44px;
+}
+
+.mantine-Chip-label {
+  min-height: 44px;
+}
+
+.mantine-SegmentedControl-label {
+  min-height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.mantine-Input-input {
+  min-height: 44px;
+}
+
+.mantine-Combobox-option {
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+}
+
+/* A visible press, since there is no hover on a tablet. */
+.mantine-Chip-label:active,
+.mantine-SegmentedControl-label:active,
+.mantine-ActionIcon-root:active:not(:disabled) {
+  transform: scale(0.97);
+}

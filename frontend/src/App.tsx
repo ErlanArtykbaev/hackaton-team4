@@ -23,11 +23,11 @@ export function App() {
     : 'Set up device'
 
   return (
-    <AppShell header={{ height: 56 }} padding="md">
+    <AppShell header={{ height: 64 }} padding="md">
       <AppShell.Header>
         <Group h="100%" px="md" justify="space-between" wrap="nowrap">
           <Group gap="xs" wrap="nowrap">
-            <Title order={4} mr="md">
+            <Title order={4} mr="sm" style={{ whiteSpace: 'nowrap' }}>
               Allergy passport
             </Title>
             {STAFF_ROUTES.map((route) => (
@@ -36,13 +36,15 @@ export function App() {
                 component={NavLink}
                 to={route.path}
                 variant="subtle"
+                size="md"
+                px="sm"
                 data-testid={route.testId}
               >
                 {route.label}
               </Button>
             ))}
           </Group>
-          <Button variant="light" onClick={setup.open} data-testid="device-setup-open">
+          <Button variant="light" size="md" onClick={setup.open} data-testid="device-setup-open">
             {deviceLabel}
           </Button>
         </Group>
