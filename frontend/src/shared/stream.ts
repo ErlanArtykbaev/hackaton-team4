@@ -1,5 +1,6 @@
 // One EventSource on `/api/stream` for the whole browser tab, shared by every screen that listens.
-// The browser reconnects by itself after a drop; screens refetch on `connected` to catch up on what they missed.
+// The browser reconnects by itself after a network drop, but gives up for good on an HTTP error (backend
+// restarting behind the proxy, endpoint missing): then we reopen it ourselves. Screens refetch on (re)connect.
 
 export const STREAM_EVENTS = ['ticket', 'log', 'passport'] as const
 export type StreamEvent = (typeof STREAM_EVENTS)[number]
@@ -12,6 +13,9 @@ const statusListeners = new Set<StatusListener>()
 let source: EventSource | null = null
 let live = false
 let users = 0
+let retry: ReturnType<typeof setTimeout> | null = null
+
+const RETRY_MS = 3_000
 
 function setLive(next: boolean) {
   if (live === next) return
@@ -22,7 +26,16 @@ function setLive(next: boolean) {
 function open() {
   source = new EventSource('/api/stream')
   source.onopen = () => setLive(true)
-  source.onerror = () => setLive(false)
+  source.onerror = () => {
+    setLive(false)
+    if (source?.readyState !== EventSource.CLOSED || retry) return
+    retry = setTimeout(() => {
+      retry = null
+      if (users === 0) return
+      source?.close()
+      open()
+    }, RETRY_MS)
+  }
   for (const event of STREAM_EVENTS) {
     source.addEventListener(event, (message) => {
       let payload: unknown
@@ -43,6 +56,8 @@ export function joinStream(): () => void {
   return () => {
     users -= 1
     if (users > 0 || !source) return
+    if (retry) clearTimeout(retry)
+    retry = null
     source.close()
     source = null
     setLive(false)
