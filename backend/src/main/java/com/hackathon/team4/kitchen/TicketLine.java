@@ -1,8 +1,8 @@
 package com.hackathon.team4.kitchen;
 
-import com.hackathon.team4.allergy.Allergen;
-import com.hackathon.team4.allergy.DangerFor;
-import com.hackathon.team4.allergy.Verdict;
+import com.hackathon.team4.allergen.Allergen;
+import com.hackathon.team4.allergen.DangerFor;
+import com.hackathon.team4.allergen.Verdict;
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
 import jakarta.persistence.Embeddable;

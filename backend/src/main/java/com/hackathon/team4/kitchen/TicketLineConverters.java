@@ -1,8 +1,8 @@
 package com.hackathon.team4.kitchen;
 
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.hackathon.team4.allergy.Allergen;
-import com.hackathon.team4.allergy.DangerFor;
+import com.hackathon.team4.allergen.Allergen;
+import com.hackathon.team4.allergen.DangerFor;
 import jakarta.persistence.Converter;
 import java.util.List;
 

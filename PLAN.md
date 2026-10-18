@@ -77,8 +77,8 @@ Progress (details: `BE-A-PLAN.md`):
 
 | ID | Task | Demo step | Depends on | Status |
 |---|---|---|---|---|
-| BE-B2 | Allergen engine per the agreement above, parameterized unit tests — **first, push early** | 2, 3, 4 | — | TODO |
-| BE-B1 | Storage: passport members + allergies, kitchen tickets, safety log; Liquibase `200_…` | 1, 4, 5 | — | TODO |
+| BE-B2 | Allergen engine per the agreement above, parameterized unit tests — **first, push early** | 2, 3, 4 | — | DONE |
+| BE-B1 | Storage: passport members + allergies, kitchen tickets, safety log; Liquibase `200_…` | 1, 4, 5 | — | DOING |
 | BE-B3 | Passport GET/PUT (front desk and waiter), default from the PMS profile, PMS sync (union), `guest.updated` listener, `PASSPORT_UPDATED` entries | 1, 2 | BE-B1 | TODO |
 | BE-B4 | Kitchen tickets (create from a round, list), safety log with search by room or last name, summary; publish `TicketChanged`, `LogAppended`, `PassportChanged` | 4, 5 | BE-B1 | TODO |
 | BE-B5 | Backend demo-path test over WireMock fixtures (after 14:00) | all | BE-A4, BE-A5 | TODO |

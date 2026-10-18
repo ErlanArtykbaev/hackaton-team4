@@ -1,7 +1,7 @@
 package com.hackathon.team4.passport;
 
-import com.hackathon.team4.allergy.Allergen;
-import com.hackathon.team4.allergy.Severity;
+import com.hackathon.team4.allergen.Allergen;
+import com.hackathon.team4.allergen.Severity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import jakarta.persistence.EnumType;

@@ -1,6 +1,6 @@
 package com.hackathon.team4.safetylog;
 
-import com.hackathon.team4.allergy.Allergen;
+import com.hackathon.team4.allergen.Allergen;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;

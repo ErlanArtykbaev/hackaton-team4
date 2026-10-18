@@ -1,4 +1,4 @@
-package com.hackathon.team4.allergy;
+package com.hackathon.team4.allergen;
 
 import com.hackathon.team4.kitchen.AckAction;
 import com.hackathon.team4.kitchen.KitchenTicket;
