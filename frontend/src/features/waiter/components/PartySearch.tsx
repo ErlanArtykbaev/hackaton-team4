@@ -1,7 +1,8 @@
+import { errorMessage } from '../../../shared/errors'
 import { Alert, Button, Group, Loader, Paper, Stack, Text, TextInput } from '@mantine/core'
 import { useDebouncedValue } from '@mantine/hooks'
 import { useState } from 'react'
-import { errorText, isSearchable, useReservations, type ReservationSummary } from '../waiterApi'
+import { isSearchable, useReservations, type ReservationSummary } from '../waiterApi'
 import { AllergenChips } from './VerdictMarks'
 
 export function PartySearch({
@@ -33,7 +34,7 @@ export function PartySearch({
           Walk-in (no room)
         </Button>
       </Group>
-      {reservations.isError && <Alert color="red">{errorText(reservations.error)}</Alert>}
+      {reservations.isError && <Alert color="red">{errorMessage(reservations.error)}</Alert>}
       {isSearchable(debounced) && reservations.isSuccess && reservations.data.length === 0 && (
         <Text c="dimmed">No guest in house matches “{debounced.trim()}”.</Text>
       )}

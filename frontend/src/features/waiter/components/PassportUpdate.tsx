@@ -1,3 +1,4 @@
+import { errorMessage } from '../../../shared/errors'
 import {
   Alert,
   Button,
@@ -13,7 +14,6 @@ import {
 import { useState } from 'react'
 import {
   ALLERGENS,
-  errorText,
   useSavePassport,
   type Allergen,
   type Member,
@@ -139,7 +139,7 @@ function PassportForm({
         data={SEVERITIES}
         data-testid="waiter-passport-severity"
       />
-      {save.isError && <Alert color="red">{errorText(save.error)}</Alert>}
+      {save.isError && <Alert color="red">{errorMessage(save.error)}</Alert>}
       <Button
         size="lg"
         disabled={!ready}

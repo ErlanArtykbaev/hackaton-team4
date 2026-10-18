@@ -1,5 +1,6 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query'
-import { useEffect, useState } from 'react'
+import { ApiError, problemOf } from '../../shared/errors'
+import { useStream } from '../../shared/useStream'
 
 // Shapes of the frozen API contract (PLAN.md) until the generated types exist (FE-B1); then switch to `api/schema`.
 export type Severity = 'INTOLERANCE' | 'SEVERE'
@@ -41,15 +42,9 @@ async function fetchTickets(rvc: number): Promise<KitchenTicket[]> {
   try {
     response = await fetch(`/api/kitchen/${rvc}/tickets`)
   } catch {
-    throw new Error('Our server is not reachable.')
+    throw new ApiError(0, undefined, 'No response from our server')
   }
-  if (!response.ok) {
-    throw new Error(
-      response.status >= 502
-        ? 'The hotel system does not answer. Retrying…'
-        : `Tickets: HTTP ${response.status}`,
-    )
-  }
+  if (!response.ok) throw await problemOf(response)
   return (await response.json()) as KitchenTicket[]
 }
 
@@ -63,34 +58,20 @@ export function useTickets(rvc: number | null, live: boolean) {
   })
 }
 
-/**
- * Pushes `ticket` events of `/api/stream` into the ticket list; returns whether the stream is connected.
- * Replaced by the shared `useStream` hook once FE-B1 lands.
- */
+/** Pushes `ticket` events of `/api/stream` into the ticket list; returns whether the stream is connected. */
 export function useTicketStream(rvc: number | null): boolean {
   const client = useQueryClient()
-  const [live, setLive] = useState(false)
-
-  useEffect(() => {
-    if (rvc == null) return
-    const source = new EventSource('/api/stream')
-    source.onopen = () => {
-      setLive(true)
-      void client.invalidateQueries({ queryKey: ['kitchen', rvc] }) // catch up on what came while disconnected
-    }
-    source.onerror = () => setLive(false)
-    source.addEventListener('ticket', (event) => {
-      const ticket = JSON.parse((event as MessageEvent<string>).data) as KitchenTicket
-      if (ticket.rvc !== rvc) return
+  return useStream<KitchenTicket>(
+    'ticket',
+    (ticket) => {
+      if (rvc == null || ticket.rvc !== rvc) return
       client.setQueryData<KitchenTicket[]>(['kitchen', rvc], (old = []) => [
         ticket,
         ...old.filter((t) => String(t.id) !== String(ticket.id)),
       ])
-    })
-    return () => source.close()
-  }, [rvc, client])
-
-  return live
+    },
+    () => void client.invalidateQueries({ queryKey: ['kitchen', rvc] }), // catch up on what came while disconnected
+  )
 }
 
 /** "Not checked at ordering" first, then newest first. */

@@ -1,4 +1,5 @@
 import { Alert, Badge, Group, Loader, SimpleGrid, Stack, Text, Title } from '@mantine/core'
+import { ErrorAlert } from '../../../shared/ErrorAlert'
 import { useDevice } from '../../../shared/deviceContext'
 import { TicketCard } from '../components/TicketCard'
 import { sortTickets, useTicketStream, useTickets } from '../kitchenApi'
@@ -26,7 +27,9 @@ export function KitchenPage() {
         </Badge>
       </Group>
       {tickets.isLoading && <Loader />}
-      {tickets.isError && <Alert color="red">{tickets.error.message}</Alert>}
+      {tickets.isError && (
+        <ErrorAlert error={tickets.error} onRetry={() => void tickets.refetch()} testId="kitchen-error" />
+      )}
       {tickets.isSuccess && tickets.data.length === 0 && <Text c="dimmed">No orders yet.</Text>}
       <SimpleGrid cols={{ base: 1, md: 2, xl: 3 }}>
         {sortTickets(tickets.data ?? []).map((t) => (

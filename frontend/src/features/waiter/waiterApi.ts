@@ -1,4 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { ApiError, problemOf } from '../../shared/errors'
 
 // Shapes of the frozen API contract (PLAN.md) until the generated types exist (FE-B1); then switch to `api/schema`.
 export const ALLERGENS = [
@@ -102,17 +103,6 @@ export type OrderBody = {
 export type LineCheck = { code: string; verdict: Verdict; dangerFor: DangerFor[]; requirement: Requirement }
 export type OrderResult = { checkNumber: number; checkSeq: number; lines: LineCheck[] }
 
-export class ApiError extends Error {
-  readonly status: number
-  readonly code: string | undefined
-
-  constructor(status: number, code: string | undefined, message: string) {
-    super(message)
-    this.status = status
-    this.code = code
-  }
-}
-
 async function call<T>(path: string, method = 'GET', body?: unknown): Promise<T> {
   let response: Response
   try {
@@ -122,37 +112,10 @@ async function call<T>(path: string, method = 'GET', body?: unknown): Promise<T>
       body: body === undefined ? undefined : JSON.stringify(body),
     })
   } catch {
-    throw new ApiError(0, undefined, 'Our server is not reachable.')
+    throw new ApiError(0, undefined, 'No response from our server')
   }
-  if (!response.ok) {
-    const problem = (await response.json().catch(() => null)) as {
-      code?: string
-      detail?: string
-      title?: string
-    } | null
-    throw new ApiError(
-      response.status,
-      problem?.code,
-      problem?.detail ?? problem?.title ?? `HTTP ${response.status}`,
-    )
-  }
+  if (!response.ok) throw await problemOf(response)
   return (await response.json()) as T
-}
-
-const MESSAGES: Record<string, string> = {
-  WAITER_CONFIRMATION_REQUIRED: 'A line still needs your confirmation.',
-  GUEST_CONSENT_REQUIRED: 'A line still needs the guest’s consent.',
-}
-
-/** Text for the waiter; replaced by the shared messages by `code` once FE-B1 lands. */
-export function errorText(error: unknown): string {
-  if (error instanceof ApiError) {
-    if (error.code && MESSAGES[error.code]) return MESSAGES[error.code]
-    if (error.status === 502 || error.status === 503 || error.status === 504)
-      return 'The hotel system does not answer. Try again in a moment.'
-    return error.message
-  }
-  return 'Something went wrong. Try again.'
 }
 
 export function sameMember(a: MemberId | undefined | null, b: MemberId | undefined | null): boolean {

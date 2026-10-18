@@ -1,3 +1,4 @@
+import { errorMessage } from '../../../shared/errors'
 import { Alert, Button, Grid, Group, Loader, Paper, Stack, Text, Title } from '@mantine/core'
 import { notifications } from '@mantine/notifications'
 import { useMemo, useState } from 'react'
@@ -10,7 +11,6 @@ import { PartyHeader } from '../components/PartyHeader'
 import { PartySearch } from '../components/PartySearch'
 import { PassportUpdate } from '../components/PassportUpdate'
 import {
-  errorText,
   useMenu,
   useOrderCheck,
   useOutlets,
@@ -87,7 +87,8 @@ export function WaiterPage() {
         })
         setCart([])
       },
-      onError: (error) => notifications.show({ color: 'red', title: 'Not sent', message: errorText(error) }),
+      onError: (error) =>
+        notifications.show({ color: 'red', title: 'Not sent', message: errorMessage(error) }),
     })
 
   const blocker = sendBlocker(cart, checks, check.isError, tables.length > 0 && table == null)
@@ -121,7 +122,7 @@ export function WaiterPage() {
           ) : passport.isLoading ? (
             <Loader />
           ) : passport.isError ? (
-            <Alert color="red">{errorText(passport.error)}</Alert>
+            <Alert color="red">{errorMessage(passport.error)}</Alert>
           ) : (
             passport.data && (
               <PartyHeader
@@ -132,7 +133,7 @@ export function WaiterPage() {
             )
           )}
           {menu.isLoading && <Loader />}
-          {menu.isError && <Alert color="red">{errorText(menu.error)}</Alert>}
+          {menu.isError && <Alert color="red">{errorMessage(menu.error)}</Alert>}
           {menu.data && <MenuList items={menu.data} walkIn={party === 'walk-in'} onPick={setPicking} />}
         </Stack>
       </Grid.Col>
@@ -141,7 +142,7 @@ export function WaiterPage() {
           <Cart
             lines={cart}
             checks={checks}
-            checkError={check.isError ? errorText(check.error) : null}
+            checkError={check.isError ? errorMessage(check.error) : null}
             tables={tables}
             table={table}
             onTable={setTable}
