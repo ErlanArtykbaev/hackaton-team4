@@ -4,7 +4,13 @@ import { useState } from 'react'
 import { AllergenChips } from '../../../shared/AllergenMarks'
 import { ErrorAlert } from '../../../shared/ErrorAlert'
 import { hotelDate } from '../../../shared/format'
-import { isSearchable, useArrivals, useReservationSearch, type ReservationSummary } from '../frontDeskApi'
+import {
+  isSearchable,
+  useArrivals,
+  usePassportStream,
+  useReservationSearch,
+  type ReservationSummary,
+} from '../frontDeskApi'
 
 /** Worklist of today's arrivals, or the search results while the agent types a room or a last name. */
 export function ArrivalsPanel({
@@ -18,6 +24,7 @@ export function ArrivalsPanel({
   const [debounced] = useDebouncedValue(query, 300)
   const searching = isSearchable(debounced)
   const arrivals = useArrivals()
+  usePassportStream()
   const search = useReservationSearch(debounced)
   const list = searching ? search : arrivals
 

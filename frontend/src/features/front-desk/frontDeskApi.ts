@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { api } from '../../api/client'
 import type { components } from '../../api/schema'
 import { unwrap } from '../../shared/errors'
+import { useStream } from '../../shared/useStream'
 
 export type ReservationSummary = components['schemas']['ReservationSummary']
 export type Passport = components['schemas']['Passport']
@@ -55,4 +56,14 @@ export function useSavePassport() {
       void client.invalidateQueries({ queryKey: ['menu'] }) // verdicts on the waiter tablet change with the passport
     },
   })
+}
+
+/** A waiter may add a member or an allergen at the table: refresh the worklist ("No passport", PMS allergens). */
+export function usePassportStream() {
+  const client = useQueryClient()
+  const refresh = () => {
+    void client.invalidateQueries({ queryKey: ['front-desk', 'arrivals'] })
+    void client.invalidateQueries({ queryKey: ['reservations'] })
+  }
+  useStream<Passport>('passport', refresh, refresh)
 }
