@@ -3,7 +3,7 @@ import { expect, test, type Page } from '@playwright/test'
 // The demo path of PLAN.md, run by hand before the rehearsals against the live sandbox (TESTING.md §5).
 // Before a run: prepare-demo.mjs --reset, empty backend/data/, backend and `npm run dev` started.
 
-const ROOM = '518'
+const ROOM = '222'
 
 /** This browser is the Pool Bar tablet of waiter W02 (the device setup, without clicking through it). */
 async function poolBarDevice(page: Page) {
@@ -56,7 +56,7 @@ test('1 · front desk records a card per family member', async ({ page }) => {
   await expect(page.getByTestId('front-desk-passport')).toBeVisible()
 
   // The primary guest comes from the PMS; Anna and Misha are added at check-in.
-  await expect(page.getByTestId('front-desk-member-0-name')).toHaveValue('Mikhail')
+  await expect(page.getByTestId('front-desk-member-0-name')).toHaveValue('Ivan')
   await ensureMember(page, 'Anna')
   const misha = await ensureMember(page, 'Misha')
   await page.getByTestId(`front-desk-member-${misha}-age`).fill('7')
@@ -99,7 +99,7 @@ test('2–3 · waiter adds Anna’s milk intolerance and sends the order', async
 
   await addFor('Kids nuggets', 'Misha')
   await addFor('Coconut ice cream', 'Misha')
-  await addFor('Chicken satay', 'Mikhail') // Misha (severe) at the table → waiter confirmation
+  await addFor('Chicken satay', 'Ivan') // Misha (severe) at the table → waiter confirmation
   await addFor('Thai iced tea', 'Anna') // Anna's own allergen → guest consent
 
   const cart = page.getByTestId('waiter-cart')
@@ -137,7 +137,7 @@ test('4 · kitchen shows the ticket with allergens and for whom', async ({ page 
   await expect(ticket.getByTestId('kitchen-line-danger').first()).toBeVisible()
 })
 
-test('5 · manager finds the consent for room 518', async ({ page }) => {
+test('5 · manager finds the consent for room 222', async ({ page }) => {
   await page.goto('/staff/manager')
   await page.getByTestId('manager-search').fill(ROOM)
   const consent = page.getByTestId('manager-entry-GUEST_CONSENT').first()

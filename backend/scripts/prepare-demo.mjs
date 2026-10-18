@@ -2,7 +2,8 @@
 //
 // Usage, from backend/:
 //   node scripts/prepare-demo.mjs           dry run: checks the sandbox and lists the steps, changes nothing
-//   node scripts/prepare-demo.mjs --reset   resets the hotel to its seed, then runs the steps
+//   node scripts/prepare-demo.mjs --prepare applies the steps without a reset (the safe choice before the demo)
+//   node scripts/prepare-demo.mjs --reset   resets the hotel to its seed, then runs the steps (may reshuffle reservations)
 //
 // Reset affects the whole team (only BE-A runs it, after telling everyone), is allowed once per minute and takes
 // up to 30 s. Before the event the key points to the practice hotel shared by ALL teams: never reset it then.
@@ -49,29 +50,44 @@ async function posToken() {
   return token;
 }
 
-// Calls that set up the demo story after the reset; the seed already restores room 518 with only PEANUTS in the PMS.
-// Each step uses `call`; POS calls pass { pos: true }.
-const steps = [];
-
-// Read-only checks of the demo state (PLAN.md, demo prep step 3): reported on a dry run, required after --reset.
-const DEMO_RESERVATION = 'R-203844';
+// The demo family: Kuznetsov, room 222. A reset can hand reservation ids to other guests (seen on the event day),
+// so the checks verify the family, and --prepare applies the steps WITHOUT a reset.
+const DEMO_RESERVATION = 'R-203156';
+const DEMO_ROOM = '222';
+const DEMO_LAST_NAME = 'Kuznetsov';
+// Waiter's table and bartender's table: B4,B6 for the rehearsal, --tables=B7,B8 for the demo itself.
+const DEMO_TABLES = (process.argv.find((a) => a.startsWith('--tables='))?.slice(9) ?? 'B4,B6').split(',');
 const POOL_BAR = 4;
+
+// Calls that set up the demo story. Each step uses `call`; POS calls pass { pos: true }.
+const steps = [
+  {
+    name: `PEANUTS on the PMS profile of room ${DEMO_ROOM} (the allergy recorded on the parent)`,
+    run: async () => {
+      const reservation = (await call('GET', `/v1/pms/reservations/${DEMO_RESERVATION}`)).reservation;
+      await call('PATCH', `/v1/pms/guests/${reservation.guest.id}`, { body: { allergies: ['PEANUTS'] } });
+    },
+  },
+];
+
+// Read-only checks of the demo state (DEMO.md, preparation): reported on a dry run, required after --prepare or --reset.
 const checks = [
   {
-    name: 'Room 518 (Kuznetsov) in house, only PEANUTS in the PMS profile',
+    name: `Room ${DEMO_ROOM} (${DEMO_LAST_NAME}) in house, only PEANUTS in the PMS profile`,
     run: async () => {
       const reservation = (await call('GET', `/v1/pms/reservations/${DEMO_RESERVATION}`)).reservation;
       const allergies = reservation.guest?.allergies ?? [];
-      if (reservation.status !== 'IN_HOUSE' || reservation.roomNumber !== '518') {
-        throw new Error(`${DEMO_RESERVATION} is ${reservation.status} in room ${reservation.roomNumber}`);
+      if (reservation.status !== 'IN_HOUSE' || reservation.roomNumber !== DEMO_ROOM || reservation.guest?.lastName !== DEMO_LAST_NAME) {
+        throw new Error(`${DEMO_RESERVATION} is ${reservation.status}, room ${reservation.roomNumber}, ${reservation.guest?.lastName}`);
       }
       if (allergies.join() !== 'PEANUTS') throw new Error(`PMS allergies are ${allergies.join(', ') || 'none'}`);
     },
   },
   {
-    name: 'No open check at the Pool Bar',
+    name: `No open check at the Pool Bar tables ${DEMO_TABLES.join(', ')}`,
     run: async () => {
-      const open = (await call('GET', `/v1/pos/checks?rvc-on=${POOL_BAR}`, { pos: true })).elements ?? [];
+      const open = ((await call('GET', `/v1/pos/checks?rvc-on=${POOL_BAR}`, { pos: true })).elements ?? [])
+        .filter((c) => DEMO_TABLES.includes(c.table));
       if (open.length) {
         throw new Error(`open: ${open.map((c) => `check ${c.checkNumber ?? c.checkNum} table ${c.table}`).join(', ')}`);
       }
@@ -97,18 +113,21 @@ async function runChecks(required) {
 }
 
 const reset = process.argv.includes('--reset');
+const prepare = process.argv.includes('--prepare');
 const health = await (await fetch(`${base}/health`)).json();
 const before = (await call('GET', '/v1/pms/hotel')).hotel;
 console.log(`Sandbox ${health.status}; hotel "${before.name}", business date ${before.businessDate}`);
 console.log(`${steps.length} prep step(s): ${steps.map((s) => s.name).join('; ') || 'none yet'}`);
-if (!reset) {
+if (!reset && !prepare) {
   await runChecks(false);
-  console.log('Dry run: nothing changed. Run with --reset to reset the hotel and apply the steps.');
+  console.log('Dry run: nothing changed. --prepare applies the steps; --reset resets the hotel first (may reshuffle reservations).');
   process.exit(0);
 }
 
-console.log('Resetting the hotel (up to 30 s)...');
-await call('POST', '/v1/sandbox/reset', { timeoutMs: 45000 });
+if (reset) {
+  console.log('Resetting the hotel (up to 30 s)...');
+  await call('POST', '/v1/sandbox/reset', { timeoutMs: 45000 });
+}
 for (const step of steps) {
   await step.run();
   console.log(`done: ${step.name}`);

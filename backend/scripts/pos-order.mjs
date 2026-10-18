@@ -4,7 +4,7 @@
 // Usage, from backend/:
 //   node scripts/pos-order.mjs                 dry run: resolves the outlet, the item and the order type, sends nothing
 //   node scripts/pos-order.mjs --send          opens a real check in the POS with one round
-// Options (defaults are the demo story): --reservation R-203844 --table B5 --item "Som tam" --rvc 4
+// Options (defaults are the demo story): --reservation R-203156 --table B6 --item "Som tam" --rvc 4
 //
 // Logs in to the POS with POS_BARTENDER_PIN from backend/.env (a bartender from the organizers' handout); falls back
 // to SANDBOX_PIN with a warning. The table must have no open check (OCCUPIED_TABLE): the hotel reset clears them.
@@ -26,8 +26,8 @@ function option(name, fallback) {
   return index > 0 && process.argv[index + 1] ? process.argv[index + 1] : fallback
 }
 
-const reservationId = option('reservation', 'R-203844')
-const table = option('table', 'B5')
+const reservationId = option('reservation', 'R-203156')
+const table = option('table', 'B6')
 const itemName = option('item', 'Som tam')
 const rvc = Number(option('rvc', '4'))
 const send = process.argv.includes('--send')

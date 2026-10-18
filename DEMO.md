@@ -1,6 +1,6 @@
 # DEMO.md — run sheet for 16:00
 
-Story: Kuznetsov family, room 518 (R-203844), Pool Bar (rvc 4). Each step proves one acceptance criterion (AC) from the deck.
+Story: Kuznetsov family, room 222 (R-203156), Pool Bar (rvc 4). Each step proves one acceptance criterion (AC) from the deck.
 
 ## Format — about 10 minutes
 
@@ -29,13 +29,13 @@ Story: Kuznetsov family, room 518 (R-203844), Pool Bar (rvc 4). Each step proves
 | 15:15–15:35 | Two timed rehearsals; reset the hotel after each (once per minute, takes up to 30 s) | all |
 | 15:40 | Final reset, below | Sergey |
 
-Final reset, on the demo laptop, from `backend/`:
+Final preparation, on the demo laptop, from `backend/` — **no hotel reset**: on the event day a reset handed our reservations to other guests.
 
 ```bash
-node scripts/prepare-demo.mjs --reset
+node scripts/prepare-demo.mjs --prepare --tables=B7,B8
 ```
 
-Then stop the backend, delete `backend/data/`, start the backend and the frontend again. The script checks that room 518 is in house with only PEANUTS in the PMS and that no check is open at the Pool Bar.
+It puts PEANUTS on Ivan's PMS profile and checks that room 222 is in house and the demo tables are free. Then stop the backend, delete `backend/data/`, start the backend and the frontend again (`SANDBOX_EVENTS_SKIP_HISTORY=true` keeps the kitchen empty). Tables: **B4 / B6** for the rehearsal, **B7 / B8** for the demo itself (a run leaves open checks behind).
 
 Gennadii's laptop: `POS_BARTENDER_PIN` set in `backend/.env`; dry run `node scripts/pos-order.mjs` once after the reset (sends nothing).
 
@@ -45,11 +45,11 @@ Gennadii's laptop: `POS_BARTENDER_PIN` set in `backend/.env`; dry run `node scri
 
 | # | AC | Click | Say |
 |---|---|---|---|
-| 1 | AC1 | Front desk → search 518 → the PMS shows PEANUTS on Mikhail's profile → add cards: Mikhail, Anna, **Misha, 7 — PEANUTS, severe** (move PEANUTS from Mikhail to Misha) → Save → "PMS updated" | "The PMS keeps one profile per booking. We keep a card per person, and the PMS gets the union." |
+| 1 | AC1 | Front desk → search 222 → the PMS shows PEANUTS on Ivan's profile → add cards: Ivan, Anna, **Misha, 7 — PEANUTS, severe** (move PEANUTS from Ivan to Misha) → Save → "PMS updated" | "The PMS keeps one profile per booking. We keep a card per person, and the PMS gets the union." |
 | 2 | AC2, AC4 | Waiter → search "Kuznetsov" → badges per person → satay, Som tam, Pad thai red for Misha; Spring rolls, Kids nuggets green → Anna: "I'm lactose intolerant" → add MILK (intolerance) to Anna → Espresso's Whole milk turns red → choose oat milk | "A new allergy in the middle of the stay, and all four outlets see it at once." |
-| 3 | AC3 | Table **B4**. Misha: Kids nuggets + Coconut ice cream. Mikhail: Chicken satay for himself → waiter confirms "Misha is at the table". Anna insists on Thai iced tea (MILK) → Erlan, as Anna, steps up and types her name → Send | "Nothing is blocked. The guest decides, the system records the consent." |
-| 4 | AC5 | Kitchen (right half): the ticket arrives within seconds — allergen lines, for whom, the consent mark. **Cue Gennadii:** `node scripts/pos-order.mjs --send` (Som tam for 518 at table B5) → a red ticket "not checked at ordering — PEANUTS: Misha" on top | "The kitchen knows about every order, even one typed past our tablet." |
-| 5 | AC6 | Manager → search 518: passport changes (front desk, waiter W02), waiter confirmation, Anna's consent with time and waiter, the unchecked POS order, the shift numbers | "After an incident the hotel can prove it was the guest's decision, not a mistake by the waiter or the kitchen." |
+| 3 | AC3 | Table **B4** (demo: **B7**). Misha: Kids nuggets + Coconut ice cream. Ivan: Chicken satay for himself → waiter confirms "Misha is at the table". Anna insists on Thai iced tea (MILK) → Erlan, as Anna, steps up and types her name → Send | "Nothing is blocked. The guest decides, the system records the consent." |
+| 4 | AC5 | Kitchen (right half): the ticket arrives within seconds — allergen lines, for whom, the consent mark. **Cue Gennadii:** `node scripts/pos-order.mjs --send` (Som tam for 222 at table B6; demo: `--table B8`) → a red ticket "not checked at ordering — PEANUTS: Misha" on top | "The kitchen knows about every order, even one typed past our tablet." |
+| 5 | AC6 | Manager → search 222: passport changes (front desk, waiter W02), waiter confirmation, Anna's consent with time and waiter, the unchecked POS order, the shift numbers | "After an incident the hotel can prove it was the guest's decision, not a mistake by the waiter or the kitchen." |
 
 Close: "Six criteria, live on the hotel's real PMS and POS. Next: staff sign-in with the POS PIN, the guest's own passport by QR, translated screens."
 
@@ -70,7 +70,7 @@ Close: "Six criteria, live on the hotel's real PMS and POS. Next: staff sign-in 
 |---|---|
 | The sandbox is slow or answers 503 | the client retries; keep talking for 5–10 s |
 | No ticket on the kitchen screen | reload the kitchen tab: tickets are loaded again |
-| Room 518 is in a broken state | switch to the backup family: room 729 (R-203981, Thomas: GLUTEN, FISH, MUSTARD) |
+| Room 222 is in a broken state | switch to the backup family: room 729 (R-203981, Thomas: GLUTEN, FISH, MUSTARD) |
 | No network | play the 15:15 recording |
 | A step fails twice | say what should happen, move to the next step |
 

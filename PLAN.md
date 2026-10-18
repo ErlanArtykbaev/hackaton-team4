@@ -25,15 +25,15 @@
   - `itemAllergens` always include the allergens of the chosen condiments.
 - **Spring events for the live stream** (Erlan publishes, Gennadii streams over SSE): `TicketChanged`, `LogAppended`, `PassportChanged`.
 
-## Demo path — Pool Bar (rvc 4), Kuznetsov family, room 518 (R-203844)
+## Demo path — Pool Bar (rvc 4), Kuznetsov family, room 222 (R-203156; was 518 / R-203844 before a hotel reset reshuffled the reservations)
 
 | # | The jury sees | Screen | Our API | Sandbox calls |
 |---|---|---|---|---|
-| 1 | Check-in card per person: **Mikhail** (adult), **Anna** (adult), **Misha, 7 — PEANUTS, severe**. Save → "PMS updated". | Front desk | `GET /api/front-desk/arrivals`, `GET /api/reservations?query=518`, `GET`/`PUT /api/passports/R-203844` | `GET /v1/pms/reservations?roomNumber=518`, `PATCH /v1/pms/guests/{guestId}` |
-| 2 | Pool Bar waiter finds "Kuznetsov": badges per person; satay, Som tam, Pad thai marked for Misha; Spring rolls and Kids nuggets green. Anna says she is lactose intolerant → the waiter adds **MILK, intolerance** to her card on the tablet → Espresso's **Whole milk** turns red for Anna; she takes oat milk. | Waiter | `GET /api/reservations?query=Kuznetsov`, `GET /api/outlets/4/menu?reservationId=…`, `PUT /api/passports/R-203844` | `GET /v1/pos/dict/pms/lookup`, `GET /v1/pos/dict/menu?rvc-on=4`, `PATCH /v1/pms/guests/{guestId}` |
-| 3 | Misha: Kids nuggets + Coconut ice cream. Mikhail: Chicken satay for himself → **waiter confirms** "Misha (severe) is at the table". Anna insists on **Thai iced tea** (MILK) → she gives **consent on the tablet** with her name. Send. | Waiter | `POST /api/orders` | `POST /v1/pos/checks?rvc-on=4` (table, `reservationId`) |
-| 4 | Within ~3 s the kitchen display shows the ticket: "Thai iced tea — MILK — Anna (intolerance) · guest consent"; "Chicken satay — PEANUTS — for Mikhail; Misha (severe) at the table". Then a bartender types **Som tam** for room 518 straight into the POS → the ticket "not checked at ordering — PEANUTS: Misha (severe)" appears on top. | Kitchen (Pool Bar) | `GET /api/kitchen/4/tickets`, SSE `GET /api/stream` | `GET /v1/events` (`pos.check.round_sent`); the bartender's order via `scripts/pos-order.mjs` |
-| 5 | The manager searches "518": Anna's consent (dish, allergen, time, waiter W02, Pool Bar), the waiter's confirmation, the passport change by the waiter, the unchecked POS order — proof for an incident. | Manager | `GET /api/safety-log?query=518`, `GET /api/safety-log/summary`, SSE | — |
+| 1 | Check-in card per person: **Ivan** (adult), **Anna** (adult), **Misha, 7 — PEANUTS, severe**. Save → "PMS updated". | Front desk | `GET /api/front-desk/arrivals`, `GET /api/reservations?query=222`, `GET`/`PUT /api/passports/R-203156` | `GET /v1/pms/reservations?roomNumber=222`, `PATCH /v1/pms/guests/{guestId}` |
+| 2 | Pool Bar waiter finds "Kuznetsov": badges per person; satay, Som tam, Pad thai marked for Misha; Spring rolls and Kids nuggets green. Anna says she is lactose intolerant → the waiter adds **MILK, intolerance** to her card on the tablet → Espresso's **Whole milk** turns red for Anna; she takes oat milk. | Waiter | `GET /api/reservations?query=Kuznetsov`, `GET /api/outlets/4/menu?reservationId=…`, `PUT /api/passports/R-203156` | `GET /v1/pos/dict/pms/lookup`, `GET /v1/pos/dict/menu?rvc-on=4`, `PATCH /v1/pms/guests/{guestId}` |
+| 3 | Misha: Kids nuggets + Coconut ice cream. Ivan: Chicken satay for himself → **waiter confirms** "Misha (severe) is at the table". Anna insists on **Thai iced tea** (MILK) → she gives **consent on the tablet** with her name. Send. | Waiter | `POST /api/orders` | `POST /v1/pos/checks?rvc-on=4` (table, `reservationId`) |
+| 4 | Within ~3 s the kitchen display shows the ticket: "Thai iced tea — MILK — Anna (intolerance) · guest consent"; "Chicken satay — PEANUTS — for Ivan; Misha (severe) at the table". Then a bartender types **Som tam** for room 222 straight into the POS → the ticket "not checked at ordering — PEANUTS: Misha (severe)" appears on top. | Kitchen (Pool Bar) | `GET /api/kitchen/4/tickets`, SSE `GET /api/stream` | `GET /v1/events` (`pos.check.round_sent`); the bartender's order via `scripts/pos-order.mjs` |
+| 5 | The manager searches "222": Anna's consent (dish, allergen, time, waiter W02, Pool Bar), the waiter's confirmation, the passport change by the waiter, the unchecked POS order — proof for an incident. | Manager | `GET /api/safety-log?query=222`, `GET /api/safety-log/summary`, SSE | — |
 
 ## API contract — frozen at 13:00
 
@@ -141,7 +141,7 @@ Blocked for more than 15 minutes: say so at once.
 
 | Who | Rooms (reservation) |
 |---|---|
-| Demo path — nobody touches | 518 (R-203844, Kuznetsov); backup 729 (R-203981, Thomas, GLUTEN / FISH / MUSTARD) |
+| Demo path — nobody touches | 222 (R-203156, Kuznetsov); backup 729 (R-203981, Thomas, GLUTEN / FISH / MUSTARD) |
 | BE-A | 633 (R-203423), 822 (R-203830) |
 | BE-B | 223 (R-203478), 539 (R-203804) |
 | FE-A | 139 (R-203358) |
@@ -149,9 +149,9 @@ Blocked for more than 15 minutes: say so at once.
 
 ## Demo prep (scripts: BE-A6; run at 15:40 by the tech lead)
 
-1. `node scripts/prepare-demo.mjs --reset` — the seed restores 518 with only PEANUTS on the PMS profile.
+1. `node scripts/prepare-demo.mjs --prepare --tables=B7,B8` — no reset (it reshuffles reservations); puts PEANUTS on Ivan's PMS profile.
 2. Stop the backend, delete `backend/data/`, start it again: no passports, no tickets, empty log.
-3. Check: room 518 is in house; no open check on the Pool Bar table used in the demo.
+3. The script checks: room 222 is in house; tables B7 and B8 are free.
 4. Open four windows: front desk, waiter (Pool Bar, W02), kitchen (Pool Bar), manager.
 
 ## Cut list
