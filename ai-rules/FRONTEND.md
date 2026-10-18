@@ -1,7 +1,7 @@
 # FRONTEND.md — frontend rules
 
 > Status: **STUB**. Load for any frontend work. Decisions are owned by the frontend developers
-> (Erlan Artykbaev, Gennadii Chzhen); going through §6 is their first step.
+> on the day (Sergey Zubov, Nikolai Ivliev); going through §6 is their first step.
 
 ## §1. Stack
 
