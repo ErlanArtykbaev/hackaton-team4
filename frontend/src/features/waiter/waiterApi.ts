@@ -1,26 +1,12 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import type { AllergenCode, SeverityCode, VerdictCode } from '../../shared/allergens'
 import { ApiError, problemOf } from '../../shared/errors'
 
-// Shapes of the frozen API contract (PLAN.md) until the generated types exist (FE-B1); then switch to `api/schema`.
-export const ALLERGENS = [
-  'GLUTEN',
-  'CRUSTACEANS',
-  'EGGS',
-  'FISH',
-  'PEANUTS',
-  'SOYBEANS',
-  'MILK',
-  'NUTS',
-  'CELERY',
-  'MUSTARD',
-  'SESAME',
-  'SULPHITES',
-  'LUPIN',
-  'MOLLUSCS',
-] as const
-export type Allergen = (typeof ALLERGENS)[number]
-export type Severity = 'INTOLERANCE' | 'SEVERE'
-export type Verdict = 'SAFE' | 'WARNING' | 'DANGER' | 'UNKNOWN'
+// Shapes of the contract (PLAN.md); enums come from the generated schema through `shared/allergens`.
+// Objects stay hand-written while the generated ones mark every field optional; switch once the backend marks them required.
+export type Allergen = AllergenCode
+export type Severity = SeverityCode
+export type Verdict = VerdictCode
 export type Requirement = 'NONE' | 'WAITER_CONFIRMATION' | 'GUEST_CONSENT'
 export type MemberId = string | number
 

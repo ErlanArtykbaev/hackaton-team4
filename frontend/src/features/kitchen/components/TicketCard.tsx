@@ -1,4 +1,6 @@
 import { Badge, Group, Paper, Stack, Text } from '@mantine/core'
+import { AllergenChip } from '../../../shared/AllergenMarks'
+import { ALLERGEN_META, SEVERITY_MARK } from '../../../shared/allergens'
 import type { KitchenTicket, TicketLine, TicketSource } from '../kitchenApi'
 
 const hotelTime = new Intl.DateTimeFormat('en-GB', {
@@ -71,9 +73,7 @@ function Line({ line }: { line: TicketLine }) {
         </Text>
         {line.condiments.length > 0 && <Text c="dimmed">({line.condiments.join(', ')})</Text>}
         {line.allergens.map((a) => (
-          <Badge key={a} variant="outline" color={danger ? 'red' : 'gray'}>
-            {a}
-          </Badge>
+          <AllergenChip key={a} allergen={a} severity={worstSeverity(line, a)} />
         ))}
       </Group>
       {danger && (
@@ -87,10 +87,12 @@ function Line({ line }: { line: TicketLine }) {
 
 /** "MILK — Anna (intolerance) · guest consent" or "PEANUTS — for Mikhail; Misha (severe) at the table". */
 function lineWarning(line: TicketLine): string {
-  const allergens = [...new Set(line.dangerFor.map((d) => d.allergen))].join(', ')
-  const people = line.dangerFor.map(
-    (d) => `${d.memberName} (${d.severity === 'SEVERE' ? 'severe' : 'intolerance'})`,
-  )
+  const allergens = [
+    ...new Set(
+      line.dangerFor.map((d) => `${ALLERGEN_META[d.allergen].icon} ${ALLERGEN_META[d.allergen].label}`),
+    ),
+  ].join(', ')
+  const people = line.dangerFor.map((d) => `${d.memberName} (${SEVERITY_MARK[d.severity].label})`)
   const forOther = line.forMemberName && !line.dangerFor.some((d) => d.memberName === line.forMemberName)
   const who = forOther
     ? `for ${line.forMemberName}; ${[...new Set(people)].join(', ')} at the table`
@@ -102,4 +104,11 @@ function lineWarning(line: TicketLine): string {
     .filter(Boolean)
     .join(' · ')
   return `${allergens} — ${who}${marks ? ` · ${marks}` : ''}`
+}
+
+/** The severity this allergen has for someone at the table; none when it endangers nobody. */
+function worstSeverity(line: TicketLine, allergen: TicketLine['allergens'][number]) {
+  const hits = line.dangerFor.filter((d) => d.allergen === allergen)
+  if (hits.length === 0) return undefined
+  return hits.some((d) => d.severity === 'SEVERE') ? 'SEVERE' : 'INTOLERANCE'
 }

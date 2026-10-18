@@ -1,3 +1,4 @@
+import { ALLERGEN_CODES, ALLERGEN_META } from '../../../shared/allergens'
 import { errorMessage } from '../../../shared/errors'
 import {
   Alert,
@@ -12,14 +13,7 @@ import {
   TextInput,
 } from '@mantine/core'
 import { useState } from 'react'
-import {
-  ALLERGENS,
-  useSavePassport,
-  type Allergen,
-  type Member,
-  type Passport,
-  type Severity,
-} from '../waiterApi'
+import { useSavePassport, type Allergen, type Member, type Passport, type Severity } from '../waiterApi'
 
 const SEVERITIES = [
   { value: 'INTOLERANCE', label: 'Intolerance' },
@@ -126,7 +120,10 @@ function PassportForm({
       )}
       <Select
         label={mode === 'allergen' ? 'Allergen' : 'Allergen (optional)'}
-        data={[...ALLERGENS]}
+        data={ALLERGEN_CODES.map((c) => ({
+          value: c,
+          label: `${ALLERGEN_META[c].icon} ${ALLERGEN_META[c].label}`,
+        }))}
         value={allergen}
         onChange={setAllergen}
         searchable

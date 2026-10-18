@@ -1,14 +1,15 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query'
+import type { AllergenCode, SeverityCode, VerdictCode } from '../../shared/allergens'
 import { ApiError, problemOf } from '../../shared/errors'
 import { useStream } from '../../shared/useStream'
 
-// Shapes of the frozen API contract (PLAN.md) until the generated types exist (FE-B1); then switch to `api/schema`.
-export type Severity = 'INTOLERANCE' | 'SEVERE'
-export type Verdict = 'SAFE' | 'WARNING' | 'DANGER' | 'UNKNOWN'
+// Shapes of the contract (PLAN.md); enums come from the generated schema through `shared/allergens`.
+export type Severity = SeverityCode
+export type Verdict = VerdictCode
 export type DangerFor = {
   memberId: string | number
   memberName: string
-  allergen: string
+  allergen: AllergenCode
   severity: Severity
 }
 export type TicketSource = 'CHECKED' | 'UNCHECKED' | 'UNLINKED'
@@ -17,7 +18,7 @@ export type TicketLine = {
   name: string
   quantity: number
   condiments: string[]
-  allergens: string[]
+  allergens: AllergenCode[]
   verdict: Verdict
   dangerFor: DangerFor[]
   forMemberName?: string | null

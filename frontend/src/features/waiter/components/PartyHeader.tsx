@@ -1,6 +1,6 @@
-import { Badge, Button, Group, Paper, Stack, Text } from '@mantine/core'
+import { Button, Group, Paper, Stack, Text } from '@mantine/core'
+import { PartyBadge } from '../../../shared/PartyBadge'
 import type { Passport } from '../waiterApi'
-import { severityLabel } from './marks'
 
 /** Who sits at the table: one badge per member with their allergens. */
 export function PartyHeader({
@@ -21,28 +21,7 @@ export function PartyHeader({
           </Text>
           <Group gap="sm">
             {passport.members.map((m) => (
-              <Paper key={String(m.id ?? m.name)} withBorder p="xs" data-testid={`waiter-member-${m.name}`}>
-                <Text fw={600}>
-                  {m.name}
-                  {m.age != null ? `, ${m.age}` : ''}
-                </Text>
-                <Group gap={4} mt={4}>
-                  {m.allergies.length === 0 && (
-                    <Badge color="green" variant="light">
-                      No allergies
-                    </Badge>
-                  )}
-                  {m.allergies.map((a) => (
-                    <Badge
-                      key={a.allergen}
-                      color={a.severity === 'SEVERE' ? 'red' : 'orange'}
-                      variant={a.severity === 'SEVERE' ? 'filled' : 'light'}
-                    >
-                      {a.allergen} · {severityLabel(a.severity)}
-                    </Badge>
-                  ))}
-                </Group>
-              </Paper>
+              <PartyBadge key={String(m.id ?? m.name)} member={m} testId={`waiter-member-${m.name}`} />
             ))}
           </Group>
         </Stack>

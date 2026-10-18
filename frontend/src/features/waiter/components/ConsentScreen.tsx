@@ -2,7 +2,7 @@ import { Button, Group, Modal, Paper, Stack, Text, TextInput, Title } from '@man
 import { useState } from 'react'
 import type { LineCheck } from '../waiterApi'
 import type { CartLine } from './Cart'
-import { severityLabel } from './marks'
+import { ALLERGEN_META, SEVERITY_MARK } from '../../../shared/allergens'
 
 /** The waiter hands the tablet to the guest: the guest reads what the dish contains and signs with their name. */
 export function ConsentScreen({
@@ -37,7 +37,7 @@ function ConsentForm({
   onClose: () => void
 }) {
   const [name, setName] = useState('')
-  const allergens = [...new Set(check.dangerFor.map((d) => d.allergen))].join(', ')
+  const allergens = [...new Set(check.dangerFor.map((d) => ALLERGEN_META[d.allergen].label))].join(', ')
   const child = line.forMember?.age != null && line.forMember.age < 18
 
   return (
@@ -50,7 +50,8 @@ function ConsentForm({
         </Text>
         {check.dangerFor.map((d) => (
           <Text key={`${String(d.memberId)}-${d.allergen}`} size="lg">
-            {d.allergen} — {d.memberName} ({severityLabel(d.severity)})
+            {ALLERGEN_META[d.allergen].icon} {ALLERGEN_META[d.allergen].label} — {d.memberName} (
+            {SEVERITY_MARK[d.severity].label})
           </Text>
         ))}
       </Paper>

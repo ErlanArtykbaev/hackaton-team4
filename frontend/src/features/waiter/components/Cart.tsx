@@ -14,7 +14,7 @@ import {
 import type { LineCheck } from '../waiterApi'
 import type { LineDraft } from './LineEditor'
 import { dangerText, money } from './marks'
-import { VerdictBadge } from './VerdictMarks'
+import { VerdictBadge } from '../../../shared/AllergenMarks'
 
 export type CartLine = LineDraft & { key: string; waiterConfirmed: boolean; consentBy: string | null }
 

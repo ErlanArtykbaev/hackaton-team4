@@ -11,8 +11,8 @@ import {
 } from '@mantine/core'
 import { useState } from 'react'
 import type { CondimentOption, DangerFor, Member, MenuItem } from '../waiterApi'
-import { VERDICT_COLOR, dangerText, money } from './marks'
-import { AllergenChips } from './VerdictMarks'
+import { verdictColor, dangerText, money } from './marks'
+import { AllergenChips } from '../../../shared/AllergenMarks'
 
 export type LineDraft = {
   item: MenuItem
@@ -160,9 +160,7 @@ function OptionLabel({ option }: { option: CondimentOption }) {
     <Group gap="xs">
       <Text
         c={
-          option.verdict === 'SAFE' || option.verdict === 'UNKNOWN'
-            ? undefined
-            : VERDICT_COLOR[option.verdict]
+          option.verdict === 'SAFE' || option.verdict === 'UNKNOWN' ? undefined : verdictColor(option.verdict)
         }
         fw={option.dangerFor.length ? 600 : 400}
       >
@@ -171,7 +169,7 @@ function OptionLabel({ option }: { option: CondimentOption }) {
       </Text>
       <AllergenChips allergens={option.allergens} size="xs" />
       {option.dangerFor.length > 0 && (
-        <Text size="sm" c={VERDICT_COLOR[option.verdict]}>
+        <Text size="sm" c={verdictColor(option.verdict)}>
           {dangerText(option.dangerFor)}
         </Text>
       )}

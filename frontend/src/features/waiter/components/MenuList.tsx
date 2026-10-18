@@ -1,8 +1,8 @@
 import { Group, Paper, SimpleGrid, Stack, Switch, Text, Title } from '@mantine/core'
 import { useState } from 'react'
 import type { MenuItem } from '../waiterApi'
-import { VERDICT_COLOR, dangerText, money } from './marks'
-import { AllergenChips, VerdictBadge } from './VerdictMarks'
+import { verdictColor, dangerText, money } from './marks'
+import { AllergenChips, VerdictBadge } from '../../../shared/AllergenMarks'
 
 export function MenuList({
   items,
@@ -49,7 +49,7 @@ export function MenuList({
                   p="sm"
                   style={{
                     cursor: 'pointer',
-                    borderLeft: `6px solid var(--mantine-color-${VERDICT_COLOR[item.verdict]}-6)`,
+                    borderLeft: `6px solid var(--mantine-color-${verdictColor(item.verdict)}-6)`,
                   }}
                   onClick={() => onPick(item)}
                   data-testid={`waiter-item-${item.code}`}
@@ -64,7 +64,7 @@ export function MenuList({
                     {!walkIn && <VerdictBadge verdict={item.verdict} />}
                   </Group>
                   {item.dangerFor.length > 0 && (
-                    <Text size="sm" c={VERDICT_COLOR[item.verdict]} mt={6} fw={600}>
+                    <Text size="sm" c={verdictColor(item.verdict)} mt={6} fw={600}>
                       {dangerText(item.dangerFor)}
                     </Text>
                   )}

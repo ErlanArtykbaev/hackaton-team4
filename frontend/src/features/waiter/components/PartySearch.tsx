@@ -3,7 +3,7 @@ import { Alert, Button, Group, Loader, Paper, Stack, Text, TextInput } from '@ma
 import { useDebouncedValue } from '@mantine/hooks'
 import { useState } from 'react'
 import { isSearchable, useReservations, type ReservationSummary } from '../waiterApi'
-import { AllergenChips } from './VerdictMarks'
+import { AllergenChips } from '../../../shared/AllergenMarks'
 
 export function PartySearch({
   onSelect,
