@@ -1,0 +1,21 @@
+/* A new ticket pulses for about 8 s; a new unchecked ticket with allergens flashes red. Finite: no endless blinking. */
+.fresh {
+  animation: fresh 1s ease-in-out 8;
+}
+
+.alarm {
+  animation: alarm 0.8s step-end 12;
+}
+
+@keyframes fresh {
+  50% {
+    box-shadow: 0 0 0 6px var(--mantine-color-teal-4);
+  }
+}
+
+@keyframes alarm {
+  50% {
+    box-shadow: 0 0 0 8px var(--mantine-color-red-6);
+    background-color: var(--mantine-color-red-2);
+  }
+}

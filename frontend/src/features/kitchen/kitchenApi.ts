@@ -78,5 +78,5 @@ export function useTicketStream(rvc: number | null): boolean {
 /** "Not checked at ordering" first, then newest first. */
 export function sortTickets(tickets: KitchenTicket[]): KitchenTicket[] {
   const rank = (t: KitchenTicket) => (t.source === 'UNCHECKED' && t.hasAllergens ? 0 : 1)
-  return [...tickets].sort((a, b) => rank(a) - rank(b) || b.sentAt.localeCompare(a.sentAt))
+  return [...tickets].sort((a, b) => rank(a) - rank(b) || Date.parse(b.sentAt) - Date.parse(a.sentAt))
 }

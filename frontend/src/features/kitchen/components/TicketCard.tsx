@@ -1,4 +1,5 @@
 import { Badge, Group, Paper, Stack, Text } from '@mantine/core'
+import classes from './TicketCard.module.css'
 import { AllergenChip } from '../../../shared/AllergenMarks'
 import { ALLERGEN_META, SEVERITY_MARK } from '../../../shared/allergens'
 import type { KitchenTicket, TicketLine, TicketSource } from '../kitchenApi'
@@ -16,7 +17,7 @@ const SOURCE: Record<TicketSource, { label: string; color: string }> = {
 }
 
 /** One round sent to the kitchen. Notification only: the kitchen does not approve anything. */
-export function TicketCard({ ticket }: { ticket: KitchenTicket }) {
+export function TicketCard({ ticket, fresh = false }: { ticket: KitchenTicket; fresh?: boolean }) {
   const source = SOURCE[ticket.source]
   const alarm = ticket.source === 'UNCHECKED' && ticket.hasAllergens
 
@@ -24,6 +25,7 @@ export function TicketCard({ ticket }: { ticket: KitchenTicket }) {
     <Paper
       withBorder
       p="md"
+      className={fresh ? (alarm ? classes.alarm : classes.fresh) : undefined}
       bg={alarm ? 'red.0' : undefined}
       style={{
         borderWidth: ticket.hasAllergens ? 3 : 1,
@@ -31,6 +33,7 @@ export function TicketCard({ ticket }: { ticket: KitchenTicket }) {
       }}
       data-testid={`kitchen-ticket-${ticket.checkNumber}`}
       data-source={ticket.source}
+      data-fresh={fresh || undefined}
     >
       <Group justify="space-between" align="flex-start">
         <div>
@@ -41,9 +44,16 @@ export function TicketCard({ ticket }: { ticket: KitchenTicket }) {
           {ticket.guestName && <Text c="dimmed">{ticket.guestName}</Text>}
         </div>
         <Stack gap={4} align="flex-end">
-          <Text fw={700} size="lg">
-            {hotelTime.format(new Date(ticket.sentAt))}
-          </Text>
+          <Group gap="xs">
+            {fresh && (
+              <Badge color="teal" variant="filled" data-testid="kitchen-ticket-new">
+                New
+              </Badge>
+            )}
+            <Text fw={700} size="lg">
+              {hotelTime.format(new Date(ticket.sentAt))}
+            </Text>
+          </Group>
           <Badge
             color={source.color}
             variant={alarm ? 'filled' : 'light'}
