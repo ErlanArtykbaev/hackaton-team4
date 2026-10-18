@@ -68,7 +68,7 @@ All under `com.hackathon.team4`; request and response records in each package's 
    - The passport endpoints call the PMS, so they need `backend/.env`; kitchen and safety log read our database only.
 5. **Done.** `stream`: `GET /api/stream` (SSE) through `StreamHub`; `:connected` on open, `:heartbeat` every 15 s; `broadcast(StreamEvent, payload)` sends `ticket` / `log` / `passport` with the REST record as JSON, as `frontend/src/shared/stream.ts` expects. Nothing is broadcast yet: BE-B publishes no domain events so far, forwarding them is BE-A5.
 6. **Done.** `ApiContractTest` (all 11 paths in OpenAPI, order requirements, 400 `VALIDATION_ERROR`, passport from the PMS profile and 404, numeric kitchen `checkNumber`, safety-log search) and `StreamHubTest` (open comment, one event to every screen in the format `shared/stream.ts` reads); suite green, 82 tests.
-7. `git pull --rebase`, push; BE-A2 → `DONE`; tell the team "contract stubs are in".
+7. **Done.** `git pull --rebase gitlab main`, `./mvnw verify` green (82 tests), pushed to `gitlab main`; BE-A2 → `DONE`.
 
 ### Open points
 

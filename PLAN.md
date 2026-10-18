@@ -64,14 +64,14 @@ Statuses: `TODO` · `DOING` · `DONE` · `CUT`. Each person edits only their own
 | ID | Task | Demo step | Depends on | Status |
 |---|---|---|---|---|
 | BE-A1 | New team key, live smoke test, slow-sandbox fix (done by Sergey) | — | — | DONE |
-| BE-A2 | The whole API contract as stub controllers + records, fixed data from the demo story; springdoc lists every endpoint — **by 13:00** | all | — | DOING |
+| BE-A2 | The whole API contract as stub controllers + records, fixed data from the demo story; springdoc lists every endpoint — **by 13:00** | all | — | DONE |
 | BE-A3 | Reservation search, front-desk arrivals, outlets (filtered PMS calls, POS lookup) | 1, 2 | BE-A2 | TODO |
 | BE-A4 | Menu with verdicts (menu cached 5 min) + `POST /api/orders/check` + `POST /api/orders` → POS check linked to the reservation; enforce requirements; publish order, confirmation and consent entries | 2, 3 | BE-B2 | TODO |
 | BE-A5 | Kitchen feed: listener on `pos.check.round_sent` → ticket through Erlan's service; SSE `/api/stream` from `TicketChanged`, `LogAppended`, `PassportChanged` | 4 | BE-B4 | TODO |
 | BE-A6 | `scripts/pos-order.mjs` (bartender order straight into the POS, PIN from `.env`) + demo prep steps in `prepare-demo.mjs` | 4 | — | TODO |
 
 Progress (details: `BE-A-PLAN.md`):
-- BE-A2, steps 1–6 of 7: shared types in `allergen`; stubs for reservations, arrivals, outlets, menu, orders; passport, kitchen and safety-log controllers wired to Erlan's services; `GET /api/stream` open (events follow in BE-A5); contract tests green. Next: push. `PUT /api/passports/{id}` takes an optional `notes`.
+- BE-A2 done: the whole contract is in `main` (`/v3/api-docs`, 11 paths, contract tests green). Stubs: reservations, arrivals, outlets, menu, orders (BE-A3/BE-A4 make them real). Passport, kitchen and safety-log controllers call Erlan's services. `GET /api/stream` is open; events follow in BE-A5. `PUT /api/passports/{id}` takes an optional `notes`.
 
 ### BE-B — Erlan
 
