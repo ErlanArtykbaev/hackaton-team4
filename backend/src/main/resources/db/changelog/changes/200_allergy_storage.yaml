@@ -1,0 +1,119 @@
+databaseChangeLog:
+  - changeSet:
+      id: 200_allergy_storage
+      author: Erlan Artykbaev
+      changes:
+        - createTable:
+            tableName: passport
+            columns:
+              - column: {name: id, type: uuid, constraints: {primaryKey: true}}
+              - column: {name: reservation_id, type: varchar(32), constraints: {nullable: false, unique: true, uniqueConstraintName: uk_passport_reservation}}
+              - column: {name: room_number, type: varchar(16)}
+              - column: {name: guest_name, type: varchar(255)}
+              - column: {name: notes, type: varchar(2000)}
+              - column: {name: updated_by, type: varchar(64)}
+              - column: {name: version, type: bigint, constraints: {nullable: false}}
+              - column: {name: created_at, type: timestamp with time zone, constraints: {nullable: false}}
+              - column: {name: updated_at, type: timestamp with time zone, constraints: {nullable: false}}
+        - createTable:
+            tableName: passport_member
+            columns:
+              - column: {name: id, type: uuid, constraints: {primaryKey: true}}
+              - column: {name: passport_id, type: uuid, constraints: {nullable: false, foreignKeyName: fk_member_passport, references: passport(id)}}
+              - column: {name: name, type: varchar(255), constraints: {nullable: false}}
+              - column: {name: age, type: int}
+              - column: {name: is_primary, type: boolean, constraints: {nullable: false}}
+              - column: {name: position, type: int, constraints: {nullable: false}}
+              - column: {name: created_at, type: timestamp with time zone, constraints: {nullable: false}}
+              - column: {name: updated_at, type: timestamp with time zone, constraints: {nullable: false}}
+        - createIndex:
+            tableName: passport_member
+            indexName: ix_member_passport
+            columns:
+              - column: {name: passport_id}
+        - createTable:
+            tableName: passport_member_allergy
+            columns:
+              - column: {name: member_id, type: uuid, constraints: {nullable: false, foreignKeyName: fk_allergy_member, references: passport_member(id)}}
+              - column: {name: allergen, type: varchar(32), constraints: {nullable: false}}
+              - column: {name: severity, type: varchar(16), constraints: {nullable: false}}
+        - addPrimaryKey:
+            tableName: passport_member_allergy
+            columnNames: member_id, allergen
+            constraintName: pk_passport_member_allergy
+        - createTable:
+            tableName: kitchen_ticket
+            columns:
+              - column: {name: id, type: uuid, constraints: {primaryKey: true}}
+              - column: {name: rvc, type: int, constraints: {nullable: false}}
+              - column: {name: check_number, type: varchar(32), constraints: {nullable: false}}
+              - column: {name: check_seq, type: varchar(32), constraints: {nullable: false}}
+              - column: {name: round_number, type: int, constraints: {nullable: false}}
+              - column: {name: table_name, type: varchar(64)}
+              - column: {name: reservation_id, type: varchar(32)}
+              - column: {name: room_number, type: varchar(16)}
+              - column: {name: guest_name, type: varchar(255)}
+              - column: {name: sent_at, type: timestamp with time zone, constraints: {nullable: false}}
+              - column: {name: source, type: varchar(16), constraints: {nullable: false}}
+              - column: {name: status, type: varchar(16), constraints: {nullable: false}}
+              - column: {name: dangerous, type: boolean, constraints: {nullable: false}}
+              - column: {name: ack_action, type: varchar(32)}
+              - column: {name: ack_cook, type: varchar(64)}
+              - column: {name: ack_at, type: timestamp with time zone}
+              - column: {name: escalated_at, type: timestamp with time zone}
+              - column: {name: version, type: bigint, constraints: {nullable: false}}
+              - column: {name: created_at, type: timestamp with time zone, constraints: {nullable: false}}
+              - column: {name: updated_at, type: timestamp with time zone, constraints: {nullable: false}}
+        - addUniqueConstraint:
+            tableName: kitchen_ticket
+            columnNames: rvc, check_seq, round_number
+            constraintName: uk_ticket_round
+        - createIndex:
+            tableName: kitchen_ticket
+            indexName: ix_ticket_rvc_sent
+            columns:
+              - column: {name: rvc}
+              - column: {name: sent_at}
+        - createTable:
+            tableName: kitchen_ticket_line
+            columns:
+              - column: {name: ticket_id, type: uuid, constraints: {nullable: false, foreignKeyName: fk_line_ticket, references: kitchen_ticket(id)}}
+              - column: {name: position, type: int, constraints: {nullable: false}}
+              - column: {name: name, type: varchar(255), constraints: {nullable: false}}
+              - column: {name: quantity, type: int, constraints: {nullable: false}}
+              # JSON arrays: condiment names, allergens, DangerFor records
+              - column: {name: condiments, type: varchar(4000), constraints: {nullable: false}}
+              - column: {name: allergens, type: varchar(4000), constraints: {nullable: false}}
+              - column: {name: verdict, type: varchar(16), constraints: {nullable: false}}
+              - column: {name: danger_for, type: varchar(4000), constraints: {nullable: false}}
+              - column: {name: for_member_name, type: varchar(255)}
+              - column: {name: override_reason, type: varchar(1000)}
+              - column: {name: waiter_code, type: varchar(32)}
+        - addPrimaryKey:
+            tableName: kitchen_ticket_line
+            columnNames: ticket_id, position
+            constraintName: pk_kitchen_ticket_line
+        - createTable:
+            tableName: safety_log_entry
+            columns:
+              - column: {name: id, type: uuid, constraints: {primaryKey: true}}
+              - column: {name: at, type: timestamp with time zone, constraints: {nullable: false}}
+              - column: {name: type, type: varchar(32), constraints: {nullable: false}}
+              - column: {name: rvc, type: int}
+              - column: {name: outlet_name, type: varchar(64)}
+              - column: {name: reservation_id, type: varchar(32)}
+              - column: {name: room_number, type: varchar(16)}
+              - column: {name: member_name, type: varchar(255)}
+              - column: {name: item, type: varchar(255)}
+              - column: {name: allergen, type: varchar(32)}
+              - column: {name: actor, type: varchar(64)}
+              - column: {name: reason, type: varchar(1000)}
+              - column: {name: minutes_to_ack, type: "numeric(6,1)"}
+              - column: {name: ticket_id, type: uuid}
+              - column: {name: created_at, type: timestamp with time zone, constraints: {nullable: false}}
+              - column: {name: updated_at, type: timestamp with time zone, constraints: {nullable: false}}
+        - createIndex:
+            tableName: safety_log_entry
+            indexName: ix_log_at
+            columns:
+              - column: {name: at}
