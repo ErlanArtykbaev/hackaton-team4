@@ -59,7 +59,7 @@ All under `com.hackathon.team4`; request and response records in each package's 
 
 1. **Done.** BE-A2 → `DOING` in my section of `PLAN.md`; shared contract types in `allergen`.
 2. **Done.** `reservation` and `menu` (outlets and menu) stubs; checked on a running backend.
-3. `order` stubs.
+3. **Done.** `order` stubs; checked on a running backend. Lines are checked against the demo menu (condiments included) with the requirement rules of `PROJECT-CONTEXT.md` §3, so "for whom" behaves as in the demo; BE-A4 swaps this for the engine. `POST /api/orders` returns 201 with check 1017 / seq 88231 and sends nothing to the POS.
 4. `passport`, `kitchen`, `safetylog` stubs (handed to BE-B after the push).
 5. `stream`: the SSE connection.
 6. `ApiContractTest`, `./mvnw test` green; commit `feat(be): add API contract stubs (BE-A2)`, no AI co-author trailer (`CLAUDE.md` §7); review before the push.
@@ -72,3 +72,4 @@ All under `com.hackathon.team4`; request and response records in each package's 
 3. **Price without a currency field**, as in the contract: one hotel, THB.
 4. **Item codes in the stub are placeholders.** Real codes come from the live menu in BE-A3/BE-A4 (needs `backend/.env`); the frontend must not depend on them.
 5. **A malformed path or query parameter** (e.g. `/api/outlets/abc/menu`) gives 400 without `code`: `GlobalExceptionHandler` adds `VALIDATION_ERROR` only for invalid request bodies. Small fix in `common`, to agree with the team.
+6. **Generated frontend types make every response field optional**, and request primitives (`rvc`, `quantity`, `waiterConfirmed`) too: the OpenAPI schemas list only `@NotNull`/`@NotBlank` fields as required. Ask FE-B whether to mark record fields required (one `OpenApiCustomizer`) before they write much code.

@@ -71,7 +71,7 @@ Statuses: `TODO` · `DOING` · `DONE` · `CUT`. Each person edits only their own
 | BE-A6 | `scripts/pos-order.mjs` (bartender order straight into the POS, PIN from `.env`) + demo prep steps in `prepare-demo.mjs` | 4 | — | TODO |
 
 Progress (details: `BE-A-PLAN.md`):
-- BE-A2, steps 1–2 of 7: shared types `Allergen`, `Severity`, `Verdict`, `Requirement`, `DangerFor` in `allergen` (Erlan's engine uses them); stubs for reservations, arrivals, outlets, menu. Not pushed yet.
+- BE-A2, steps 1–3 of 7: shared types `Allergen`, `Severity`, `Verdict`, `Requirement`, `DangerFor` in `allergen` (Erlan's engine uses them); stubs for reservations, arrivals, outlets, menu, orders. Not pushed yet.
 
 ### BE-B — Erlan
 
