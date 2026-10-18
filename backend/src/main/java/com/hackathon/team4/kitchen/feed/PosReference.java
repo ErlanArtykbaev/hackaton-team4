@@ -4,7 +4,6 @@ import com.hackathon.team4.allergen.Allergen;
 import com.hackathon.team4.sandbox.generated.model.CondimentGroupDTO;
 import com.hackathon.team4.sandbox.generated.model.CondimentOptionDTO;
 import com.hackathon.team4.sandbox.generated.model.MenuItemDTO;
-import com.hackathon.team4.sandbox.generated.model.OutletDictionaryElement;
 import com.hackathon.team4.sandbox.pos.PosGateway;
 import java.time.Clock;
 import java.time.Duration;
@@ -15,15 +14,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Supplier;
 import org.springframework.stereotype.Component;
 
 /**
- * POS reference data the kitchen feed needs for every round: allergens of the menu items and condiments, and outlet
- * names. Cached for 5 minutes ({@code BACKEND.md} §5.2), so a busy POS does not cost two sandbox calls per round.
+ * Allergens of the menu items and condiments, which the kitchen feed needs for every round. Cached for 5 minutes
+ * ({@code BACKEND.md} §5.2), so a busy POS does not cost a sandbox call per round.
  */
 @Component
 class PosReference {
@@ -49,7 +47,6 @@ class PosReference {
     private final PosGateway pos;
     private final Clock clock;
     private final Map<Integer, Cached<MenuAllergens>> menus = new ConcurrentHashMap<>();
-    private final Map<String, Cached<Map<Integer, String>>> outlets = new ConcurrentHashMap<>();
 
     PosReference(PosGateway pos, Clock clock) {
         this.pos = pos;
@@ -60,9 +57,6 @@ class PosReference {
         return cached(menus, rvc, () -> allergens(pos.menu(rvc, LANGUAGE)));
     }
 
-    Optional<String> outletName(int rvc) {
-        return Optional.ofNullable(cached(outlets, LANGUAGE, () -> names(pos.outlets(LANGUAGE))).get(rvc));
-    }
 
     private <K, T> T cached(Map<K, Cached<T>> cache, K key, Supplier<T> load) {
         Instant now = clock.instant();
@@ -89,13 +83,6 @@ class PosReference {
         return new MenuAllergens(Map.copyOf(items), Map.copyOf(condiments));
     }
 
-    private static Map<Integer, String> names(List<OutletDictionaryElement> outlets) {
-        Map<Integer, String> names = new HashMap<>();
-        nullSafe(outlets).stream()
-                .filter(outlet -> outlet.getObjectNumber() != null && outlet.getName() != null)
-                .forEach(outlet -> names.put(outlet.getObjectNumber(), outlet.getName()));
-        return Map.copyOf(names);
-    }
 
     private static Set<Allergen> ours(List<com.hackathon.team4.sandbox.generated.model.Allergen> allergens) {
         Set<Allergen> ours = EnumSet.noneOf(Allergen.class);

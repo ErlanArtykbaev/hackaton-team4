@@ -17,14 +17,16 @@ import org.springframework.web.bind.annotation.RestController;
 public class OutletController {
 
     private final MenuService menus;
+    private final OutletService outlets;
 
-    public OutletController(MenuService menus) {
+    public OutletController(MenuService menus, OutletService outlets) {
         this.menus = menus;
+        this.outlets = outlets;
     }
 
     @GetMapping
     public List<Outlet> outlets() {
-        return menus.outlets();
+        return outlets.outlets();
     }
 
     /** Without {@code reservationId} (walk-in) every verdict is {@code UNKNOWN}. */

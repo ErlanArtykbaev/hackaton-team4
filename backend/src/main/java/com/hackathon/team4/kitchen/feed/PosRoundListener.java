@@ -4,6 +4,7 @@ import com.hackathon.team4.allergen.Allergen;
 import com.hackathon.team4.kitchen.KitchenTicketService;
 import com.hackathon.team4.kitchen.KitchenTicketService.Round;
 import com.hackathon.team4.kitchen.KitchenTicketService.RoundLine;
+import com.hackathon.team4.menu.OutletService;
 import com.hackathon.team4.sandbox.SandboxException;
 import com.hackathon.team4.sandbox.events.SandboxEventReceived;
 import com.hackathon.team4.sandbox.generated.model.Event;
@@ -38,11 +39,13 @@ class PosRoundListener {
 
     private final KitchenTicketService tickets;
     private final PosReference reference;
+    private final OutletService outlets;
     private final Clock clock;
 
-    PosRoundListener(KitchenTicketService tickets, PosReference reference, Clock clock) {
+    PosRoundListener(KitchenTicketService tickets, PosReference reference, OutletService outlets, Clock clock) {
         this.tickets = tickets;
         this.reference = reference;
+        this.outlets = outlets;
         this.clock = clock;
     }
 
@@ -78,8 +81,9 @@ class PosRoundListener {
                 .map(item -> line(asMap(item), menu))
                 .toList();
         Instant sentAt = event.getOccurredAt() == null ? clock.instant() : event.getOccurredAt().toInstant();
-        return new Round(rvc, outletName(rvc), required(data, "checkNumber"), required(data, "checkSeq"),
-                number(data, "round"), text(data.get("table")), text(data.get("reservationId")), sentAt, lines);
+        return new Round(rvc, outlets.outletName(rvc).orElse(null), required(data, "checkNumber"),
+                required(data, "checkSeq"), number(data, "round"), text(data.get("table")),
+                text(data.get("reservationId")), sentAt, lines);
     }
 
     /**
@@ -117,14 +121,6 @@ class PosRoundListener {
         }
     }
 
-    private String outletName(int rvc) {
-        try {
-            return reference.outletName(rvc).orElse(null);
-        } catch (SandboxException failure) {
-            log.warn("Outlet names unavailable ({}); ticket of rvc {} without one", failure.code(), rvc);
-            return null;
-        }
-    }
 
     private static Set<Allergen> allergens(Object values) {
         return list(values).stream()

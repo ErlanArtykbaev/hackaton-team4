@@ -2,7 +2,7 @@ package com.hackathon.team4.passport;
 
 import com.hackathon.team4.allergen.Allergen;
 import com.hackathon.team4.allergen.Severity;
-import com.hackathon.team4.menu.MenuService;
+import com.hackathon.team4.menu.OutletService;
 import com.hackathon.team4.passport.dto.MemberAllergyRequest;
 import com.hackathon.team4.passport.dto.PassportMemberRequest;
 import com.hackathon.team4.passport.dto.PassportResponse;
@@ -28,11 +28,11 @@ import org.springframework.web.bind.annotation.RestController;
 public class PassportController {
 
     private final PassportService passports;
-    private final MenuService menus;
+    private final OutletService outlets;
 
-    public PassportController(PassportService passports, MenuService menus) {
+    public PassportController(PassportService passports, OutletService outlets) {
         this.passports = passports;
-        this.menus = menus;
+        this.outlets = outlets;
     }
 
     /** Without a saved passport: the primary guest with the PMS allergens as severe. */
@@ -45,7 +45,7 @@ public class PassportController {
     @PutMapping("/{reservationId}")
     public PassportResponse update(@PathVariable String reservationId,
                                    @Valid @RequestBody PassportUpdateRequest update) {
-        String outletName = update.rvc() == null ? null : menus.outletName(update.rvc()).orElse(null);
+        String outletName = update.rvc() == null ? null : outlets.outletName(update.rvc()).orElse(null);
         List<PassportSnapshot.Member> members = update.members().stream()
                 .map(PassportController::toMember)
                 .toList();

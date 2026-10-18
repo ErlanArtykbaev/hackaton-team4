@@ -21,7 +21,7 @@ import com.hackathon.team4.kitchen.KitchenTicketController;
 import com.hackathon.team4.kitchen.KitchenTicketService;
 import com.hackathon.team4.kitchen.TicketLine;
 import com.hackathon.team4.kitchen.TicketSource;
-import com.hackathon.team4.menu.MenuService;
+import com.hackathon.team4.menu.OutletService;
 import com.hackathon.team4.safetylog.LogEntryType;
 import com.hackathon.team4.safetylog.SafetyLogController;
 import com.hackathon.team4.safetylog.SafetyLogEntry;
@@ -54,7 +54,7 @@ class AllergyApiTest {
     private PassportService passports;
 
     @MockitoBean
-    private MenuService menus;
+    private OutletService outlets;
 
     @MockitoBean
     private KitchenTicketService kitchen;
@@ -64,7 +64,7 @@ class AllergyApiTest {
 
     @Test
     void shouldSaveWaitersPassportChangeWithTheOutletName() throws Exception {
-        when(menus.outletName(4)).thenReturn(Optional.of("Pool Bar"));
+        when(outlets.outletName(4)).thenReturn(Optional.of("Pool Bar"));
         when(passports.save(eq("R-203844"), isNull(), anyList(), eq("W02"), eq(PassportService.Source.WAITER),
                 eq(4), eq("Pool Bar"))).thenReturn(new PassportSnapshot("R-203844", "518", "Mikhail Kuznetsov", null,
                 List.of(Allergen.MILK), List.of(new PassportSnapshot.Member(ANNA, "Anna", null, false,

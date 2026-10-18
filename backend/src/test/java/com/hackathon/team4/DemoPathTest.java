@@ -63,6 +63,12 @@ class DemoPathTest extends SandboxTestBase {
                 {"success": true, "guest": {"id": "G-203844", "firstName": "Mikhail", "lastName": "Kuznetsov"}}
                 """)));
 
+        // the outlet name in the safety log comes from the POS
+        stubs.posLogin();
+        SANDBOX.stubFor(get(urlPathEqualTo("/v1/pos/dict/outlets")).willReturn(SandboxStubs.json(200, """
+                {"success": true, "elements": [{"objectNumber": 4, "name": "Pool Bar", "kind": "BAR", "tables": ["P3"]}]}
+                """)));
+
         // 1. Front desk: a card per person, Misha 7 with PEANUTS severe.
         JsonNode passport = save("""
                 {"members": [{"name": "Mikhail", "primary": true, "allergies": []},
