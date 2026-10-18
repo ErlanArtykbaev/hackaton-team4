@@ -56,11 +56,11 @@ export function MemberCard({
             allowNegative={false}
             value={member.age ?? ''}
             onChange={(v) => onChange({ ...member, age: typeof v === 'number' ? v : null })}
-            w={90}
+            w={110}
             data-testid={`${testId}-age`}
           />
           {member.primary ? (
-            <Badge variant="light" mb={8}>
+            <Badge variant="light" mb={15}>
               Booker
             </Badge>
           ) : (
@@ -87,7 +87,7 @@ export function MemberCard({
             {ALLERGEN_CODES.map((code) => (
               <Chip
                 key={code}
-                size="xs"
+                size="md"
                 color="red"
                 checked={member.allergies.some((a) => a.allergen === code)}
                 onChange={() => onChange(toggleAllergen(member, code))}
@@ -111,7 +111,7 @@ export function MemberCard({
                   {ALLERGEN_META[a.allergen].icon} {ALLERGEN_META[a.allergen].label}
                 </Text>
                 <SegmentedControl
-                  size="xs"
+                  size="md"
                   value={a.severity}
                   color={SEVERITY_MARK[a.severity].color}
                   onChange={(v) => onChange(setSeverity(member, a.allergen, v as SeverityCode))}

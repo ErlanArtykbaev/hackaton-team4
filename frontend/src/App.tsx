@@ -53,12 +53,14 @@ export function App() {
             variant="light"
             size="md"
             maw={190}
-            styles={{ label: { overflow: 'hidden', textOverflow: 'ellipsis' } }}
+            styles={{ label: { overflow: 'hidden' } }}
             title={deviceLabel}
             onClick={setup.open}
             data-testid="device-setup-open"
           >
-            {deviceLabel}
+            <Text span inherit truncate>
+              {deviceLabel}
+            </Text>
           </Button>
         </Group>
       </AppShell.Header>

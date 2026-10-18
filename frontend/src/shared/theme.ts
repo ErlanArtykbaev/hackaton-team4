@@ -5,6 +5,7 @@ import {
   Checkbox,
   Chip,
   CloseButton,
+  Modal,
   MultiSelect,
   NumberInput,
   Radio,
@@ -31,7 +32,10 @@ export const theme = createTheme({
     CloseButton: CloseButton.extend({ defaultProps: { size: 'xl' } }),
     TextInput: TextInput.extend({ defaultProps: { size: 'lg' } }),
     Textarea: Textarea.extend({ defaultProps: { size: 'lg' } }),
-    NumberInput: NumberInput.extend({ defaultProps: { size: 'lg' } }),
+    // Stepper arrows are too small for a finger; the tablet opens a numeric keypad instead.
+    NumberInput: NumberInput.extend({
+      defaultProps: { size: 'lg', hideControls: true, inputMode: 'numeric' },
+    }),
     Select: Select.extend({ defaultProps: { size: 'lg' } }),
     MultiSelect: MultiSelect.extend({ defaultProps: { size: 'lg' } }),
     Autocomplete: Autocomplete.extend({ defaultProps: { size: 'lg' } }),
@@ -40,5 +44,6 @@ export const theme = createTheme({
     Checkbox: Checkbox.extend({ defaultProps: { size: 'md' } }),
     Radio: Radio.extend({ defaultProps: { size: 'md' } }),
     Switch: Switch.extend({ defaultProps: { size: 'lg' } }),
+    Modal: Modal.extend({ styles: { title: { fontSize: 'var(--mantine-font-size-xl)', fontWeight: 700 } } }),
   },
 })
