@@ -49,12 +49,52 @@ async function posToken() {
   return token;
 }
 
-// Filled on the event day (PLAN.md task BE-A3): topic-specific calls that set up the demo story. Each step uses
-// `call`; POS calls pass { pos: true }; folio postings and room charges need a fresh postingGuid
-// (import { randomUUID } from 'node:crypto').
-const steps = [
-  // { name: 'Room 612 dirty with a VIP arrival', run: () => call('PATCH', '/v1/pms/rooms/612', { body: { status: 'DIRTY' } }) },
+// Calls that set up the demo story after the reset; the seed already restores room 518 with only PEANUTS in the PMS.
+// Each step uses `call`; POS calls pass { pos: true }.
+const steps = [];
+
+// Read-only checks of the demo state (PLAN.md, demo prep step 3): reported on a dry run, required after --reset.
+const DEMO_RESERVATION = 'R-203844';
+const POOL_BAR = 4;
+const checks = [
+  {
+    name: 'Room 518 (Kuznetsov) in house, only PEANUTS in the PMS profile',
+    run: async () => {
+      const reservation = (await call('GET', `/v1/pms/reservations/${DEMO_RESERVATION}`)).reservation;
+      const allergies = reservation.guest?.allergies ?? [];
+      if (reservation.status !== 'IN_HOUSE' || reservation.roomNumber !== '518') {
+        throw new Error(`${DEMO_RESERVATION} is ${reservation.status} in room ${reservation.roomNumber}`);
+      }
+      if (allergies.join() !== 'PEANUTS') throw new Error(`PMS allergies are ${allergies.join(', ') || 'none'}`);
+    },
+  },
+  {
+    name: 'No open check at the Pool Bar',
+    run: async () => {
+      const open = (await call('GET', `/v1/pos/checks?rvc-on=${POOL_BAR}`, { pos: true })).elements ?? [];
+      if (open.length) {
+        throw new Error(`open: ${open.map((c) => `check ${c.checkNumber ?? c.checkNum} table ${c.table}`).join(', ')}`);
+      }
+    },
+  },
 ];
+
+async function runChecks(required) {
+  let failed = 0;
+  for (const check of checks) {
+    try {
+      await check.run();
+      console.log(`ok: ${check.name}`);
+    } catch (error) {
+      failed += 1;
+      console.log(`NOT READY: ${check.name} — ${error.message}`);
+    }
+  }
+  if (required && failed) {
+    console.log(`${failed} check(s) failed: the demo state is not ready.`);
+    process.exit(1);
+  }
+}
 
 const reset = process.argv.includes('--reset');
 const health = await (await fetch(`${base}/health`)).json();
@@ -62,6 +102,7 @@ const before = (await call('GET', '/v1/pms/hotel')).hotel;
 console.log(`Sandbox ${health.status}; hotel "${before.name}", business date ${before.businessDate}`);
 console.log(`${steps.length} prep step(s): ${steps.map((s) => s.name).join('; ') || 'none yet'}`);
 if (!reset) {
+  await runChecks(false);
   console.log('Dry run: nothing changed. Run with --reset to reset the hotel and apply the steps.');
   process.exit(0);
 }
@@ -72,5 +113,6 @@ for (const step of steps) {
   await step.run();
   console.log(`done: ${step.name}`);
 }
+await runChecks(true);
 const after = (await call('GET', '/v1/pms/hotel')).hotel;
 console.log(`Demo state ready: "${after.name}", business date ${after.businessDate}`);
