@@ -65,7 +65,7 @@ Statuses: `TODO` · `DOING` · `DONE` · `CUT`. Each person edits only their own
 
 | ID | Task | Demo step | Depends on | Status |
 |---|---|---|---|---|
-| BE-B1 | Storage: passport members + allergies, kitchen tickets, safety log; Liquibase `200_…` | 1, 4, 5 | — | TODO |
+| BE-B1 | Storage: passport members + allergies, kitchen tickets, safety log; Liquibase `200_…` | 1, 4, 5 | — | DONE |
 | BE-B2 | Allergen engine (pure code + parameterized unit tests): item + chosen condiments vs members → verdict, `dangerFor`; "for whom" rules; safe alternatives from the same group | 2, 3, 4 | — | TODO |
 | BE-B3 | Passport GET/PUT, default from the PMS profile, PMS sync (union), `guest.updated` listener, log entry | 1 | BE-B1 | TODO |
 | BE-B4 | Kitchen tickets store + acknowledge + 3-minute escalation (scheduled), safety log + summary | 4, 5 | BE-B1 | TODO |
