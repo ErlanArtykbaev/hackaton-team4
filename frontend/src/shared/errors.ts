@@ -38,6 +38,8 @@ export function errorMessage(error: unknown): string {
   if (!(error instanceof ApiError)) return UNEXPECTED
   if (error.code && MESSAGES[error.code]) return MESSAGES[error.code]
   if (error.status === 0) return NOT_REACHABLE
+  // Our backend always sends a code; a gateway error without one comes from the dev proxy: the backend is down.
+  if (!error.code && error.status >= 502 && error.status <= 504) return NOT_REACHABLE
   if (error.status >= 502 && error.status <= 504) return HOTEL_DOWN
   return UNEXPECTED
 }
