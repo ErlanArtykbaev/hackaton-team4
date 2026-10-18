@@ -56,7 +56,7 @@
 
 **Needs a person's confirmation:** guest consent (guest, on the tablet), waiter confirmation (waiter), passport cards (front desk, or the waiter after asking the guest).
 
-**Cut list:** guest self-service passport (stretch only); kitchen approval and escalation; "may contain" and cross-contamination; printing and export; translation of staff screens; payment and room charge; login; real devices.
+**Cut list:** guest self-service passport; kitchen approval and escalation; "may contain" and cross-contamination; printing and export; translation of staff screens; payment and room charge; login; real devices.
 
 **Still open:** in-house reservations whose departure date has passed (seen in the data) — treat them as in house until told otherwise.
 

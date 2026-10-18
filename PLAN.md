@@ -153,6 +153,6 @@ Blocked for more than 15 minutes: say so at once.
 
 ## Cut list
 
-- Guest self-service passport (stretch FE-B5 only).
+- Guest self-service passport by QR (FE-B5): the front desk and the waiter cover changes; next step in the pitch.
 - Kitchen approval and escalation (the kitchen is notified only).
 - "May contain" and cross-contamination; printing and export; payment and room charge; login; translation of staff screens.
