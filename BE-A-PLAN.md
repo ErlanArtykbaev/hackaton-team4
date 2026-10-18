@@ -78,3 +78,12 @@ All under `com.hackathon.team4`; request and response records in each package's 
 4. **Item codes in the stub are placeholders.** Real codes come from the live menu in BE-A3/BE-A4 (needs `backend/.env`); the frontend must not depend on them.
 5. **A malformed path or query parameter** (e.g. `/api/outlets/abc/menu`) gives 400 without `code`: `GlobalExceptionHandler` adds `VALIDATION_ERROR` only for invalid request bodies. Small fix in `common`, to agree with the team.
 6. **Generated frontend types make every response field optional**, and request primitives (`rvc`, `quantity`, `waiterConfirmed`) too: the OpenAPI schemas list only `@NotNull`/`@NotBlank` fields as required. Ask FE-B whether to mark record fields required (one `OpenApiCustomizer`) before they write much code.
+
+## BE-A5 — live kitchen feed and stream events
+
+BE-B publishes `PassportChanged`, `TicketChanged`, `LogAppended` (inside the transaction) and has `KitchenTicketService.recordPosRound(Round)`; BE-A5 connects them to the screens and to the POS feed.
+
+### Steps — one per prompt
+
+1. **Done.** `stream.StreamForwarder`: `@TransactionalEventListener(fallbackExecution = true)` for `PassportChanged`, `TicketChanged`, `LogAppended` → `StreamHub.broadcast` (`passport`, `ticket`, `log`). `StreamForwarderTest` drives BE-B's real services (log append, POS round, passport save) and checks the broadcast; checked live: saving room 633's passport unchanged sent `log` and `passport` on `/api/stream`. Note: application tests share one in-memory H2, so each test uses its own reservation ids.
+2. `kitchen.feed`: listener on `SandboxEventReceived` of type `pos.check.round_sent` → `Round` (rvc, outlet name, check, round, table, reservation, items with allergens incl. condiments) → `KitchenTicketService.recordPosRound`. Test over the recorded event fixture.
