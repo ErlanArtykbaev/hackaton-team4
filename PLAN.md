@@ -79,15 +79,16 @@ Progress (details: `BE-A-PLAN.md`):
 |---|---|---|---|---|
 | BE-B2 | Allergen engine per the agreement above, parameterized unit tests — **first, push early** | 2, 3, 4 | — | DONE |
 | BE-B1 | Storage: passport members + allergies, kitchen tickets, safety log; Liquibase `200_…` | 1, 4, 5 | — | DONE |
-| BE-B3 | Passport GET/PUT (front desk and waiter), default from the PMS profile, PMS sync (union), `guest.updated` listener, `PASSPORT_UPDATED` entries | 1, 2 | BE-B1 | DOING |
-| BE-B4 | Kitchen tickets (create from a round, list), safety log with search by room or last name, summary; publish `TicketChanged`, `LogAppended`, `PassportChanged` | 4, 5 | BE-B1 | DOING |
+| BE-B3 | Passport GET/PUT (front desk and waiter), default from the PMS profile, PMS sync (union), `guest.updated` listener, `PASSPORT_UPDATED` entries | 1, 2 | BE-B1 | DONE |
+| BE-B4 | Kitchen tickets (create from a round, list), safety log with search by room or last name, summary; publish `TicketChanged`, `LogAppended`, `PassportChanged` | 4, 5 | BE-B1 | DONE |
 | BE-B5 | Backend demo-path test over WireMock fixtures (after 14:00) | all | BE-A4, BE-A5 | TODO |
 
-Progress: services are in `main`; controllers and events follow once the BE-A2 stubs for passport, kitchen and safety log land. What BE-A calls:
+Progress: passport, kitchen ticket and safety-log endpoints run on the real services. What BE-A calls:
 - `AllergenEngine` (`allergen`): `checkItem(party, allergens)`, `checkLine(party, allergens, forMemberId)`, `safeAlternatives(menu, party, item)`; merge condiments with `AllergenEngine.withCondiments(...)`; unknown `forMemberId` → `UnknownPartyMemberException`.
 - `PassportService.party(reservationId)` → `Party` (room, guest name, members for the engine); reads the PMS only when there is no passport yet.
 - `KitchenTicketService.recordCheckedRound(Round)` right after the POS accepted a tablet round (lines with `forMemberId`, `waiterConfirmed`, `consentBy`); `recordPosRound(Round)` from the `pos.check.round_sent` feed, deduplicated per round. Line allergens include the condiments' (resolve them from the menu).
 - `SafetyLogService.append(safetyLog.entry(type)…build())` for `ORDER_PLACED`, `WAITER_CONFIRMED`, `GUEST_CONSENT` (one entry per line, so the summary adds up).
+- Events for `/api/stream`: `PassportChanged(PassportResponse)`, `TicketChanged(KitchenTicketResponse)`, `LogAppended(LogEntry)` — the same records the endpoints return. They are published inside the transaction: listen with `@TransactionalEventListener(fallbackExecution = true)`.
 
 ### FE-A — Sergey
 
