@@ -85,10 +85,10 @@ Runs in a separate session and worktree, branch `claude/be-a4-2ece74`, in parall
 
 ### Steps — one per prompt
 
-1. **Done** (`1c132a7`). `MenuService.menu(rvc, reservationId)` from `PosGateway.menu`, cached per outlet for 5 minutes; verdicts, "for whom", safe alternatives and condiment verdicts from `AllergenEngine` for the reservation's party; a walk-in gets allergens only. Application tests save their own family through `TestParty`. Checked live: room 633 gets 36 Pool Bar items.
-2. **Done** (`4f5cfbb`). `POST /api/orders/check` matches each line with its condiments and "for whom" through the engine. `POST /api/orders` refuses a line without the confirmation or consent it needs (400 `WAITER_CONFIRMATION_REQUIRED` / `GUEST_CONSENT_REQUIRED`) and an unknown item, condiment or member (400 `VALIDATION_ERROR`); it still answers the fixed check 1017. Suite green, 112 tests.
-3. `POST /api/orders` → POS check linked to the reservation (`PosGateway.openCheck`), then `KitchenTicketService.recordCheckedRound` with `checkSeq` and round from the POS answer (same key as the BE-A5 feed), then `ORDER_PLACED`, `WAITER_CONFIRMED`, `GUEST_CONSENT` log entries, one per line.
-4. Live check on room 633 or 822, `./mvnw verify`, rebase onto `main`, BE-A4 → `DONE`.
+1. **Done** (`216773d`). `MenuService.menu(rvc, reservationId)` from `PosGateway.menu`, cached per outlet for 5 minutes; verdicts, "for whom", safe alternatives and condiment verdicts from `AllergenEngine` for the reservation's party; a walk-in gets allergens only. Application tests save their own family through `TestParty`. Checked live: room 633 gets 36 Pool Bar items.
+2. **Done** (`a9eae9c`). `POST /api/orders/check` matches each line with its condiments and "for whom" through the engine. `POST /api/orders` refuses a line without the confirmation or consent it needs (400 `WAITER_CONFIRMATION_REQUIRED` / `GUEST_CONSENT_REQUIRED`) and an unknown item, condiment or member (400 `VALIDATION_ERROR`); it still answers the fixed check 1017. Suite green, 112 tests.
+3. **Done** (`ca495f0`). `POST /api/orders` → POS check linked to the reservation (`PosGateway.openCheck`, never retried), then `KitchenTicketService.recordCheckedRound` with `checkSeq` and round from the POS answer (same key as the BE-A5 feed), then `ORDER_PLACED`, `WAITER_CONFIRMED`, `GUEST_CONSENT` log entries, one per line. `9f6079e`: outlet names from `OutletService`; the stub outlets are gone from `MenuService`.
+4. Rebased onto `main` and fast-forwarded into it; `DemoPathTest` now mocks `OutletService`, so the shared outlet cache of other tests cannot break it; `./mvnw verify` green, 132 tests. **Open:** live order check on room 633 or 822 (opens a real POS check), then BE-A4 → `DONE`.
 
 ## BE-A5 — live kitchen feed and stream events (DONE)
 
