@@ -16,5 +16,8 @@ public interface PassportRepository extends JpaRepository<Passport, UUID> {
     @EntityGraph(attributePaths = {"members", "members.allergies"})
     List<Passport> findByReservationIdIn(Collection<String> reservationIds);
 
+    @EntityGraph(attributePaths = {"members", "members.allergies"})
+    List<Passport> findByGuestId(String guestId);
+
     boolean existsByReservationId(String reservationId);
 }

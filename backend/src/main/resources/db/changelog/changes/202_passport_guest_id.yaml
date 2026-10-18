@@ -1,0 +1,15 @@
+databaseChangeLog:
+  - changeSet:
+      id: 202_passport_guest_id
+      author: Erlan Artykbaev
+      comment: guest.updated names only the PMS guest, so a passport is found by it.
+      changes:
+        - addColumn:
+            tableName: passport
+            columns:
+              - column: {name: guest_id, type: varchar(32)}
+        - createIndex:
+            tableName: passport
+            indexName: ix_passport_guest
+            columns:
+              - column: {name: guest_id}

@@ -32,6 +32,9 @@ public class Passport {
     @Column(name = "room_number")
     private String roomNumber;
 
+    @Column(name = "guest_id")
+    private String guestId;
+
     @Column(name = "guest_name")
     private String guestName;
 
@@ -64,8 +67,10 @@ public class Passport {
         this.updatedAt = now;
     }
 
-    public void describe(String roomNumber, String guestName, String notes, String updatedBy, Instant now) {
+    public void describe(String roomNumber, String guestId, String guestName, String notes, String updatedBy,
+            Instant now) {
         this.roomNumber = roomNumber;
+        this.guestId = guestId;
         this.guestName = guestName;
         this.notes = notes;
         this.updatedBy = updatedBy;
@@ -106,6 +111,11 @@ public class Passport {
 
     public String roomNumber() {
         return roomNumber;
+    }
+
+    /** The PMS guest profile; {@code null} for passports saved before it was stored. */
+    public String guestId() {
+        return guestId;
     }
 
     public String guestName() {

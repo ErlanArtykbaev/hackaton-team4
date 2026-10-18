@@ -48,7 +48,7 @@ class AllergyStorageTest {
     @Test
     void shouldStorePassportMembersWithAllergiesInOrder() {
         Passport passport = new Passport("R-203844", NOW);
-        passport.describe("518", "Kuznetsov Mikhail", null, "front-desk", NOW);
+        passport.describe("518", "G-203844", "Kuznetsov Mikhail", null, "front-desk", NOW);
         passport.addMember(NOW).update("Mikhail", null, true, Set.of(new MemberAllergy(Allergen.PEANUTS,
                 Severity.INTOLERANCE)), NOW);
         passport.addMember(NOW).update("Misha", 7, false, Set.of(new MemberAllergy(Allergen.PEANUTS,

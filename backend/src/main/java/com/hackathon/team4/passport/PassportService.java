@@ -38,7 +38,9 @@ public class PassportService {
 
     /** Who changed the passport. */
     public enum Source {
-        FRONT_DESK, WAITER
+        FRONT_DESK, WAITER,
+        /** Someone changed the allergies on the PMS profile directly. */
+        PMS
     }
 
     private final PassportRepository passports;
@@ -93,15 +95,47 @@ public class PassportService {
     public PassportSnapshot save(String reservationId, String notes, List<PassportSnapshot.Member> members,
             String updatedBy, Source source, Integer rvc, String outletName) {
         Reservation reservation = pms.reservation(reservationId);
-        Instant now = clock.instant();
         Optional<Passport> stored = passports.findByReservationId(reservationId);
+        Passport saved = store(reservation, stored, notes, members, updatedBy, source, rvc, outletName);
+        Set<Allergen> union = union(members);
+        syncPms(reservation.getGuest(), union);
+        return snapshot(saved, reservation, List.copyOf(union));
+    }
+
+    /**
+     * A {@code guest.updated} event: allergens someone put on the PMS profile directly are added to the primary
+     * member's card as {@code SEVERE}. Nothing is removed from the cards, since a missing allergen is the dangerous
+     * mistake. Our own PMS update comes back here and changes nothing.
+     */
+    @Transactional
+    public void applyPmsAllergies(String guestId) {
+        for (Passport passport : passports.findByGuestId(guestId)) {
+            Reservation reservation = pms.reservation(passport.reservationId());
+            List<PassportSnapshot.Member> before = snapshot(passport, reservation, List.of()).members();
+            Set<Allergen> missing = EnumSet.noneOf(Allergen.class);
+            missing.addAll(pmsAllergens(reservation));
+            missing.removeAll(union(before));
+            if (missing.isEmpty()) {
+                continue;
+            }
+            store(reservation, Optional.of(passport), passport.notes(), withMissing(before, missing, reservation),
+                    "PMS", Source.PMS, null, null);
+        }
+    }
+
+    private Passport store(Reservation reservation, Optional<Passport> stored, String notes,
+            List<PassportSnapshot.Member> members, String updatedBy, Source source, Integer rvc, String outletName) {
+        String reservationId = reservation.getId();
+        Instant now = clock.instant();
         // the first save is compared with the default card the user saw
         String changes = describeChanges(stored
                 .map(existing -> snapshot(existing, reservation, List.of()).members())
                 .orElseGet(() -> defaultSnapshot(reservation).members()), members);
         Passport passport = stored.orElseGet(() -> new Passport(reservationId, now));
 
-        passport.describe(reservation.getRoomNumber(), guestName(reservation.getGuest()), notes, updatedBy, now);
+        Guest guest = reservation.getGuest();
+        passport.describe(reservation.getRoomNumber(), guest == null ? null : guest.getId(), guestName(guest), notes,
+                updatedBy, now);
         List<PassportMember> kept = new ArrayList<>();
         for (PassportSnapshot.Member input : members) {
             PassportMember member = Optional.ofNullable(input.id())
@@ -113,17 +147,37 @@ public class PassportService {
         passport.keepMembers(kept);
         Passport saved = passports.save(passport);
 
-        Set<Allergen> union = union(members);
-        syncPms(reservation.getGuest(), union);
         safetyLog.append(safetyLog.entry(LogEntryType.PASSPORT_UPDATED)
                 .outlet(rvc, outletName)
-                .reservation(reservationId, reservation.getRoomNumber(), guestName(reservation.getGuest()))
+                .reservation(reservationId, reservation.getRoomNumber(), guestName(guest))
                 .actor(updatedBy)
                 .statement(source + ": " + changes)
                 .build());
         log.info("Passport of reservation {} saved by {} ({}), {} members", reservationId, updatedBy, source,
                 members.size());
-        return snapshot(saved, reservation, List.copyOf(union));
+        return saved;
+    }
+
+    /** The cards with the missing allergens added to the primary member (or a new primary card when there is none). */
+    private static List<PassportSnapshot.Member> withMissing(List<PassportSnapshot.Member> members,
+            Set<Allergen> missing, Reservation reservation) {
+        PassportSnapshot.Member target = members.stream().filter(PassportSnapshot.Member::primary).findFirst()
+                .orElse(members.isEmpty() ? null : members.get(0));
+        if (target == null) {
+            Map<Allergen, Severity> allergies = new EnumMap<>(Allergen.class);
+            missing.forEach(allergen -> allergies.put(allergen, Severity.SEVERE));
+            return List.of(new PassportSnapshot.Member(null, guestName(reservation.getGuest()), null, true,
+                    allergies));
+        }
+        return members.stream().map(member -> {
+            if (member != target) {
+                return member;
+            }
+            Map<Allergen, Severity> allergies = new EnumMap<>(Allergen.class);
+            allergies.putAll(member.allergies());
+            missing.forEach(allergen -> allergies.put(allergen, Severity.SEVERE));
+            return new PassportSnapshot.Member(member.id(), member.name(), member.age(), member.primary(), allergies);
+        }).toList();
     }
 
     private void syncPms(Guest guest, Set<Allergen> union) {

@@ -165,6 +165,41 @@ class PassportServiceTest {
                 .isInstanceOf(SandboxException.class);
     }
 
+    @Test
+    void shouldAddAllergenSetDirectlyInPmsToThePrimaryCardAsSevere() {
+        passports.save(RESERVATION, null, List.of(
+                member(null, "Mikhail", null, true, Map.of()),
+                member(null, "Misha", 7, false, Map.of(Allergen.PEANUTS, Severity.SEVERE))),
+                "front-desk", PassportService.Source.FRONT_DESK, null, null);
+        when(pms.reservation(RESERVATION)).thenReturn(reservation(List.of(
+                com.hackathon.team4.sandbox.generated.model.Allergen.PEANUTS,
+                com.hackathon.team4.sandbox.generated.model.Allergen.SESAME)));
+
+        passports.applyPmsAllergies("G-203478");
+
+        PassportSnapshot snapshot = passports.get(RESERVATION);
+        assertThat(snapshot.members().get(0).allergies()).containsExactlyEntriesOf(
+                Map.of(Allergen.SESAME, Severity.SEVERE));
+        assertThat(snapshot.members().get(1).allergies()).containsOnlyKeys(Allergen.PEANUTS);
+        assertThat(snapshot.updatedBy()).isEqualTo("PMS");
+        assertThat(log.search(null, LogEntryType.PASSPORT_UPDATED, null, null).get(0).statement())
+                .isEqualTo("PMS: Mikhail: +SESAME (severe)");
+        verify(pms, never()).updateGuest(anyString(), any());
+    }
+
+    @Test
+    void shouldIgnoreOurOwnPmsUpdateComingBack() {
+        passports.save(RESERVATION, null, List.of(
+                member(null, "Misha", 7, true, Map.of(Allergen.PEANUTS, Severity.SEVERE))),
+                "front-desk", PassportService.Source.FRONT_DESK, null, null);
+
+        passports.applyPmsAllergies("G-203478");
+        passports.applyPmsAllergies("G-UNKNOWN");
+
+        assertThat(log.search(null, LogEntryType.PASSPORT_UPDATED, null, null)).hasSize(1);
+        assertThat(passports.get(RESERVATION).updatedBy()).isEqualTo("front-desk");
+    }
+
     private static PassportSnapshot.Member member(UUID id, String name, Integer age, boolean primary,
             Map<Allergen, Severity> allergies) {
         return new PassportSnapshot.Member(id, name, age, primary, allergies);
