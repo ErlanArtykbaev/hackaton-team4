@@ -93,7 +93,7 @@ Statuses: `TODO` · `DOING` · `DONE` · `CUT`. Each person edits only their own
 
 | ID | Task | Demo step | Depends on | Status |
 |---|---|---|---|---|
-| FE-B0 | Design in `shared/`: chips with icons for the 14 allergens, severity and verdict colours, party badge | all | FE-A1 | TODO |
+| FE-B0 | Design in `shared/`: chips with icons for the 14 allergens, severity and verdict colours, party badge | all | FE-A1 | DONE |
 | FE-B1 | Generated API types (`npm run gen:api`) + `useStream` hook for `/api/stream` + error messages by `code` | — | BE-A2 | TODO |
 | FE-B2 | Front desk: arrivals worklist, search, a card per member (name, age, allergens, severity), save with "PMS updated" | 1 | FE-B1 | TODO |
 | FE-B3 | Manager: search by room or last name, timeline with consent records highlighted, KPIs, live via SSE | 5 | FE-B1 | TODO |
