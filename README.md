@@ -22,6 +22,16 @@ cp .env.example .env          # then fill in the team key, access code and PIN
 - Data: H2 file database in `backend/data/` (git-ignored). Delete the folder to start clean.
 - The sandbox client is generated from `backend/src/main/resources/sandbox/openapi.yaml` during the build.
 
+## Frontend
+
+```bash
+cd frontend
+npm install
+npm run dev          # http://localhost:5173, /api proxied to the backend on :8080
+npm run gen:api      # regenerate API types from the running backend
+npm run typecheck && npm run lint && npm run build
+```
+
 ## Tests
 
 ```bash

@@ -84,7 +84,7 @@ Statuses: `TODO` · `DOING` · `DONE` · `CUT`. Each person edits only their own
 
 | ID | Task | Demo step | Depends on | Status |
 |---|---|---|---|---|
-| FE-A1 | Frontend skeleton (block A defaults), routes, device setup, CI job — **by 12:45** | — | — | DOING |
+| FE-A1 | Frontend skeleton (block A defaults), routes, device setup, CI job — **by 12:45** | — | — | DONE |
 | FE-A2 | Waiter: party search (room or last name), badges per person, menu by group with verdict colours, "only safe" toggle, walk-in mode (allergens only) | 2 | FE-B1 | TODO |
 | FE-A3 | Waiter: condiment picker, "for whom", waiter-confirmation tap, **guest consent screen** (guest types their name), safe alternatives, quick passport update (add member or allergen), cart → send | 2, 3 | FE-A2 | TODO |
 | FE-A4 | Kitchen display: tickets live via SSE, allergen lines "for whom", consent and confirmation marks, "not checked at ordering" on top — no approval | 4 | FE-B1 | TODO |

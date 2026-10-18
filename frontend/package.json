@@ -1,0 +1,42 @@
+{
+  "name": "team4-frontend",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "typecheck": "tsc -b",
+    "lint": "oxlint",
+    "format": "prettier --write src",
+    "gen:api": "openapi-typescript http://localhost:8080/v3/api-docs -o src/api/schema.d.ts",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@mantine/core": "^9.7.3",
+    "@mantine/hooks": "^9.7.3",
+    "@mantine/notifications": "^9.7.3",
+    "@tanstack/react-query": "^5.104.4",
+    "openapi-fetch": "^0.17.0",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8",
+    "react-router": "^8.4.0"
+  },
+  "devDependencies": {
+    "@types/node": "^24.13.3",
+    "@types/react": "^19.2.18",
+    "@types/react-dom": "^19.2.7",
+    "@vitejs/plugin-react": "^6.1.1",
+    "openapi-typescript": "^7.13.0",
+    "oxlint": "^1.81.0",
+    "postcss": "^8.5.30",
+    "postcss-preset-mantine": "^1.18.0",
+    "postcss-simple-vars": "^7.0.1",
+    "prettier": "^3.9.10",
+    "typescript": "~5.9",
+    "vite": "^8.3.0"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
