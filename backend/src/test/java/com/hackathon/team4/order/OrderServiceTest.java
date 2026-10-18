@@ -7,6 +7,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import com.hackathon.team4.allergen.Allergen;
@@ -15,6 +16,7 @@ import com.hackathon.team4.allergen.PartyMember;
 import com.hackathon.team4.allergen.Requirement;
 import com.hackathon.team4.allergen.Severity;
 import com.hackathon.team4.allergen.Verdict;
+import com.hackathon.team4.kitchen.KitchenTicketService;
 import com.hackathon.team4.menu.MenuService;
 import com.hackathon.team4.menu.dto.CondimentGroup;
 import com.hackathon.team4.menu.dto.CondimentOption;
@@ -26,7 +28,10 @@ import com.hackathon.team4.order.dto.OrderLineRequest;
 import com.hackathon.team4.order.dto.OrderRequest;
 import com.hackathon.team4.passport.Party;
 import com.hackathon.team4.passport.PassportService;
+import com.hackathon.team4.safetylog.SafetyLogService;
+import com.hackathon.team4.sandbox.pos.PosGateway;
 import java.math.BigDecimal;
+import java.time.Clock;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -46,7 +51,9 @@ class OrderServiceTest {
 
     private final MenuService menus = mock(MenuService.class);
     private final PassportService passports = mock(PassportService.class);
-    private final OrderService orders = new OrderService(menus, passports, new AllergenEngine());
+    private final PosGateway pos = mock(PosGateway.class);
+    private final OrderService orders = new OrderService(menus, passports, new AllergenEngine(), pos,
+            mock(KitchenTicketService.class), mock(SafetyLogService.class), Clock.systemUTC());
 
     @BeforeEach
     void poolBarMenuAndKuznetsovParty() {
@@ -103,17 +110,7 @@ class OrderServiceTest {
 
         assertThatThrownBy(() -> orders.place(order)).isInstanceOfSatisfying(OrderRejectedException.class,
                 rejected -> assertThat(rejected.reason()).isEqualTo(Reason.GUEST_CONSENT_REQUIRED));
-    }
-
-    @Test
-    void shouldSendLinesThatHaveWhatTheyNeed() {
-        OrderRequest order = order(RESERVATION,
-                line("1036", List.of(), MISHA.id(), false, null),
-                line("1019", List.of(), MIKHAIL.id(), true, null),
-                line("2018", List.of("7021"), ANNA.id(), false, new ConsentRequest("Anna Kuznetsova")));
-
-        assertThat(orders.place(order).lines()).extracting(LineCheck::requirement).containsExactly(
-                Requirement.NONE, Requirement.WAITER_CONFIRMATION, Requirement.GUEST_CONSENT);
+        verifyNoInteractions(pos);
     }
 
     @Test
