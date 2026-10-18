@@ -63,7 +63,8 @@ public class OrderService {
                         chosenOptions(item, line).flatMap(option -> option.dangerFor().stream()))
                 .distinct()
                 .toList();
-        return new LineCheck(line.code(), verdictOf(dangerFor), dangerFor, requirementOf(dangerFor, line.forMemberId()));
+        return new LineCheck(line.code(), verdictOf(dangerFor), dangerFor,
+                requirementOf(dangerFor, line.forMemberId()));
     }
 
     private static Stream<CondimentOption> chosenOptions(MenuItem item, OrderLineRequest line) {

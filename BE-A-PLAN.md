@@ -16,9 +16,9 @@ All under `com.hackathon.team4`; request and response records in each package's 
 | `reservation` | `ReservationController` (`GET /api/reservations`, `GET /api/front-desk/arrivals`), `ReservationService` | `ReservationSummary` | BE-A |
 | `menu` | `OutletController` (`GET /api/outlets`, `GET /api/outlets/{rvc}/menu`), `MenuService` | `Outlet`, `OutletKind` (RESTAURANT / BAR / ROOM_SERVICE, as in the POS), `MenuItem`, `CondimentGroup`, `CondimentOption` | BE-A |
 | `order` | `OrderController` (`POST /api/orders/check`, `POST /api/orders`), `OrderService` | `OrderRequest`, `OrderLineRequest`, `ConsentRequest` {givenBy}, `OrderCheckResponse`, `LineCheck` {code, verdict, dangerFor, requirement}, `OrderResponse` {checkNumber, checkSeq, lines} | BE-A |
-| `passport` | `PassportController` (`GET`/`PUT /api/passports/{reservationId}`), `PassportService` | `Passport`, `PassportMember`, `MemberAllergy`, `PassportUpdateRequest`, `PassportMemberRequest`, `PassportSource` (FRONT_DESK / WAITER) | BE-B |
-| `kitchen` | `KitchenTicketController` (`GET /api/kitchen/{rvc}/tickets`), `KitchenTicketService` | `KitchenTicket`, `KitchenTicketLine`, `TicketSource` (CHECKED / UNCHECKED / UNLINKED) | BE-B |
-| `safetylog` | `SafetyLogController` (`GET /api/safety-log`, `GET /api/safety-log/summary`), `SafetyLogService` | `LogEntry`, `LogEntryType` (5 types), `SafetyLogSummary` | BE-B |
+| `passport` | `PassportController` (`GET`/`PUT /api/passports/{reservationId}`), `PassportService` | `PassportResponse`, `PassportMemberResponse`, `MemberAllergyResponse` (schemas `Passport`, `PassportMember`, `MemberAllergy`), `PassportUpdateRequest`, `PassportMemberRequest`, `MemberAllergyRequest`, `PassportSource` (FRONT_DESK / WAITER) | BE-B |
+| `kitchen` | `KitchenTicketController` (`GET /api/kitchen/{rvc}/tickets`), `KitchenTicketService` | `KitchenTicketResponse` (schema `KitchenTicket`), `KitchenTicketLine`; BE-B's `TicketSource` | BE-B |
+| `safetylog` | `SafetyLogController` (`GET /api/safety-log`, `GET /api/safety-log/summary`), `SafetyLogService` | `LogEntry`, `SafetyLogSummary`; BE-B's `LogEntryType` | BE-B |
 | `stream` | `StreamController` (`GET /api/stream`, `text/event-stream`), `StreamHub` (registry of `SseEmitter`s) | events `ticket` / `log` / `passport` | BE-A |
 
 `kitchen.feed` stays empty until BE-A5. About 45 small files, mostly records.
@@ -60,7 +60,11 @@ All under `com.hackathon.team4`; request and response records in each package's 
 1. **Done.** BE-A2 → `DOING` in my section of `PLAN.md`; shared contract types in `allergen`.
 2. **Done.** `reservation` and `menu` (outlets and menu) stubs; checked on a running backend.
 3. **Done.** `order` stubs; checked on a running backend. Lines are checked against the demo menu (condiments included) with the requirement rules of `PROJECT-CONTEXT.md` §3, so "for whom" behaves as in the demo; BE-A4 swaps this for the engine. `POST /api/orders` returns 201 with check 1017 / seq 88231 and sends nothing to the POS.
-4. `passport`, `kitchen`, `safetylog` stubs (handed to BE-B after the push).
+4. **Done.** `passport`, `kitchen`, `safetylog` stubs (handed to BE-B after the push); checked on a running backend.
+   - Built on BE-B's storage in `main`: the API records get a `Response` suffix where BE-B's entities already use the name, and `@Schema` keeps the contract names in OpenAPI; BE-B's `TicketSource` and `LogEntryType` are reused.
+   - Passport: R-203844 after demo step 2; R-203981 without a passport gives the default (primary guest, `id` `null`, PMS allergens as severe); any other reservation gives 404 `NOT_FOUND`. `PUT` echoes the members, gives new ones an id, returns the union as `pmsAllergens`, stores nothing.
+   - Kitchen: three Pool Bar tickets, one per source; other outlets get `[]`. Safety log: six entries for room 518 with the query, `rvc` and `type` filters; a fixed summary.
+   - `checkNumber` is a number in our API (`OrderResponse`, `KitchenTicket`), as the frontend already expects; BE-B's ticket entity stores it as a string, so the mapping parses it.
 5. `stream`: the SSE connection.
 6. `ApiContractTest`, `./mvnw test` green; commit `feat(be): add API contract stubs (BE-A2)`, no AI co-author trailer (`CLAUDE.md` §7); review before the push.
 7. `git pull --rebase`, push; BE-A2 → `DONE`; tell the team "contract stubs are in".
