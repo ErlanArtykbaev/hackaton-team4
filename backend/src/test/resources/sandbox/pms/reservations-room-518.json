@@ -1,0 +1,50 @@
+{
+  "elements": [
+    {
+      "adults": 2,
+      "arrivalDate": "2026-10-09",
+      "balance": 27610.0,
+      "breakfastIncluded": true,
+      "children": 1,
+      "creditLimit": 113490.0,
+      "departureDate": "2026-10-22",
+      "departureTime": "12:00",
+      "groupCode": null,
+      "guest": {
+        "allergies": [
+          "PEANUTS"
+        ],
+        "country": "RU",
+        "firstName": "Mikhail",
+        "id": "G-203844",
+        "language": "ru",
+        "lastName": "Kuznetsov",
+        "marketingConsent": false,
+        "preferences": [
+          "away from elevator",
+          "room away from bar",
+          "king bed"
+        ],
+        "stayCount": 1,
+        "vip": true
+      },
+      "id": "R-203844",
+      "nightlyRate": 5820.0,
+      "notes": null,
+      "postingAllowed": true,
+      "ratePlanCode": "BB",
+      "roomNumber": "518",
+      "roomTypeCode": "SEA",
+      "source": "OTA",
+      "status": "IN_HOUSE"
+    }
+  ],
+  "message": null,
+  "pageMetadata": {
+    "number": 0,
+    "size": 50,
+    "totalElements": 1,
+    "totalPages": 1
+  },
+  "success": true
+}

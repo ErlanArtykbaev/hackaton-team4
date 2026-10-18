@@ -80,6 +80,12 @@ class ApiContractTest extends SandboxTestBase {
 
     @Test
     void shouldFindDemoReservationByRoomNumber() throws Exception {
+        stubs.ok(WireMock.get(WireMock.urlPathEqualTo("/v1/pms/hotel")), 200, "pms/hotel")
+                .ok(WireMock.get(WireMock.urlPathEqualTo("/v1/pms/reservations"))
+                        .withQueryParam("status", WireMock.equalTo("IN_HOUSE")), 200, "pms/reservations-room-518")
+                .ok(WireMock.get(WireMock.urlPathEqualTo("/v1/pms/reservations"))
+                        .withQueryParam("status", WireMock.equalTo("BOOKED")), 200, "pms/reservations-empty");
+
         mvc.perform(getJson("/api/reservations?query=518"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].reservationId").value("R-203844"))
