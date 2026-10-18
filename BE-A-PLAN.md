@@ -79,6 +79,17 @@ All under `com.hackathon.team4`; request and response records in each package's 
 5. **A malformed path or query parameter** (e.g. `/api/outlets/abc/menu`) gives 400 without `code`: `GlobalExceptionHandler` adds `VALIDATION_ERROR` only for invalid request bodies. Small fix in `common`, to agree with the team.
 6. **Generated frontend types make every response field optional**, and request primitives (`rvc`, `quantity`, `waiterConfirmed`) too: the OpenAPI schemas list only `@NotNull`/`@NotBlank` fields as required. Ask FE-B whether to mark record fields required (one `OpenApiCustomizer`) before they write much code.
 
+## BE-A4 — menu verdicts and orders to the POS
+
+Runs in a separate session and worktree, branch `claude/be-a4-2ece74`, in parallel with BE-A5; touches only `menu`, `order` and their tests. The branch is rebased onto `main` after BE-A5 lands.
+
+### Steps — one per prompt
+
+1. **Done** (`1c132a7`). `MenuService.menu(rvc, reservationId)` from `PosGateway.menu`, cached per outlet for 5 minutes; verdicts, "for whom", safe alternatives and condiment verdicts from `AllergenEngine` for the reservation's party; a walk-in gets allergens only. Application tests save their own family through `TestParty`. Checked live: room 633 gets 36 Pool Bar items.
+2. **Done** (`4f5cfbb`). `POST /api/orders/check` matches each line with its condiments and "for whom" through the engine. `POST /api/orders` refuses a line without the confirmation or consent it needs (400 `WAITER_CONFIRMATION_REQUIRED` / `GUEST_CONSENT_REQUIRED`) and an unknown item, condiment or member (400 `VALIDATION_ERROR`); it still answers the fixed check 1017. Suite green, 112 tests.
+3. `POST /api/orders` → POS check linked to the reservation (`PosGateway.openCheck`), then `KitchenTicketService.recordCheckedRound` with `checkSeq` and round from the POS answer (same key as the BE-A5 feed), then `ORDER_PLACED`, `WAITER_CONFIRMED`, `GUEST_CONSENT` log entries, one per line.
+4. Live check on room 633 or 822, `./mvnw verify`, rebase onto `main`, BE-A4 → `DONE`.
+
 ## BE-A5 — live kitchen feed and stream events
 
 BE-B publishes `PassportChanged`, `TicketChanged`, `LogAppended` (inside the transaction) and has `KitchenTicketService.recordPosRound(Round)`; BE-A5 connects them to the screens and to the POS feed.
