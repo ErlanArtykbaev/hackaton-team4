@@ -6,6 +6,7 @@ import static com.github.tomakehurst.wiremock.client.WireMock.patch;
 import static com.github.tomakehurst.wiremock.client.WireMock.patchRequestedFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -16,16 +17,19 @@ import com.hackathon.team4.allergen.Allergen;
 import com.hackathon.team4.kitchen.KitchenTicketService;
 import com.hackathon.team4.kitchen.KitchenTicketService.Round;
 import com.hackathon.team4.kitchen.KitchenTicketService.RoundLine;
+import com.hackathon.team4.menu.OutletService;
 import com.hackathon.team4.sandbox.SandboxStubs;
 import com.hackathon.team4.sandbox.SandboxTestBase;
 import java.time.Instant;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.transaction.annotation.Transactional;
@@ -50,6 +54,9 @@ class DemoPathTest extends SandboxTestBase {
     @Autowired
     private KitchenTicketService kitchen;
 
+    @MockitoBean
+    private OutletService outlets;
+
     @Test
     void shouldRecordPassportOrdersAndProofForTheKuznetsovFamily() throws Exception {
         SANDBOX.stubFor(get(urlPathEqualTo("/v1/pms/reservations/" + RESERVATION)).willReturn(SandboxStubs.json(200,
@@ -63,11 +70,8 @@ class DemoPathTest extends SandboxTestBase {
                 {"success": true, "guest": {"id": "G-203844", "firstName": "Mikhail", "lastName": "Kuznetsov"}}
                 """)));
 
-        // the outlet name in the safety log comes from the POS
-        stubs.posLogin();
-        SANDBOX.stubFor(get(urlPathEqualTo("/v1/pos/dict/outlets")).willReturn(SandboxStubs.json(200, """
-                {"success": true, "elements": [{"objectNumber": 4, "name": "Pool Bar", "kind": "BAR", "tables": ["P3"]}]}
-                """)));
+        // the outlet name in the safety log; a mock, since the outlet cache is shared by the other tests' contexts
+        when(outlets.outletName(4)).thenReturn(Optional.of("Pool Bar"));
 
         // 1. Front desk: a card per person, Misha 7 with PEANUTS severe.
         JsonNode passport = save("""
