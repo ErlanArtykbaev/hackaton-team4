@@ -11,6 +11,7 @@ import com.hackathon.team4.kitchen.KitchenTicket;
 import com.hackathon.team4.kitchen.KitchenTicketRepository;
 import com.hackathon.team4.kitchen.TicketLine;
 import com.hackathon.team4.kitchen.TicketSource;
+import com.hackathon.team4.passport.PassportService;
 import com.hackathon.team4.safetylog.LogEntryType;
 import com.hackathon.team4.safetylog.SafetyLogService;
 import com.hackathon.team4.sandbox.SandboxStubs;
@@ -39,10 +40,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 class ApiContractTest extends SandboxTestBase {
 
-    private static final String MIKHAIL = "518a0000-0000-4000-8000-000000000001";
-    private static final String ANNA = "518a0000-0000-4000-8000-000000000002";
-    private static final String MISHA = "518a0000-0000-4000-8000-000000000003";
-
     @Autowired
     private MockMvc mvc;
 
@@ -54,6 +51,9 @@ class ApiContractTest extends SandboxTestBase {
 
     @Autowired
     private SafetyLogService safetyLog;
+
+    @Autowired
+    private PassportService passports;
 
     @Test
     void shouldListEveryContractEndpointInOpenApi() throws Exception {
@@ -94,13 +94,15 @@ class ApiContractTest extends SandboxTestBase {
 
     @Test
     void shouldAskConsentFromAllergicMemberAndConfirmationForAnotherMember() throws Exception {
+        TestParty party = TestParty.save(passports, SANDBOX, "R-990201");
+        stubs.posLogin().ok(WireMock.get(WireMock.urlPathEqualTo("/v1/pos/dict/menu")), 200, "pos/menu-2");
         String order = """
-                {"rvc": 4, "reservationId": "R-203844", "table": "P3", "waiterCode": "W02", "lines": [
-                  {"code": "4201", "quantity": 1, "condimentCodes": [], "forMemberId": "%s", "waiterConfirmed": false},
-                  {"code": "4101", "quantity": 1, "condimentCodes": [], "forMemberId": "%s", "waiterConfirmed": true},
-                  {"code": "4402", "quantity": 1, "condimentCodes": ["7401"], "forMemberId": "%s",
+                {"rvc": 44, "reservationId": "%s", "table": "P3", "waiterCode": "W02", "lines": [
+                  {"code": "1023", "quantity": 1, "condimentCodes": [], "forMemberId": "%s", "waiterConfirmed": false},
+                  {"code": "1020", "quantity": 1, "condimentCodes": [], "forMemberId": "%s", "waiterConfirmed": true},
+                  {"code": "2014", "quantity": 1, "condimentCodes": ["7021"], "forMemberId": "%s",
                    "waiterConfirmed": false}
-                ]}""".formatted(MISHA, MIKHAIL, ANNA);
+                ]}""".formatted(party.reservationId(), party.misha(), party.mikhail(), party.anna());
 
         mvc.perform(post("/api/orders/check").contentType(MediaType.APPLICATION_JSON).content(order))
                 .andExpect(status().isOk())

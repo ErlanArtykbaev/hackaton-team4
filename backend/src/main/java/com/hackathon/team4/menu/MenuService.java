@@ -1,34 +1,50 @@
 package com.hackathon.team4.menu;
 
 import com.hackathon.team4.allergen.Allergen;
-import com.hackathon.team4.allergen.DangerFor;
-import com.hackathon.team4.allergen.Severity;
+import com.hackathon.team4.allergen.AllergenEngine;
+import com.hackathon.team4.allergen.ItemCheck;
+import com.hackathon.team4.allergen.MenuCandidate;
+import com.hackathon.team4.allergen.PartyMember;
 import com.hackathon.team4.allergen.Verdict;
 import com.hackathon.team4.menu.dto.CondimentGroup;
 import com.hackathon.team4.menu.dto.CondimentOption;
 import com.hackathon.team4.menu.dto.MenuItem;
 import com.hackathon.team4.menu.dto.Outlet;
+import com.hackathon.team4.passport.PassportService;
+import com.hackathon.team4.sandbox.generated.model.CondimentGroupDTO;
+import com.hackathon.team4.sandbox.generated.model.CondimentOptionDTO;
+import com.hackathon.team4.sandbox.generated.model.MenuItemDTO;
+import com.hackathon.team4.sandbox.pos.PosGateway;
 import java.math.BigDecimal;
+import java.time.Clock;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
-import java.util.UUID;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 /**
- * Outlets and their menus with a verdict per item for the party.
+ * Outlets and their menus with a verdict per item and per condiment for the party.
  *
- * <p>Stub (BE-A2): fixed data from the demo story; BE-A3 reads the outlets from the POS, BE-A4 the menu with
- * verdicts from the allergen engine.
+ * <p>The menu comes from the POS, cached per outlet for {@link #MENU_TTL}; verdicts, "for whom" and safe
+ * alternatives come from the allergen engine with the reservation's party. Outlets are fixed data until BE-A3.
  */
 @Service
 public class MenuService {
 
-    private static final String DEMO_RESERVATION_ID = "R-203844";
+    private static final Logger log = LoggerFactory.getLogger(MenuService.class);
 
-    private static final DangerFor MISHA_PEANUTS = new DangerFor(
-            UUID.fromString("518a0000-0000-4000-8000-000000000003"), "Misha", Allergen.PEANUTS, Severity.SEVERE);
-    private static final DangerFor ANNA_MILK = new DangerFor(
-            UUID.fromString("518a0000-0000-4000-8000-000000000002"), "Anna", Allergen.MILK, Severity.INTOLERANCE);
+    /** Reference data is cached for 5 minutes ({@code BACKEND.md} §5.2). */
+    static final Duration MENU_TTL = Duration.ofMinutes(5);
+
+    /** Staff screens are in English. */
+    private static final String LANGUAGE = "en";
 
     private static final List<Outlet> OUTLETS = List.of(
             new Outlet(1, "Main Restaurant", OutletKind.RESTAURANT, List.of("T1", "T2", "T3", "T4", "T5", "T6")),
@@ -36,34 +52,18 @@ public class MenuService {
             new Outlet(3, "Room Service", OutletKind.ROOM_SERVICE, List.of()),
             new Outlet(4, "Pool Bar", OutletKind.BAR, List.of("P1", "P2", "P3", "P4", "P5", "P6")));
 
-    private static final String THAI = "Thai classics";
-    private static final String KIDS = "Kids";
-    private static final String DESSERTS = "Desserts";
-    private static final String DRINKS = "Drinks";
+    private final PosGateway pos;
+    private final PassportService passports;
+    private final AllergenEngine engine;
+    private final Clock clock;
+    private final Map<Integer, CachedMenu> cache = new ConcurrentHashMap<>();
 
-    /** Verdicts for the Kuznetsov party (room 518) once Anna's milk intolerance is on her card (demo step 2). */
-    private static final List<MenuItem> DEMO_MENU = List.of(
-            item("4101", "Chicken satay", THAI, 220, List.of(Allergen.PEANUTS),
-                    Verdict.DANGER, List.of(MISHA_PEANUTS), List.of("4104")),
-            item("4102", "Som tam", THAI, 180, List.of(Allergen.PEANUTS, Allergen.FISH),
-                    Verdict.DANGER, List.of(MISHA_PEANUTS), List.of("4104")),
-            item("4103", "Pad thai", THAI, 240, List.of(Allergen.PEANUTS, Allergen.EGGS, Allergen.FISH),
-                    Verdict.DANGER, List.of(MISHA_PEANUTS), List.of("4104")),
-            item("4104", "Spring rolls", THAI, 160, List.of(Allergen.GLUTEN, Allergen.SOYBEANS),
-                    Verdict.SAFE, List.of(), List.of()),
-            item("4201", "Kids nuggets", KIDS, 190, List.of(Allergen.GLUTEN, Allergen.EGGS),
-                    Verdict.SAFE, List.of(), List.of()),
-            item("4301", "Coconut ice cream", DESSERTS, 120, List.of(),
-                    Verdict.SAFE, List.of(), List.of()),
-            item("4401", "Thai iced tea", DRINKS, 110, List.of(Allergen.MILK),
-                    Verdict.WARNING, List.of(ANNA_MILK), List.of("4402")),
-            new MenuItem("4402", "Espresso", DRINKS, BigDecimal.valueOf(90), List.of(),
-                    Verdict.SAFE, List.of(), List.of(),
-                    List.of(new CondimentGroup("740", "Milk", 0, 1, List.of(
-                            new CondimentOption("7401", "Whole milk", BigDecimal.ZERO, List.of(Allergen.MILK),
-                                    Verdict.WARNING, List.of(ANNA_MILK)),
-                            new CondimentOption("7402", "Oat milk", BigDecimal.valueOf(30), List.of(),
-                                    Verdict.SAFE, List.of()))))));
+    MenuService(PosGateway pos, PassportService passports, AllergenEngine engine, Clock clock) {
+        this.pos = pos;
+        this.passports = passports;
+        this.engine = engine;
+        this.clock = clock;
+    }
 
     public List<Outlet> outlets() {
         return OUTLETS;
@@ -75,34 +75,88 @@ public class MenuService {
     }
 
     /**
-     * The same menu for every outlet. The demo reservation gets its verdicts; a walk-in (no reservation) or any
-     * other reservation gets {@code UNKNOWN}: allergens only, nothing matched.
+     * The outlet's menu with verdicts for the reservation's party. Without a reservation (walk-in) every verdict is
+     * {@code UNKNOWN}: allergens only, nothing matched.
      */
     public List<MenuItem> menu(int rvc, String reservationId) {
-        if (DEMO_RESERVATION_ID.equals(reservationId)) {
-            return DEMO_MENU;
+        List<MenuItem> items = posMenu(rvc);
+        if (reservationId == null || reservationId.isBlank()) {
+            return items;
         }
-        return DEMO_MENU.stream().map(MenuService::walkInItem).toList();
+        List<PartyMember> party = passports.party(reservationId).members();
+        List<MenuCandidate> candidates = items.stream().map(MenuService::candidate).toList();
+        return items.stream().map(item -> withVerdicts(item, party, candidates)).toList();
     }
 
-    private static MenuItem item(String code, String name, String group, int price, List<Allergen> allergens,
-                                 Verdict verdict, List<DangerFor> dangerFor, List<String> safeAlternatives) {
-        return new MenuItem(code, name, group, BigDecimal.valueOf(price), allergens, verdict, dangerFor,
-                safeAlternatives, List.of());
+    /** The walk-in menu, read from the POS at most once per {@link #MENU_TTL}. */
+    private List<MenuItem> posMenu(int rvc) {
+        Instant now = clock.instant();
+        CachedMenu cached = cache.get(rvc);
+        if (cached != null && now.isBefore(cached.loadedAt().plus(MENU_TTL))) {
+            return cached.items();
+        }
+        List<MenuItem> items = pos.menu(rvc, LANGUAGE).stream()
+                .filter(item -> item.getType() != MenuItemDTO.TypeEnum.DISCOUNT)
+                .map(MenuService::walkInItem)
+                .toList();
+        cache.put(rvc, new CachedMenu(now, items));
+        log.info("Menu of rvc {} read from the POS: {} items", rvc, items.size());
+        return items;
     }
 
-    private static MenuItem walkInItem(MenuItem item) {
-        return new MenuItem(item.code(), item.name(), item.group(), item.price(), item.allergens(), Verdict.UNKNOWN,
-                List.of(), List.of(), item.condimentGroups().stream().map(MenuService::walkInGroup).toList());
+    private MenuItem withVerdicts(MenuItem item, List<PartyMember> party, List<MenuCandidate> candidates) {
+        ItemCheck check = engine.checkItem(party, item.allergens());
+        return new MenuItem(item.code(), item.name(), item.group(), item.price(), item.allergens(), check.verdict(),
+                check.dangerFor(), engine.safeAlternatives(candidates, party, candidate(item)),
+                item.condimentGroups().stream().map(group -> withVerdicts(group, party)).toList());
     }
 
-    private static CondimentGroup walkInGroup(CondimentGroup group) {
+    private CondimentGroup withVerdicts(CondimentGroup group, List<PartyMember> party) {
         return new CondimentGroup(group.code(), group.name(), group.minSelect(), group.maxSelect(),
-                group.options().stream().map(MenuService::walkInOption).toList());
+                group.options().stream().map(option -> {
+                    ItemCheck check = engine.checkItem(party, option.allergens());
+                    return new CondimentOption(option.code(), option.name(), option.price(), option.allergens(),
+                            check.verdict(), check.dangerFor());
+                }).toList());
     }
 
-    private static CondimentOption walkInOption(CondimentOption option) {
-        return new CondimentOption(option.code(), option.name(), option.price(), option.allergens(), Verdict.UNKNOWN,
-                List.of());
+    private static MenuCandidate candidate(MenuItem item) {
+        return new MenuCandidate(item.code(), item.group(), Set.copyOf(item.allergens()));
+    }
+
+    private static MenuItem walkInItem(MenuItemDTO item) {
+        List<CondimentGroup> groups = orEmpty(item.getCondiments()).stream().map(MenuService::walkInGroup).toList();
+        String group = item.getGroupL2() != null ? item.getGroupL2() : item.getGroupL1();
+        return new MenuItem(item.getCode(), item.getName(), group, orZero(item.getPrice()),
+                allergens(item.getAllergens()), Verdict.UNKNOWN, List.of(), List.of(), groups);
+    }
+
+    private static CondimentGroup walkInGroup(CondimentGroupDTO group) {
+        List<CondimentOption> options = orEmpty(group.getItems()).stream().map(MenuService::walkInOption).toList();
+        return new CondimentGroup(group.getCode(), group.getName(), Objects.requireNonNullElse(group.getMinSelect(), 0),
+                Objects.requireNonNullElse(group.getMaxSelect(), options.size()), options);
+    }
+
+    private static CondimentOption walkInOption(CondimentOptionDTO option) {
+        return new CondimentOption(option.getCode(), option.getName(), orZero(option.getPrice()),
+                allergens(option.getAllergens()), Verdict.UNKNOWN, List.of());
+    }
+
+    private static List<Allergen> allergens(List<com.hackathon.team4.sandbox.generated.model.Allergen> allergens) {
+        return orEmpty(allergens).stream()
+                .filter(Objects::nonNull)
+                .map(allergen -> Allergen.valueOf(allergen.name()))
+                .toList();
+    }
+
+    private static <T> List<T> orEmpty(List<T> list) {
+        return list == null ? List.of() : list;
+    }
+
+    private static BigDecimal orZero(BigDecimal price) {
+        return price == null ? BigDecimal.ZERO : price;
+    }
+
+    private record CachedMenu(Instant loadedAt, List<MenuItem> items) {
     }
 }
