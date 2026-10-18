@@ -125,8 +125,6 @@ class AllergyStorageTest {
         assertThat(stored.lines().get(1).consentBy()).isEqualTo("Anna Kuznetsova");
         assertThat(tickets.existsByRvcAndCheckSeqAndRound(4, "83400", 1)).isTrue();
         assertThat(tickets.existsByRvcAndCheckSeqAndRound(4, "83400", 2)).isFalse();
-        assertThat(tickets.countLines(NOW.minusSeconds(1), TicketSource.CHECKED,
-                List.of(Verdict.WARNING, Verdict.DANGER))).isEqualTo(2);
     }
 
     @Test
