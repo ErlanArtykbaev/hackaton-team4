@@ -133,7 +133,7 @@ Blocked for more than 15 minutes: say so at once.
 - **Dev key: 10 requests per second for the team.** `SANDBOX_RATE_LIMIT=2` in every developer's `backend/.env`. The demo laptop uses the App key with the default 8.
 - **Hotel data is shared.** Work only on your reserved rooms; only the tech lead resets, after telling the team.
 - **No language model** in this topic.
-- **Demo laptop:** TODO (whose).
+- **Demo laptop:** Sergey's; a clean clone of `main` next to the working checkout.
 
 | Who | Rooms (reservation) |
 |---|---|
