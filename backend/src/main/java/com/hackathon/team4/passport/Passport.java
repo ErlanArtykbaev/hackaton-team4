@@ -74,7 +74,12 @@ public class Passport {
 
     /** Adds a new member at the end of the list; the caller fills it with {@link PassportMember#update}. */
     public PassportMember addMember(Instant now) {
-        PassportMember member = new PassportMember(UUID.randomUUID(), this, members.size(), now);
+        return addMember(UUID.randomUUID(), now);
+    }
+
+    /** Adds a member with a known id, e.g. the default primary guest shown before the first save. */
+    public PassportMember addMember(UUID id, Instant now) {
+        PassportMember member = new PassportMember(id, this, members.size(), now);
         members.add(member);
         return member;
     }

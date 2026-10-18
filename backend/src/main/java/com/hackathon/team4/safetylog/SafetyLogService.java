@@ -1,88 +1,78 @@
 package com.hackathon.team4.safetylog;
 
-import com.hackathon.team4.allergen.Allergen;
-import com.hackathon.team4.allergen.Severity;
-import com.hackathon.team4.safetylog.dto.LogEntry;
-import com.hackathon.team4.safetylog.dto.SafetyLogSummary;
-import java.time.OffsetDateTime;
-import java.time.ZoneOffset;
+import java.time.Clock;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.List;
 import java.util.Locale;
-import java.util.UUID;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
- * The safety log: proof of what was ordered, confirmed and consented to, searchable by room or last name.
- *
- * <p>Stub (BE-A2): fixed entries from the demo story for room 518, one or more per type; BE-B4 replaces them with
- * the stored log.
+ * The append-only safety log: what was ordered, confirmed and consented, and what changed in the passports, so the
+ * hotel can prove after an incident that a dish was ordered with the guest's explicit consent.
  */
 @Service
 public class SafetyLogService {
 
-    private static final int MIN_LAST_NAME_PREFIX = 2;
-    private static final String POOL_BAR = "Pool Bar";
+    private static final Logger log = LoggerFactory.getLogger(SafetyLogService.class);
 
-    private static final List<StubEntry> ENTRIES = List.of(
-            entry(6, at(18, 50), LogEntryType.POS_ORDER_UNCHECKED, 4, POOL_BAR, "Misha", "Som tam",
-                    Allergen.PEANUTS, Severity.SEVERE, "B01",
-                    "Typed straight into the POS, not checked at ordering"),
-            entry(5, at(18, 45), LogEntryType.GUEST_CONSENT, 4, POOL_BAR, "Anna", "Thai iced tea",
-                    Allergen.MILK, Severity.INTOLERANCE, "W02",
-                    "Anna Kuznetsova: I know it contains MILK and I order it"),
-            entry(4, at(18, 45), LogEntryType.WAITER_CONFIRMED, 4, POOL_BAR, "Misha", "Chicken satay",
-                    Allergen.PEANUTS, Severity.SEVERE, "W02",
-                    "Ordered for Mikhail; Misha (severe) is at the table"),
-            entry(3, at(18, 45), LogEntryType.ORDER_PLACED, 4, POOL_BAR, null, null,
-                    null, null, "W02",
-                    "Check 1017 sent: 5 lines, 2 with allergens"),
-            entry(2, at(18, 42), LogEntryType.PASSPORT_UPDATED, 4, POOL_BAR, "Anna", null,
-                    Allergen.MILK, Severity.INTOLERANCE, "W02",
-                    "Added MILK (intolerance) for Anna after asking the guest"),
-            entry(1, at(15, 10), LogEntryType.PASSPORT_UPDATED, null, null, "Misha", null,
-                    Allergen.PEANUTS, Severity.SEVERE, "Front desk",
-                    "Passport saved at check-in: Mikhail, Anna, Misha (7)"));
+    /** The summary covers the last day: one shift view, no hotel calendar needed. */
+    static final Duration SUMMARY_PERIOD = Duration.ofHours(24);
 
-    private static final SafetyLogSummary SUMMARY = new SafetyLogSummary(1, 2, 1, 1, 1);
+    private final SafetyLogRepository entries;
+    private final Clock clock;
 
-    /** All filters are optional; {@code query} is a room number (exact) or a last-name prefix. Newest first. */
-    public List<LogEntry> search(String query, Integer rvc, LogEntryType type) {
-        return ENTRIES.stream()
-                .filter(stub -> matches(stub, query))
-                .map(StubEntry::entry)
-                .filter(entry -> rvc == null || rvc.equals(entry.rvc()))
-                .filter(entry -> type == null || type == entry.type())
-                .toList();
+    SafetyLogService(SafetyLogRepository entries, Clock clock) {
+        this.entries = entries;
+        this.clock = clock;
     }
 
-    public SafetyLogSummary summary() {
-        return SUMMARY;
+    /** Starts an entry stamped with the current time. */
+    public SafetyLogEntry.Builder entry(LogEntryType type) {
+        return SafetyLogEntry.of(type, clock.instant());
     }
 
-    private static boolean matches(StubEntry stub, String query) {
-        if (query == null || query.isBlank()) {
-            return true;
+    @Transactional
+    public SafetyLogEntry append(SafetyLogEntry entry) {
+        SafetyLogEntry saved = entries.save(entry);
+        log.info("Safety log {} for reservation {} by {}", saved.type(), saved.reservationId(), saved.actor());
+        return saved;
+    }
+
+    /**
+     * Newest first. {@code query}: a room number (digits, exact) or a fragment of the guest's or member's name;
+     * blank means everything. Every filter is optional.
+     */
+    @Transactional(readOnly = true)
+    public List<SafetyLogEntry> search(String query, Integer rvc, LogEntryType type) {
+        String trimmed = query == null ? "" : query.trim();
+        if (trimmed.isEmpty()) {
+            return entries.search(rvc, type, null, null);
         }
-        String text = query.strip();
-        if (text.chars().allMatch(Character::isDigit)) {
-            return text.equals(stub.entry().roomNumber());
+        if (trimmed.chars().allMatch(Character::isDigit)) {
+            return entries.search(rvc, type, trimmed, null);
         }
-        return text.length() >= MIN_LAST_NAME_PREFIX
-                && stub.lastName().toLowerCase(Locale.ROOT).startsWith(text.toLowerCase(Locale.ROOT));
+        return entries.search(rvc, type, null, trimmed.toLowerCase(Locale.ROOT));
     }
 
-    private static StubEntry entry(int number, OffsetDateTime at, LogEntryType type, Integer rvc, String outletName,
-                                   String memberName, String item, Allergen allergen, Severity severity, String actor,
-                                   String statement) {
-        UUID id = UUID.fromString("10600000-0000-4000-8000-00000000000" + number);
-        return new StubEntry("Kuznetsov", new LogEntry(id, at, type, rvc, outletName, "R-203844", "518", memberName,
-                item, allergen, severity, actor, statement));
+    @Transactional(readOnly = true)
+    public Counts summary() {
+        Instant since = clock.instant().minus(SUMMARY_PERIOD);
+        long confirmations = entries.countByAtAfterAndType(since, LogEntryType.WAITER_CONFIRMED);
+        long consents = entries.countByAtAfterAndType(since, LogEntryType.GUEST_CONSENT);
+        return new Counts(
+                entries.countByAtAfterAndType(since, LogEntryType.ORDER_PLACED),
+                // every tablet line with an allergen at the table needs exactly one confirmation or consent
+                confirmations + consents,
+                confirmations,
+                consents,
+                entries.countByAtAfterAndType(since, LogEntryType.POS_ORDER_UNCHECKED));
     }
 
-    private static OffsetDateTime at(int hour, int minute) {
-        return OffsetDateTime.of(2026, 10, 18, hour, minute, 0, 0, ZoneOffset.ofHours(7));
-    }
-
-    private record StubEntry(String lastName, LogEntry entry) {
+    public record Counts(long ordersChecked, long linesWithAllergens, long waiterConfirmations, long guestConsents,
+            long uncheckedPosOrders) {
     }
 }
