@@ -199,6 +199,7 @@ export interface components {
     }
     PassportUpdateRequest: {
       members: components['schemas']['PassportMemberRequest'][]
+      notes?: string
       updatedBy: string
       /** @enum {string} */
       source: 'FRONT_DESK' | 'WAITER'
