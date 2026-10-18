@@ -46,6 +46,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 /**
@@ -106,9 +107,15 @@ public class OrderService {
         String outletName = outlets.outletName(order.rvc()).orElse(null);
         // A walk-in's round reaches the kitchen through the POS event feed, as a check without a reservation.
         if (party != null) {
-            kitchen.recordCheckedRound(new Round(order.rvc(), outletName, check.getCheckNumber(), check.getCheckSeq(),
-                    round, order.table(), party.reservationId(), sentAt(check, round),
-                    lines.stream().map(OrderService::roundLine).toList()));
+            Round checked = new Round(order.rvc(), outletName, check.getCheckNumber(), check.getCheckSeq(), round,
+                    order.table(), party.reservationId(), sentAt(check, round),
+                    lines.stream().map(OrderService::roundLine).toList());
+            try {
+                kitchen.recordCheckedRound(checked);
+            } catch (DataIntegrityViolationException raced) {
+                // The POS event feed recorded the same round between the two steps; the retry replaces its ticket.
+                kitchen.recordCheckedRound(checked);
+            }
         }
         logOrder(order, party, outletName, check, lines);
         log.info("Order by {} sent to rvc {} as check {} round {} for reservation {}: {} lines", order.waiterCode(),
