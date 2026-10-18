@@ -90,7 +90,7 @@ Runs in a separate session and worktree, branch `claude/be-a4-2ece74`, in parall
 3. `POST /api/orders` → POS check linked to the reservation (`PosGateway.openCheck`), then `KitchenTicketService.recordCheckedRound` with `checkSeq` and round from the POS answer (same key as the BE-A5 feed), then `ORDER_PLACED`, `WAITER_CONFIRMED`, `GUEST_CONSENT` log entries, one per line.
 4. Live check on room 633 or 822, `./mvnw verify`, rebase onto `main`, BE-A4 → `DONE`.
 
-## BE-A5 — live kitchen feed and stream events
+## BE-A5 — live kitchen feed and stream events (DONE)
 
 BE-B publishes `PassportChanged`, `TicketChanged`, `LogAppended` (inside the transaction) and has `KitchenTicketService.recordPosRound(Round)`; BE-A5 connects them to the screens and to the POS feed.
 
