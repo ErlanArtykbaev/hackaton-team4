@@ -71,7 +71,7 @@ Statuses: `TODO` · `DOING` · `DONE` · `CUT`. Each person edits only their own
 | BE-A6 | `scripts/pos-order.mjs` (bartender order straight into the POS, PIN from `.env`) + demo prep steps in `prepare-demo.mjs` | 4 | — | TODO |
 
 Progress (details: `BE-A-PLAN.md`):
-- BE-A2, steps 1–5 of 7: shared types in `allergen`; stubs for reservations, arrivals, outlets, menu, orders; passport, kitchen and safety-log controllers wired to Erlan's services; `GET /api/stream` open (events follow in BE-A5). `PUT /api/passports/{id}` takes an optional `notes`.
+- BE-A2, steps 1–6 of 7: shared types in `allergen`; stubs for reservations, arrivals, outlets, menu, orders; passport, kitchen and safety-log controllers wired to Erlan's services; `GET /api/stream` open (events follow in BE-A5); contract tests green. Next: push. `PUT /api/passports/{id}` takes an optional `notes`.
 
 ### BE-B — Erlan
 
