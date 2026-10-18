@@ -7,6 +7,7 @@ import com.hackathon.team4.sandbox.generated.model.EventListResponse;
 import java.time.Clock;
 import java.time.Instant;
 import java.util.List;
+import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationEventPublisher;
@@ -22,6 +23,7 @@ import org.springframework.stereotype.Component;
 public class SandboxEventPoller {
 
     private static final Logger log = LoggerFactory.getLogger(SandboxEventPoller.class);
+    private static final int HISTORY_PAGE = 500;
 
     private final PlatformGateway platform;
     private final EventCursorRepository cursors;
@@ -58,7 +60,12 @@ public class SandboxEventPoller {
      * tests call it directly.
      */
     public int pollOnce() {
-        EventCursor cursor = cursors.findById(EventCursor.FEED).orElseGet(() -> new EventCursor(EventCursor.FEED, 0));
+        Optional<EventCursor> stored = cursors.findById(EventCursor.FEED);
+        if (stored.isEmpty() && properties.events().skipHistory()) {
+            skipHistory();
+            return 0;
+        }
+        EventCursor cursor = stored.orElseGet(() -> new EventCursor(EventCursor.FEED, 0));
         int limit = properties.events().batchSize();
         int published = 0;
         while (true) {
@@ -77,6 +84,26 @@ public class SandboxEventPoller {
                 return published;
             }
         }
+    }
+
+    /** Moves a new cursor to the end of the feed without publishing anything: the feed outlives hotel resets. */
+    private void skipHistory() {
+        EventCursor cursor = new EventCursor(EventCursor.FEED, 0);
+        int limit = HISTORY_PAGE;
+        int skipped = 0;
+        while (true) {
+            EventListResponse batch = platform.events(cursor.nextSince(), limit, null);
+            int size = batch.getElements() == null ? 0 : batch.getElements().size();
+            skipped += size;
+            if (batch.getNextSince() != null) {
+                cursor.moveTo(batch.getNextSince());
+            }
+            if (size < limit) {
+                break;
+            }
+        }
+        cursors.save(cursor);
+        log.info("Skipped {} events of the feed history; live from position {}", skipped, cursor.nextSince());
     }
 
     private boolean publishIfNew(Event event) {

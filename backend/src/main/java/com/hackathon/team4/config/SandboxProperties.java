@@ -29,6 +29,7 @@ public record SandboxProperties(
     public record Retry(@Min(1) int maxAttempts, @NotNull Duration initialBackoff) {
     }
 
-    public record Events(boolean enabled, @NotNull Duration pollInterval, @Min(1) int batchSize) {
+    /** {@code skipHistory}: with no stored cursor (fresh database), start at the end of the feed and publish nothing older. */
+    public record Events(boolean enabled, @NotNull Duration pollInterval, @Min(1) int batchSize, boolean skipHistory) {
     }
 }

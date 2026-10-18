@@ -44,6 +44,8 @@ sandbox:
     enabled: ${SANDBOX_EVENTS_ENABLED:true}
     poll-interval: PT3S
     batch-size: 100
+    # The feed keeps its history across hotel resets: a fresh database would replay every old round on the kitchen screen.
+    skip-history: ${SANDBOX_EVENTS_SKIP_HISTORY:false}
 
 management:
   endpoints:

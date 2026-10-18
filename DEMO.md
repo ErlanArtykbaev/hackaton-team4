@@ -24,7 +24,7 @@ Story: Kuznetsov family, room 518 (R-203844), Pool Bar (rvc 4). Each step proves
 
 | Time | Action | Who |
 |---|---|---|
-| 15:15 | Feature freeze. Demo laptop = **Sergey's laptop** on the projector: clean clone of `main`, `backend/.env` with the **App key**, default rate limit | Sergey |
+| 15:15 | Feature freeze. Demo laptop = **Sergey's laptop** on the projector: clean clone of `main`, `backend/.env` with the **App key**, default rate limit and `SANDBOX_EVENTS_SKIP_HISTORY=true` (a fresh database must not replay old rounds on the kitchen screen) | Sergey |
 | 15:15 | One full run, screen-recorded: the fallback video | Nikolai |
 | 15:15–15:35 | Two timed rehearsals; reset the hotel after each (once per minute, takes up to 30 s) | all |
 | 15:40 | Final reset, below | Sergey |
