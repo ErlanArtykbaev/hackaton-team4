@@ -1,6 +1,11 @@
 // Visual vocabulary shared by every staff screen: allergen icons, severity and verdict colours.
-// The codes are the values of the contract enums (PLAN.md); once `api/schema.d.ts` is generated (FE-B1)
-// the maps below are checked against the generated enums.
+// The codes come from the generated contract (`api/schema.d.ts`); a new enum value fails the type check here.
+import type { components } from '../api/schema'
+
+type Schemas = components['schemas']
+export type AllergenCode = NonNullable<Schemas['MemberAllergy']['allergen']>
+export type SeverityCode = NonNullable<Schemas['MemberAllergy']['severity']>
+export type VerdictCode = NonNullable<Schemas['MenuItem']['verdict']>
 
 /** The 14 EU allergens as the sandbox names them, with an icon and a label for staff. */
 export const ALLERGEN_META = {
@@ -18,13 +23,9 @@ export const ALLERGEN_META = {
   SULPHITES: { icon: '🍷', label: 'Sulphites' },
   LUPIN: { icon: '🌸', label: 'Lupin' },
   MOLLUSCS: { icon: '🦪', label: 'Molluscs' },
-} as const
+} as const satisfies Record<AllergenCode, { icon: string; label: string }>
 
-export type AllergenCode = keyof typeof ALLERGEN_META
 export const ALLERGEN_CODES = Object.keys(ALLERGEN_META) as AllergenCode[]
-
-export type SeverityCode = 'INTOLERANCE' | 'SEVERE'
-export type VerdictCode = 'SAFE' | 'WARNING' | 'DANGER' | 'UNKNOWN'
 
 type Mark = { color: string; variant: 'filled' | 'light'; label: string }
 

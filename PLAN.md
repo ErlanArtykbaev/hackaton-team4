@@ -97,8 +97,8 @@ Progress (details: `BE-A-PLAN.md`):
 | ID | Task | Demo step | Depends on | Status |
 |---|---|---|---|---|
 | FE-B0 | Design in `shared/`: chips with icons for the 14 allergens, severity and verdict colours, party badge | all | FE-A1 | DONE |
-| FE-B1 | Generated API types (`npm run gen:api`) + `useStream` hook for `/api/stream` + error messages by `code` | — | BE-A2 | TODO |
-| FE-B2 | Front desk: arrivals worklist, search, a card per member (name, age, allergens, severity), save with "PMS updated" | 1 | FE-B1 | TODO |
+| FE-B1 | Generated API types (`npm run gen:api`) + `useStream` hook for `/api/stream` + error messages by `code` | — | BE-A2 | DONE |
+| FE-B2 | Front desk: arrivals worklist, search, a card per member (name, age, allergens, severity), save with "PMS updated" | 1 | FE-B1 | DOING |
 | FE-B3 | Manager: search by room or last name, timeline with consent records highlighted, KPIs, live via SSE | 5 | FE-B1 | TODO |
 | FE-B4 | Playwright happy path (after 14:30), screen recording at 15:15 | all | UI stable | TODO |
 | FE-B5 | Stretch: guest passport page by QR | — | everything else DONE | TODO |
